@@ -6,6 +6,8 @@ namespace Sol
     {
         private IStatsService _statsService;
         private IPlayerContext _context;
+        private IGroundChecker _groundChecker;
+        
         private Transform _cameraTransform;
         
         [SerializeField] private float _rotationSpeed = 10f;
@@ -24,12 +26,23 @@ namespace Sol
         {
            _context = context;
            _statsService = context.GetService<IStatsService>();
+           _groundChecker = context.GetService<IGroundChecker>();
+           
            _cameraTransform = Camera.main.transform;
         }
 
         public bool CanBeActivated()
         {
-            throw new System.NotImplementedException();
+            // Can walk if:
+            // 1. On the ground (using ground checker)
+            // 2. Not in water or other special zones
+            // 3. Not in a state that prevents walking (stunned, etc.)
+            bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
+                _context.GetStateValue<bool>("IsGrounded", false);
+            bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
+            bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
+        
+            return isGrounded && canMove && !isInWater;
         }
 
         public void ProcessMovement()
