@@ -23,6 +23,7 @@ namespace Sol
         private Camera _mainCamera;
 
         [HideInInspector]public bool _moveInputDetected = false;
+        private Dictionary<string, object> _stateValues = new Dictionary<string, object>();
         private Vector2 _moveInput;
         
         private Dictionary<Type, object> _services = new Dictionary<Type, object>();
@@ -38,7 +39,7 @@ namespace Sol
             if(_playerRb == null) _playerRb = GetComponent<Rigidbody>();
             
             RegisterService<IStatsService>(GetComponent<IStatsService>());
-            
+            RegisterService<IGroundChecker>(GetComponent<GroundChecker>());
             
             InitializeComponents();
         }
@@ -174,12 +175,16 @@ namespace Sol
 
         public void SetStateValue<T>(string key, T value)
         {
-            throw new System.NotImplementedException();
+            _stateValues[key] = value;
         }
 
         public T GetStateValue<T>(string key, T defaultValue)
         {
-            throw new System.NotImplementedException();
+            if (_stateValues.TryGetValue(key, out object value) && value is T typedValue)
+            {
+                return typedValue;
+            }
+            return defaultValue;
         }
     }
 }

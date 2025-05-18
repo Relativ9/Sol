@@ -907,6 +907,7 @@ GameObject:
   - component: {fileID: 2100861469}
   - component: {fileID: 2100861473}
   - component: {fileID: 2100861475}
+  - component: {fileID: 2100861479}
   - component: {fileID: 2100861476}
   - component: {fileID: 2100861478}
   - component: {fileID: 2100861477}
@@ -1129,6 +1130,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerStats: {fileID: 11400000, guid: 6b8b5e174e3a426469cb0623ee87618d, type: 2}
+--- !u!114 &2100861479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100861468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 259c8e92afddc4a44bd0a12c3ab0b89b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _checkPoint: {fileID: 0}
+  _checkRadius: 0.2
+  _checkDistance: 0.3
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _useSphereCast: 1
+  _debugDraw: 0
+  _groundedBufferTime: 0.1
+  _coyoteTime: 0.15
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
