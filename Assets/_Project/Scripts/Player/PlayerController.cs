@@ -23,23 +23,28 @@ namespace Sol
         private Camera _mainCamera;
 
         [HideInInspector]public bool _moveInputDetected = false;
+        [HideInInspector] public bool _runInputDetected = false;
+        [HideInInspector] public bool _jumpInputDetected = false;
         private Dictionary<string, object> _stateValues = new Dictionary<string, object>();
         private Vector2 _moveInput;
+        private Vector2 _lookInput; 
         
         private Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private List<IPlayerComponent> _allComponents = new List<IPlayerComponent>();
         private List<IBaseMovement> _baseMovementState = new List<IBaseMovement>();
         private IBaseMovement _currentMovementState;
-        
 
-    
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        [SerializeField] private Vector3 _debugVelDisplay;
+        [SerializeField] private Vector2 _debugLookDisplay;
+
         void Awake()
         {
             if(_playerRb == null) _playerRb = GetComponent<Rigidbody>();
             
             RegisterService<IStatsService>(GetComponent<IStatsService>());
             RegisterService<IGroundChecker>(GetComponent<GroundChecker>());
+            RegisterService<IAnimationController>(GetComponent<PlayerAnimationController>());
+            RegisterService<ICameraController>(GetComponent<CameraController>());
             
             InitializeComponents();
         }
@@ -48,6 +53,7 @@ namespace Sol
         {
 
             DetermineActiveMovementState();
+            _debugVelDisplay = _playerRb.linearVelocity;
         }
 
         private void DetermineActiveMovementState()
@@ -130,6 +136,35 @@ namespace Sol
             CheckInputState();
         }
         
+        public void OnLook(InputAction.CallbackContext context)
+        {
+            _lookInput = context.ReadValue<Vector2>();
+        }
+
+        public void OnRun(InputAction.CallbackContext context)
+        {
+            // For a button action, we check if it's pressed or released
+            _runInputDetected = context.ReadValueAsButton();
+            
+            // Update the state value so other components can access it
+            SetStateValue("IsRunning", _runInputDetected);
+            
+            if (_debugVelDisplay != null)
+            {
+                Debug.Log($"Run input: {_runInputDetected}");
+            }
+        }
+        
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            _jumpInputDetected = context.ReadValueAsButton();
+            SetStateValue("IsJumping", _jumpInputDetected);
+        }
+
+        public bool IsRunning()
+        {
+            return _runInputDetected && _moveInputDetected;
+        }
         
         private void RegisterService<T>(T service) where T : class
         {
@@ -160,9 +195,14 @@ namespace Sol
             return _moveInput;
         }
 
-        public Vector3 GetCurrentVeolocity()
+        public Vector3 GetCurrentVelocity()
         {
             return _playerRb.linearVelocity;
+        }
+
+        public Vector2 GetLookInput()
+        {
+            return _lookInput;
         }
 
         public void ApplyMovement(Vector3 movement)
@@ -185,6 +225,16 @@ namespace Sol
                 return typedValue;
             }
             return defaultValue;
+        }
+
+        public bool GetRunInput()
+        {
+            return _runInputDetected;
+        }
+
+        public bool GetJumpInput()
+        {   
+            return _jumpInputDetected;
         }
     }
 }

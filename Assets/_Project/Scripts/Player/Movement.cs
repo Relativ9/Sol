@@ -4,116 +4,628 @@ namespace Sol
 {
     public class Movement : MonoBehaviour, IPlayerComponent, IBaseMovement
     {
-        private IStatsService _statsService;
-        private IPlayerContext _context;
-        private IGroundChecker _groundChecker;
+                [Header("Movement Settings")]
+        [SerializeField] private float _defaultSpeed = 3f;
+        [SerializeField] private float _defaultDeceleration = 20f;
+        [SerializeField] private bool _debugMovement = true;
         
-        private Transform _cameraTransform;
+        [Header("Running Settings")]
+        [SerializeField] private string _runModifierSourceId = "PlayerRunning"; // Unique ID for run modifier
+        [SerializeField] private float _speedTransitionRate = 5f; // How quickly to transition between speeds
         
+        [Header("Direction Modifiers")]
+        [SerializeField] private float _backwardSpeedMultiplier = 0.5f; // Multiplier for backward movement
+        
+        [Header("Rotation Settings")]
+        [SerializeField] private bool _rotateWithCamera = true;
         [SerializeField] private float _rotationSpeed = 10f;
-
-        private Vector3 _currentVelocity;
+        
+        // Dependencies
+        private IPlayerContext _context;
+        private IStatsService _statsService;
+        private IGroundChecker _groundChecker;
+        private ICameraController _cameraController;
+        private Rigidbody _rigidbody;
+        
+        // State
+        private Vector3 _moveDirection = Vector3.zero;
+        private Vector2 _rawInput = Vector2.zero;
         private bool _isActive;
-
-        // Update is called once per frame
-        void Update()
-        {
+        private bool _hasInput;
+        private bool _isRunning;
+        private float _currentSpeed; // Current interpolated speed
+        private bool _isMovingBackward;
+        private float _lastCameraYaw; // Store the last camera yaw to detect changes
         
-        }
-        
-
         public void Initialize(IPlayerContext context)
         {
-           _context = context;
-           _statsService = context.GetService<IStatsService>();
-           _groundChecker = context.GetService<IGroundChecker>();
-           
-           _cameraTransform = Camera.main.transform;
+            _context = context;
+            _statsService = context.GetService<IStatsService>();
+            _groundChecker = context.GetService<IGroundChecker>();
+            _cameraController = context.GetService<ICameraController>();
+            _rigidbody = GetComponent<Rigidbody>();
+            
+            if (_rigidbody == null)
+            {
+                Debug.LogError("No Rigidbody found on the GameObject. Deceleration won't work!");
+                _rigidbody = gameObject.AddComponent<Rigidbody>();
+            }
+            
+            // Use CameraController if available, otherwise fall back to main camera
+            if (_cameraController == null)
+            {
+                Debug.LogWarning("CameraController not found! Falling back to main camera.");
+            }
+            else
+            {
+                Debug.Log("Using CameraController for movement direction");
+                // Initialize last camera yaw
+                _lastCameraYaw = _cameraController.GetCameraYaw();
+            }
+            
+            _currentSpeed = _defaultSpeed;
+            
+            Debug.Log("Movement behavior initialized");
         }
-
+        
         public bool CanBeActivated()
         {
-            // Can walk if:
-            // 1. On the ground (using ground checker)
-            // 2. Not in water or other special zones
-            // 3. Not in a state that prevents walking (stunned, etc.)
             bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
-                _context.GetStateValue<bool>("IsGrounded", false);
+                            _context.GetStateValue<bool>("IsGrounded", false);
             bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
             bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
-        
+            
             return isGrounded && canMove && !isInWater;
         }
-
-        public void ProcessMovement()
+        
+        private void Update()
         {
             if (!_isActive) return;
-
-            Vector2 input = _context.GetMovementInput();
-            bool hasInput = input.magnitude > 0.01f;
-
-            float currentSpeed = _statsService.GetStat("moveSpeed");
-
-            Vector3 moveDirection = CalculateMoveDirection(input);
-
-            if (hasInput)
+            
+            // Always update rotation with camera, regardless of movement input
+            UpdateRotation();
+            
+            // Get input and calculate direction in Update for responsive controls
+            _rawInput = _context.GetMovementInput();
+            _hasInput = _rawInput.magnitude > 0.1f;
+            
+            // Check if moving backward
+            _isMovingBackward = _rawInput.y < -0.1f;
+            
+            // Check if running
+            bool wasRunning = _isRunning;
+            _isRunning = _context.GetRunInput() && _hasInput;
+            
+            // Update the context state
+            _context.SetStateValue("IsRunning", _isRunning);
+            _context.SetStateValue("IsMoving", _hasInput);
+            
+            // Store the raw input in the context for animation
+            _context.SetStateValue("MoveInputX", _rawInput.x);
+            _context.SetStateValue("MoveInputZ", _rawInput.y);
+            
+            // Calculate movement speed for animation blending (0 = idle, 0.5 = walk, 1.0 = run)
+            float animSpeed = _hasInput ? (_isRunning ? 1.0f : 0.5f) : 0.0f;
+            _context.SetStateValue("MovementSpeed", animSpeed);
+            
+            // Apply or remove running modifier when state changes
+            if (_isRunning != wasRunning && _statsService != null)
             {
-                RotateTowardsMoveDirection(moveDirection);
-
-                _currentVelocity = moveDirection * currentSpeed;
-            }
-            else //Look into a better method of breaking, this might not be ideal depending on how our state system ends up working
-            {
-                _currentVelocity = Vector3.Lerp(_currentVelocity, Vector3.zero, Time.deltaTime * 10f);
+                UpdateRunningState();
             }
             
-            Vector3 finalVelocity = new Vector3(_currentVelocity.x, _context.GetCurrentVeolocity().y, _currentVelocity.z);
-            _context.ApplyMovement(finalVelocity); //makes sure dependency inversion is respected and actually apply the forces in the controller.
-            
+            if (_hasInput)
+            {
+                _moveDirection = CalculateStrafingDirection(_rawInput);
+            }
         }
         
-        private Vector3 CalculateMoveDirection(Vector2 input)
+        private void UpdateRotation()
         {
-            // Convert input to world space direction based on camera orientation
-            Vector3 forward = _cameraTransform.forward;
-            Vector3 right = _cameraTransform.right;
-        
-            // Project vectors onto the horizontal plane
-            forward.y = 0;
-            right.y = 0;
-            forward.Normalize();
-            right.Normalize();
-        
-            // Combine directions based on input
-            return (forward * input.y + right * input.x).normalized;
+            if (!_rotateWithCamera || _cameraController == null) return;
+    
+            // Get the camera's yaw rotation
+            float currentYaw = _cameraController.GetCameraYaw();
+    
+            // Create rotation based on camera yaw
+            Quaternion targetRotation = Quaternion.Euler(0, currentYaw, 0);
+    
+            // Apply a small amount of smoothing to character rotation
+            // This makes the character rotation look natural without affecting camera control
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                _rotationSpeed * Time.deltaTime
+            );
         }
         
-        private void RotateTowardsMoveDirection(Vector3 moveDirection)
+        private void UpdateRunningState()
         {
-            if (moveDirection.magnitude > 0.1f)
-            {
-                // Calculate target rotation
-                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            if (_statsService == null) return;
             
-                // Smoothly rotate towards the target rotation
-                transform.rotation = Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    _rotationSpeed * Time.deltaTime
+            if (_isRunning)
+            {
+                // Get the run multiplier from stats
+                float runMultiplier = _statsService.GetStat("runMultiplier");
+                
+                // Create a running modifier
+                StatModifier runModifier = new StatModifier(
+                    ModifierType.Multiplicative,
+                    ModifierCatagory.Temporary,
+                    runMultiplier,
+                    this,
+                    -1f // No duration (will be removed manually)
+                );
+                
+                // Apply the modifier
+                _statsService.ApplyOrReplaceModifier(
+                    "moveSpeed", 
+                    runModifier, 
+                    ModifierCatagory.Temporary, 
+                    _runModifierSourceId
+                );
+                
+                if (_debugMovement)
+                {
+                    //Debug.Log($"Applied run modifier with multiplier: {runMultiplier}");
+                }
+            }
+            else
+            {
+                // Remove the running modifier
+                _statsService.RemoveModifiersFromSource("moveSpeed", _runModifierSourceId);
+                
+                if (_debugMovement)
+                {
+                    //Debug.Log("Removed run modifier");
+                }
+            }
+        }
+        
+        private void FixedUpdate()
+        {
+            if (_isActive)
+            {
+                ProcessMovement();
+            }
+        }
+        
+        public void ProcessMovement()
+        {
+            if (_rigidbody == null) return;
+            
+            // Get target speed from stats service
+            float targetSpeed = _statsService != null 
+                ? _statsService.GetStat("moveSpeed") 
+                : _defaultSpeed;
+            
+            float deceleration = _statsService != null 
+                ? _statsService.GetStat("deceleration") 
+                : _defaultDeceleration;
+            
+            // Smoothly transition to the target speed
+            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
+            
+            // Get current horizontal velocity
+            Vector3 currentVelocity = _rigidbody.linearVelocity;
+            Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
+            
+            if (_debugMovement)
+            {
+                //Debug.Log($"HasInput: {_hasInput}, IsRunning: {_isRunning}, IsBackward: {_isMovingBackward}, TargetSpeed: {targetSpeed}, CurrentSpeed: {_currentSpeed}");
+            }
+            
+            if (_hasInput)
+            {
+                // Apply backward movement multiplier if moving backward
+                float speedMultiplier = _isMovingBackward ? _backwardSpeedMultiplier : 1.0f;
+                
+                // Calculate target velocity based on input direction and interpolated speed
+                Vector3 targetVelocity = _moveDirection * (_currentSpeed * speedMultiplier);
+                
+                // Apply the new velocity directly to the rigidbody
+                _rigidbody.linearVelocity = new Vector3(
+                    targetVelocity.x,
+                    currentVelocity.y,
+                    targetVelocity.z
                 );
             }
+            else if (horizontalVelocity.magnitude > 0.1f)
+            {
+                // Calculate how much to reduce velocity this frame
+                float reductionAmount = deceleration * Time.fixedDeltaTime;
+                float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - reductionAmount);
+                
+                if (newMagnitude > 0.1f)
+                {
+                    // Apply reduced velocity in the same direction
+                    Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
+                    
+                    _rigidbody.linearVelocity = new Vector3(
+                        deceleratedVelocity.x,
+                        currentVelocity.y,
+                        deceleratedVelocity.z
+                    );
+                }
+                else
+                {
+                    // Below threshold, stop horizontal movement completely
+                    _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
+                }
+            }
         }
-
+        
+        private Vector3 CalculateStrafingDirection(Vector2 input)
+        {
+            // If we have a camera controller, use it
+            if (_cameraController != null)
+            {
+                // Get camera forward and right vectors from the camera controller
+                Vector3 forward = _cameraController.GetCameraForward();
+                Vector3 right = _cameraController.GetCameraRight();
+                
+                // Project vectors onto the horizontal plane (ignore Y component)
+                forward.y = 0f;
+                right.y = 0f;
+                
+                // Normalize to ensure consistent movement speed
+                if (forward.magnitude > 0.01f) forward.Normalize();
+                if (right.magnitude > 0.01f) right.Normalize();
+                
+                // Calculate direction based on input
+                Vector3 direction = (forward * input.y + right * input.x);
+                
+                // Normalize final direction
+                if (direction.magnitude > 0.01f)
+                {
+                    return direction.normalized;
+                }
+                
+                return Vector3.zero;
+            }
+            
+            // Fallback to using the main camera if no camera controller
+            Camera mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                // Get camera forward and right vectors
+                Vector3 forward = mainCamera.transform.forward;
+                Vector3 right = mainCamera.transform.right;
+                
+                // Project vectors onto the horizontal plane (ignore Y component)
+                forward.y = 0f;
+                right.y = 0f;
+                
+                // Normalize to ensure consistent movement speed
+                if (forward.magnitude > 0.01f) forward.Normalize();
+                if (right.magnitude > 0.01f) right.Normalize();
+                
+                // Calculate direction based on input
+                Vector3 direction = (forward * input.y + right * input.x);
+                
+                // Normalize final direction
+                if (direction.magnitude > 0.01f)
+                {
+                    return direction.normalized;
+                }
+            }
+            
+            // Fallback to world coordinates if no camera
+            return new Vector3(input.x, 0f, input.y).normalized;
+        }
+        
         public void OnActivate()
         {
             _isActive = true;
-            Debug.Log("Movement state activated");
+            Debug.Log("Movement behavior activated");
         }
-
+        
         public void OnDeactivate()
         {
             _isActive = false;
-            Debug.Log("Movement state deactivated");
+            _moveDirection = Vector3.zero;
+            _hasInput = false;
+            _isRunning = false;
+            
+            // Reset state values
+            _context.SetStateValue("IsMoving", false);
+            _context.SetStateValue("IsRunning", false);
+            _context.SetStateValue("MoveInputX", 0f);
+            _context.SetStateValue("MoveInputZ", 0f);
+            _context.SetStateValue("MovementSpeed", 0f);
+            
+            // Ensure we stop when deactivated
+            if (_rigidbody != null)
+            {
+                Vector3 currentVelocity = _rigidbody.linearVelocity;
+                _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
+            }
+            
+            Debug.Log("Movement behavior deactivated");
         }
+        
+        // [Header("Movement Settings")]
+        // [SerializeField] private float _defaultSpeed = 3f;
+        // [SerializeField] private float _defaultDeceleration = 20f;
+        // [SerializeField] private bool _debugMovement = true;
+        //
+        // [Header("Running Settings")]
+        // [SerializeField] private string _runModifierSourceId = "PlayerRunning"; // Unique ID for run modifier
+        // [SerializeField] private float _speedTransitionRate = 5f; // How quickly to transition between speeds
+        //
+        // [Header("Direction Modifiers")]
+        // [SerializeField] private float _backwardSpeedMultiplier = 0.5f; // Multiplier for backward movement
+        //
+        // [Header("Rotation Settings")]
+        // [SerializeField] private bool _rotateWithCamera = true;
+        // [SerializeField] private float _rotationSpeed = 10f;
+        //
+        // // Dependencies
+        // private IPlayerContext _context;
+        // private IStatsService _statsService;
+        // private IGroundChecker _groundChecker;
+        // // private IAnimationController _animationController;
+        // private Transform _cameraTransform;
+        // private Rigidbody _rigidbody;
+        //
+        // // State
+        // private Vector3 _moveDirection = Vector3.zero;
+        // private Vector2 _rawInput = Vector2.zero;
+        // private bool _isActive;
+        // private bool _hasInput;
+        // private bool _isRunning;
+        // private float _currentSpeed; // Current interpolated speed
+        // private bool _isMovingBackward;
+        //
+        //
+        // public void Initialize(IPlayerContext context)
+        // {
+        //     _context = context;
+        //     _statsService = context.GetService<IStatsService>();
+        //     _groundChecker = context.GetService<IGroundChecker>();
+        //     // _animationController = context.GetService<IAnimationController>();
+        //     _rigidbody = GetComponent<Rigidbody>();
+        //     
+        //     if (_rigidbody == null)
+        //     {
+        //         Debug.LogError("No Rigidbody found on the GameObject. Deceleration won't work!");
+        //         _rigidbody = gameObject.AddComponent<Rigidbody>();
+        //     }
+        //     
+        //     // Get main camera reference
+        //     _cameraTransform = Camera.main.transform;
+        //     if (_cameraTransform == null)
+        //     {
+        //         Debug.LogError("Main camera not found! Movement will not be relative to camera.");
+        //     }
+        //     
+        //     _currentSpeed = _defaultSpeed;
+        //     
+        //     Debug.Log("Movement behavior initialized");
+        // }
+        //
+        // public bool CanBeActivated()
+        // {
+        //     bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
+        //                     _context.GetStateValue<bool>("IsGrounded", false);
+        //     bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
+        //     bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
+        //     
+        //     return isGrounded && canMove && !isInWater;
+        // }
+        //
+        // private void Update()
+        // {
+        //     if (!_isActive) return;
+        //     
+        //     // Get input and calculate direction in Update for responsive controls
+        //     _rawInput = _context.GetMovementInput();
+        //     _hasInput = _rawInput.magnitude > 0.1f;
+        //     
+        //     // Check if moving backward
+        //     _isMovingBackward = _rawInput.y < -0.1f;
+        //     
+        //     // Check if running
+        //     bool wasRunning = _isRunning;
+        //     _isRunning = _context.GetRunInput() && _hasInput;
+        //     
+        //     // Update the context state
+        //     _context.SetStateValue("IsRunning", _isRunning);
+        //     
+        //     // Apply or remove running modifier when state changes
+        //     if (_isRunning != wasRunning && _statsService != null)
+        //     {
+        //         UpdateRunningState();
+        //     }
+        //     
+        //     if (_hasInput)
+        //     {
+        //         _moveDirection = CalculateStrafingDirection(_rawInput);
+        //         
+        //         // Handle rotation in Update for smoother camera following
+        //         if (_rotateWithCamera && _cameraTransform != null)
+        //         {
+        //             float yaw = _cameraTransform.eulerAngles.y;
+        //             Quaternion targetRotation = Quaternion.Euler(0, yaw, 0);
+        //             
+        //             transform.rotation = Quaternion.Slerp(
+        //                 transform.rotation,
+        //                 targetRotation,
+        //                 _rotationSpeed * Time.deltaTime
+        //             );
+        //         }
+        //     }
+        // }
+        //
+        // private void UpdateRunningState()
+        // {
+        //     if (_statsService == null) return;
+        //     
+        //     if (_isRunning)
+        //     {
+        //         // Get the run multiplier from stats
+        //         float runMultiplier = _statsService.GetStat("runMultiplier");
+        //         
+        //         // Create a running modifier
+        //         StatModifier runModifier = new StatModifier(
+        //             ModifierType.Multiplicative,
+        //             ModifierCatagory.Temporary,
+        //             runMultiplier,
+        //             this,
+        //             -1f // No duration (will be removed manually)
+        //         );
+        //         
+        //         // Apply the modifier
+        //         _statsService.ApplyOrReplaceModifier(
+        //             "moveSpeed", 
+        //             runModifier, 
+        //             ModifierCatagory.Temporary, 
+        //             _runModifierSourceId
+        //         );
+        //         
+        //         if (_debugMovement)
+        //         {
+        //             //Debug.Log($"Applied run modifier with multiplier: {runMultiplier}");
+        //         }
+        //     }
+        //     else
+        //     {
+        //         // Remove the running modifier
+        //         _statsService.RemoveModifiersFromSource("moveSpeed", _runModifierSourceId);
+        //         
+        //         if (_debugMovement)
+        //         {
+        //             //Debug.Log("Removed run modifier");
+        //         }
+        //     }
+        // }
+        //
+        // private void FixedUpdate()
+        // {
+        //     if (_isActive)
+        //     {
+        //         ProcessMovement();
+        //     }
+        // }
+        //
+        // public void ProcessMovement()
+        // {
+        //     if (_rigidbody == null) return;
+        //     
+        //     // Get target speed from stats service
+        //     float targetSpeed = _statsService != null 
+        //         ? _statsService.GetStat("moveSpeed") 
+        //         : _defaultSpeed;
+        //     
+        //     float deceleration = _statsService != null 
+        //         ? _statsService.GetStat("deceleration") 
+        //         : _defaultDeceleration;
+        //     
+        //     // Smoothly transition to the target speed
+        //     _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
+        //     
+        //     // Get current horizontal velocity
+        //     Vector3 currentVelocity = _rigidbody.linearVelocity;
+        //     Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
+        //     
+        //     if (_debugMovement)
+        //     {
+        //         //Debug.Log($"HasInput: {_hasInput}, IsRunning: {_isRunning}, IsBackward: {_isMovingBackward}, TargetSpeed: {targetSpeed}, CurrentSpeed: {_currentSpeed}");
+        //     }
+        //     
+        //     if (_hasInput)
+        //     {
+        //         // Apply backward movement multiplier if moving backward
+        //         float speedMultiplier = _isMovingBackward ? _backwardSpeedMultiplier : 1.0f;
+        //         
+        //         // Calculate target velocity based on input direction and interpolated speed
+        //         Vector3 targetVelocity = _moveDirection * (_currentSpeed * speedMultiplier);
+        //         
+        //         // Apply the new velocity directly to the rigidbody
+        //         _rigidbody.linearVelocity = new Vector3(
+        //             targetVelocity.x,
+        //             currentVelocity.y,
+        //             targetVelocity.z
+        //         );
+        //     }
+        //     else if (horizontalVelocity.magnitude > 0.1f)
+        //     {
+        //         // Calculate how much to reduce velocity this frame
+        //         float reductionAmount = deceleration * Time.fixedDeltaTime;
+        //         float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - reductionAmount);
+        //         
+        //         if (newMagnitude > 0.1f)
+        //         {
+        //             // Apply reduced velocity in the same direction
+        //             Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
+        //             
+        //             _rigidbody.linearVelocity = new Vector3(
+        //                 deceleratedVelocity.x,
+        //                 currentVelocity.y,
+        //                 deceleratedVelocity.z
+        //             );
+        //         }
+        //         else
+        //         {
+        //             // Below threshold, stop horizontal movement completely
+        //             _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
+        //         }
+        //     }
+        // }
+        //
+        // private Vector3 CalculateStrafingDirection(Vector2 input)
+        // {
+        //     // If no camera, use world coordinates
+        //     if (_cameraTransform == null)
+        //     {
+        //         return new Vector3(input.x, 0f, input.y).normalized;
+        //     }
+        //     
+        //     // Get camera forward and right vectors
+        //     Vector3 forward = _cameraTransform.forward;
+        //     Vector3 right = _cameraTransform.right;
+        //     
+        //     // Project vectors onto the horizontal plane (ignore Y component)
+        //     forward.y = 0f;
+        //     right.y = 0f;
+        //     
+        //     // Normalize to ensure consistent movement speed
+        //     if (forward.magnitude > 0.01f) forward.Normalize();
+        //     if (right.magnitude > 0.01f) right.Normalize();
+        //     
+        //     // Calculate direction based on input
+        //     Vector3 direction = (forward * input.y + right * input.x);
+        //     
+        //     // Normalize final direction
+        //     if (direction.magnitude > 0.01f)
+        //     {
+        //         return direction.normalized;
+        //     }
+        //     
+        //     return Vector3.zero;
+        // }
+        //
+        // public void OnActivate()
+        // {
+        //     _isActive = true;
+        //     Debug.Log("Movement behavior activated");
+        // }
+        //
+        // public void OnDeactivate()
+        // {
+        //     _isActive = false;
+        //     _moveDirection = Vector3.zero;
+        //     _hasInput = false;
+        //     _isRunning = false;
+        //     
+        //     // Ensure we stop when deactivated
+        //     if (_rigidbody != null)
+        //     {
+        //         Vector3 currentVelocity = _rigidbody.linearVelocity;
+        //         _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
+        //     }
+        //     
+        //     Debug.Log("Movement behavior deactivated");
+        // }
     }
 }

@@ -20,10 +20,9 @@ namespace Sol
         private void IntializeStats()
         {
             //Movement stats
-            _baseValues["walkSpeed"] = _playerStats.baseWalkSpeed;
-            _baseValues["runSpeed"] = _playerStats.baseRunSpeed;
-            _baseValues["crouchSpeed"] = _playerStats.baseCrouchSpeed;
-            _baseValues["jumpForce"] = _playerStats.baseJumpForce;
+            _baseValues["moveSpeed"] = _playerStats != null ? _playerStats.baseMoveSpeed : 5f;
+            _baseValues["runMultiplier"] = _playerStats != null ? _playerStats.baseRunMultiplier : 1.6f;
+            _baseValues["deceleration"] = _playerStats != null ? _playerStats.baseDeceleration : 8f;
             
             //Combat stats
             _baseValues["health"] = _playerStats.baseHealth;
@@ -122,8 +121,43 @@ namespace Sol
             return finalValue;
         }
         
-
-
+        public string ApplyOrReplaceModifier(string statName, StatModifier modifier, ModifierCatagory category, string sourceId)
+        {
+            if (!_modifiersByCategory.ContainsKey(statName))
+            {
+                Debug.LogWarning($"Stat {statName} not found!");
+                return null;
+            }
+    
+            // Set the sourceId on the modifier
+            modifier.sourceId = sourceId;
+    
+            // Check if there's already a modifier with this sourceId in this category
+            int existingIndex = _modifiersByCategory[statName][category].FindIndex(m => m.sourceId == sourceId);
+    
+            if (existingIndex >= 0)
+            {
+                // Replace the existing modifier but keep its ID
+                string existingId = _modifiersByCategory[statName][category][existingIndex].id;
+                modifier.id = existingId;
+                _modifiersByCategory[statName][category][existingIndex] = modifier;
+        
+                Debug.Log($"Replaced modifier for {statName} from source {sourceId}. Value: {modifier.value}, Duration: {modifier.duration}");
+                return existingId;
+            }
+            else
+            {
+                // Generate a new ID for this modifier
+                modifier.id = System.Guid.NewGuid().ToString();
+        
+                // Add the new modifier
+                _modifiersByCategory[statName][category].Add(modifier);
+        
+                Debug.Log($"Added new modifier for {statName} from source {sourceId}. Value: {modifier.value}, Duration: {modifier.duration}");
+                return modifier.id;
+            }
+        }
+        
         public string ApplyModifier(string statName, StatModifier modifier, ModifierCatagory modifierCatagory)
         {
             if (!_modifiersByCategory.ContainsKey(statName))
@@ -149,12 +183,31 @@ namespace Sol
                 _modifiersByCategory[statName][category].RemoveAll(m => m.id == modifierId);
             }
         }
+        
+        public void RemoveModifiersFromSource(string statName, string sourceId)
+        {
+            if (!_modifiersByCategory.ContainsKey(statName))
+                return;
+                
+            foreach (var category in _modifiersByCategory[statName].Keys)
+            {
+                _modifiersByCategory[statName][category].RemoveAll(m => m.sourceId == sourceId);
+            }
+        }
 
         public void RemoveAllModifiersOfType(string statName, ModifierCatagory modifierCatagory)
         {
             if (!_modifiersByCategory.ContainsKey(statName)) return;
             
             _modifiersByCategory[statName][modifierCatagory].Clear();
+        }
+        
+        public float GetSpeedMultiplier()
+        {
+            float baseSpeed = _baseValues["moveSpeed"];
+            float currentSpeed = GetStat("moveSpeed");
+            
+            return currentSpeed / baseSpeed;
         }
     }
 }
