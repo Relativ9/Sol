@@ -6,8 +6,9 @@ namespace Sol
     public class PlayerStats : ScriptableObject
     {
         [Header("Movement")]
-        public float baseWalkSpeed = 5f;
-        public float baseRunSpeed = 8f;
+        public float baseMoveSpeed = 3f;
+        public float baseRunMultiplier = 1.6f;
+        public float baseDeceleration = 8f;
         public float baseCrouchSpeed = 3f;
         public float baseJumpForce = 5f;
     
@@ -15,6 +16,9 @@ namespace Sol
         public float baseHealth = 100f;
         public float baseStamina = 100f;
         public float baseFocus = 100f;
+        
+        // [Header("Camera")]
+        // public float baseFOV = 60f;
         
     }
 }
