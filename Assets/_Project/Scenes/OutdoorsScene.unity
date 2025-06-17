@@ -6088,6 +6088,7 @@ GameObject:
   - component: {fileID: 2100861482}
   - component: {fileID: 2100861483}
   - component: {fileID: 2100861484}
+  - component: {fileID: 2100861485}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -6241,6 +6242,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: a180752f-23b0-4f96-90dc-27334a6f4cf8
     m_ActionName: 'Main/Run[/Keyboard/shift]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f1a19efd-8473-4488-95f2-46f09c7aa2d3
+    m_ActionName: 'Main/Jump[/Keyboard/space]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: Mouse&Keyboard
   m_DefaultActionMap: Main
@@ -6395,6 +6400,26 @@ MonoBehaviour:
   _debugLookInput: {x: 0, y: 0}
   _debugMode: 1
   _isActive: 0
+--- !u!114 &2100861485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100861468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4f316acd51b51545a49dc0449d98b51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _jumpForce: 5
+  _jumpCooldown: 0.1
+  _maxAirJumps: 0
+  _coyoteTime: 0.2
+  _jumpBufferTime: 0.2
+  _fallMultiplier: 2.5
+  _lowJumpMultiplier: 2
+  _terminalVelocity: -20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

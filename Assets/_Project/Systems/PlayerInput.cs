@@ -119,6 +119,24 @@ namespace Sol
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""a180752f-23b0-4f96-90dc-27334a6f4cf8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""f1a19efd-8473-4488-95f2-46f09c7aa2d3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -198,6 +216,28 @@ namespace Sol
                     ""action"": ""MainHand"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""aedd6d4b-67fb-40b1-94af-0708269b7135"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse&Keyboard"",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""38ead46b-b9a5-480b-ba80-766eeea364c2"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -226,6 +266,8 @@ namespace Sol
             m_Main_Move = m_Main.FindAction("Move", throwIfNotFound: true);
             m_Main_Look = m_Main.FindAction("Look", throwIfNotFound: true);
             m_Main_MainHand = m_Main.FindAction("MainHand", throwIfNotFound: true);
+            m_Main_Run = m_Main.FindAction("Run", throwIfNotFound: true);
+            m_Main_Jump = m_Main.FindAction("Jump", throwIfNotFound: true);
         }
 
         ~@PlayerInput()
@@ -309,6 +351,8 @@ namespace Sol
         private readonly InputAction m_Main_Move;
         private readonly InputAction m_Main_Look;
         private readonly InputAction m_Main_MainHand;
+        private readonly InputAction m_Main_Run;
+        private readonly InputAction m_Main_Jump;
         /// <summary>
         /// Provides access to input actions defined in input action map "Main".
         /// </summary>
@@ -332,6 +376,14 @@ namespace Sol
             /// Provides access to the underlying input action "Main/MainHand".
             /// </summary>
             public InputAction @MainHand => m_Wrapper.m_Main_MainHand;
+            /// <summary>
+            /// Provides access to the underlying input action "Main/Run".
+            /// </summary>
+            public InputAction @Run => m_Wrapper.m_Main_Run;
+            /// <summary>
+            /// Provides access to the underlying input action "Main/Jump".
+            /// </summary>
+            public InputAction @Jump => m_Wrapper.m_Main_Jump;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -367,6 +419,12 @@ namespace Sol
                 @MainHand.started += instance.OnMainHand;
                 @MainHand.performed += instance.OnMainHand;
                 @MainHand.canceled += instance.OnMainHand;
+                @Run.started += instance.OnRun;
+                @Run.performed += instance.OnRun;
+                @Run.canceled += instance.OnRun;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
 
             /// <summary>
@@ -387,6 +445,12 @@ namespace Sol
                 @MainHand.started -= instance.OnMainHand;
                 @MainHand.performed -= instance.OnMainHand;
                 @MainHand.canceled -= instance.OnMainHand;
+                @Run.started -= instance.OnRun;
+                @Run.performed -= instance.OnRun;
+                @Run.canceled -= instance.OnRun;
+                @Jump.started -= instance.OnJump;
+                @Jump.performed -= instance.OnJump;
+                @Jump.canceled -= instance.OnJump;
             }
 
             /// <summary>
@@ -461,6 +525,20 @@ namespace Sol
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMainHand(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Run" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnRun(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnJump(InputAction.CallbackContext context);
         }
     }
 }
