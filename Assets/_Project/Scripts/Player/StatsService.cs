@@ -28,6 +28,10 @@ namespace Sol
             _baseValues["health"] = _playerStats.baseHealth;
             _baseValues["stamina"] = _playerStats.baseStamina;
             _baseValues["focus"] = _playerStats.baseFocus;
+            
+            // Jump stats
+            _baseValues["JumpForce"] = _playerStats.baseJumpForce;
+            _baseValues["JumpCooldown"] = _playerStats.baseJumpCooldown;
 
             foreach (string statName in _baseValues.Keys)
             {

@@ -1,19 +1,11 @@
 using System.Collections.Generic;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Sol
 {
-    // public interface IMovementBehavior
-    // {
-    //     void Initialize(PlayerController controller);
-    //     void ProcessMovement();
-    //     bool CanBeActivated();
-    //     void OnActivate();
-    //     void OnDeactivate();
-    // }
-    
     public class PlayerController : MonoBehaviour, IPlayerContext
     {
 
@@ -22,7 +14,7 @@ namespace Sol
         private PlayerInput _playerInput;
         private Camera _mainCamera;
 
-        [HideInInspector]public bool _moveInputDetected = false;
+        [HideInInspector] public bool _moveInputDetected = false;
         [HideInInspector] public bool _runInputDetected = false;
         [HideInInspector] public bool _jumpInputDetected = false;
         private Dictionary<string, object> _stateValues = new Dictionary<string, object>();
@@ -32,7 +24,10 @@ namespace Sol
         private Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private List<IPlayerComponent> _allComponents = new List<IPlayerComponent>();
         private List<IBaseMovement> _baseMovementState = new List<IBaseMovement>();
+        // private List<IBaseJumping> _jumpingComponents = new List<IBaseJumping>();
         private IBaseMovement _currentMovementState;
+        private IBaseJumping _jumpingComponent;
+        private IGravityController _gravityController;
 
         [SerializeField] private Vector3 _debugVelDisplay;
         [SerializeField] private Vector2 _debugLookDisplay;
@@ -47,6 +42,18 @@ namespace Sol
             RegisterService<ICameraController>(GetComponent<CameraController>());
             
             InitializeComponents();
+            
+            if (_gravityController != null)
+            {
+                RegisterService<IGravityController>(_gravityController);
+            }
+            
+            Debug.Log($"Movement states: {_baseMovementState.Count}");
+            foreach (var state in _baseMovementState)
+            {
+                Debug.Log($"- {state.GetType().Name}");
+            }
+            
         }
 
         void Update()
@@ -69,21 +76,44 @@ namespace Sol
                         if (_currentMovementState != null)
                         {
                             _currentMovementState.OnDeactivate();
+                            Debug.Log($"Deactivated movement: {_currentMovementState.GetType().Name}");
                         }
-                    
+                
                         // Activate new behavior
                         _currentMovementState = state;
                         _currentMovementState.OnActivate();
+                        Debug.Log($"Activated movement: {_currentMovementState.GetType().Name}");
                     }
                     return;
                 }
             }
-        
+
             // If we get here, no behavior could be activated
             if (_currentMovementState != null)
             {
                 _currentMovementState.OnDeactivate();
+                Debug.Log($"Deactivated movement: {_currentMovementState.GetType().Name}");
                 _currentMovementState = null;
+            }
+    
+            // Also check if jumping component should be activated/deactivated
+            if (_jumpingComponent != null)
+            {
+                // For jumping, we don't need to activate/deactivate here
+                // It will be triggered by input events in OnJump
+        
+                // However, if your jumping component needs to be active to process updates,
+                // you could add logic here to activate it based on conditions
+        
+                // For example:
+                // bool canJumpBeActivated = /* your condition */;
+                // if (canJumpBeActivated)
+                // {
+                //     if (_jumpingComponent is MonoBehaviour jumpBehavior)
+                //     {
+                //         Debug.Log($"Ensuring jump component is active: {jumpBehavior.GetType().Name}");
+                //     }
+                // }
             }
         }
 
@@ -107,23 +137,55 @@ namespace Sol
                     _allComponents.Add(playerComponent);
                     playerComponent.Initialize(this);
                 
-                    // Also check if it's a movement behavior
+                    // Check if it's a movement behavior
                     if (component is IBaseMovement movementBehavior)
                     {
                         _baseMovementState.Add(movementBehavior);
+                        Debug.Log($"Found movement component: {component.GetType().Name}");
+                    }
+                    
+                    // Check if it's a jumping component
+                    if (component is IBaseJumping jumpingComponent)
+                    {
+                        _jumpingComponent = jumpingComponent;
+                        Debug.Log($"Found jumping component: {component.GetType().Name}");
+                    }
+                    
+                    // Check if it's a gravity controller
+                    if (component is IGravityController gravityController)
+                    {
+                        _gravityController = gravityController;
+                        Debug.Log($"Found gravity controller: {component.GetType().Name}");
                     }
                 }
             }
-        
+
             // Sort movement behaviors by priority if they implement IComparable
             _baseMovementState.Sort((a, b) => {
                 if (a is IComparable<IBaseMovement> comparable)
                     return comparable.CompareTo(b);
                 return 0;
             });
-        
+
+            // If no jumping component was found, log a warning
+            if (_jumpingComponent == null)
+            {
+                Debug.LogWarning("No jumping component found during initialization!");
+            }
+
             Debug.Log($"Initialized {_allComponents.Count} player components, including {_baseMovementState.Count} movement behaviors");
+            
+            // Let the DetermineActiveMovementState method handle movement activation
+            DetermineActiveMovementState();
+            
+            // For jumping, we can activate it directly if needed
+            if (_jumpingComponent != null && _jumpingComponent is IBaseJumping)
+            {
+                // The jumping component will be activated when needed through input
+                Debug.Log($"Jumping component ready: {(_jumpingComponent as MonoBehaviour).GetType().Name}");
+            }
         }
+        
 
         void CheckInputState()
         {
@@ -157,8 +219,34 @@ namespace Sol
         
         public void OnJump(InputAction.CallbackContext context)
         {
-            _jumpInputDetected = context.ReadValueAsButton();
-            SetStateValue("IsJumping", _jumpInputDetected);
+            // Only handle the button press event
+            if (context.started)
+            {
+                _jumpInputDetected = true;
+                SetStateValue("JumpPressed", true);
+        
+                // Directly notify the jumping component
+                if (_jumpingComponent != null)
+                {
+                    _jumpingComponent.HandleJumpInput();
+                    Debug.Log("Jump input handled by jumping component");
+                }
+                else
+                {
+                    Debug.LogWarning("Jump input detected but no jumping component found!");
+                }
+            }
+            else if (context.canceled)
+            {
+                _jumpInputDetected = false;
+                SetStateValue("JumpPressed", false);
+            }
+        }
+        
+        private IEnumerator ClearJumpPriority(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            SetStateValue("JumpPriority", false);
         }
 
         public bool IsRunning()
