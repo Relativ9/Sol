@@ -10,7 +10,10 @@ namespace Sol
         public float baseRunMultiplier = 1.6f;
         public float baseDeceleration = 8f;
         public float baseCrouchSpeed = 3f;
+        
         public float baseJumpForce = 5f;
+        public float baseJumpCooldown = 0.1f;
+
     
         [Header("Combat")]
         public float baseHealth = 100f;

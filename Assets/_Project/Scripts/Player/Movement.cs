@@ -38,6 +38,10 @@ namespace Sol
         private bool _isMovingBackward;
         private float _lastCameraYaw; // Store the last camera yaw to detect changes
         
+        // [Header("Air Control")]
+        // [SerializeField] private float _airControlMultiplier = 0.5f; // How much control in air (0-1)
+        // [SerializeField] private float _airDrag = 0.1f; // How quickly air velocity decreases
+        
         public void Initialize(IPlayerContext context)
         {
             _context = context;
@@ -71,12 +75,19 @@ namespace Sol
         
         public bool CanBeActivated()
         {
-            bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
-                            _context.GetStateValue<bool>("IsGrounded", false);
+            
+            // We can still be active when not grounded, but we'll handle movement differently
             bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
             bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
+        
+            return canMove && !isInWater;
             
-            return isGrounded && canMove && !isInWater;
+            // bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
+            //                 _context.GetStateValue<bool>("IsGrounded", false);
+            // bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
+            // bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
+            //
+            // return isGrounded && canMove && !isInWater;
         }
         
         private void Update()
@@ -195,6 +206,10 @@ namespace Sol
         public void ProcessMovement()
         {
             if (_rigidbody == null) return;
+            
+            bool jumpHasPriority = _context.GetStateValue<bool>("JumpPriority", false);
+            if (jumpHasPriority) return; // Don't modify velocity during jump priority period 
+
             
             // Get target speed from stats service
             float targetSpeed = _statsService != null 
