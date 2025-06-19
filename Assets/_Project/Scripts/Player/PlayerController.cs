@@ -151,11 +151,10 @@ namespace Sol
                         Debug.Log($"Found jumping component: {component.GetType().Name}");
                     }
                     
-                    // Check if it's a gravity controller
-                    if (component is IGravityController gravityController)
+                    if (component is IGravityController gravity)
                     {
-                        _gravityController = gravityController;
-                        Debug.Log($"Found gravity controller: {component.GetType().Name}");
+                        // Store reference to gravity controller
+                        _gravityController = gravity;
                     }
                 }
             }
@@ -219,7 +218,7 @@ namespace Sol
         
         public void OnJump(InputAction.CallbackContext context)
         {
-            // Only handle the button press event
+            // Only update the jump state when the context phase changes
             if (context.started)
             {
                 _jumpInputDetected = true;
@@ -235,12 +234,38 @@ namespace Sol
                 {
                     Debug.LogWarning("Jump input detected but no jumping component found!");
                 }
+        
+                Debug.Log("Jump button pressed");
             }
             else if (context.canceled)
             {
                 _jumpInputDetected = false;
                 SetStateValue("JumpPressed", false);
+                Debug.Log("Jump button released");
             }
+            
+            // // Only handle the button press event
+            // if (context.started)
+            // {
+            //     _jumpInputDetected = true;
+            //     SetStateValue("JumpPressed", true);
+            //
+            //     // Directly notify the jumping component
+            //     if (_jumpingComponent != null)
+            //     {
+            //         _jumpingComponent.HandleJumpInput();
+            //         Debug.Log("Jump input handled by jumping component");
+            //     }
+            //     else
+            //     {
+            //         Debug.LogWarning("Jump input detected but no jumping component found!");
+            //     }
+            // }
+            // else if (context.canceled)
+            // {
+            //     _jumpInputDetected = false;
+            //     SetStateValue("JumpPressed", false);
+            // }
         }
         
         private IEnumerator ClearJumpPriority(float delay)

@@ -4,7 +4,7 @@ namespace Sol
 {
     public class GravityController : MonoBehaviour, IPlayerComponent, IGravityController
     {
-        [Header("Gravity Settings")]
+                [Header("Gravity Settings")]
         [SerializeField] private float _defaultGravityScale = 1.0f;
         [SerializeField] private Vector3 _defaultGravityDirection = Vector3.down;
         [SerializeField] private float _defaultGravityStrength = 9.81f;
@@ -21,6 +21,7 @@ namespace Sol
         
         // Dependencies
         private IPlayerContext _context;
+        private IStatsService _statsService;
         private IGroundChecker _groundChecker;
         private Rigidbody _rigidbody;
         
@@ -32,6 +33,7 @@ namespace Sol
         public void Initialize(IPlayerContext context)
         {
             _context = context;
+            _statsService = context.GetService<IStatsService>();
             _groundChecker = context.GetService<IGroundChecker>();
             _rigidbody = GetComponent<Rigidbody>();
             
@@ -48,12 +50,15 @@ namespace Sol
             // Make sure the rigidbody doesn't use Unity's built-in gravity
             _rigidbody.useGravity = false;
             
+            // Activate immediately
+            _isActive = true;
+            
             Debug.Log("GravityController initialized");
         }
         
         public bool CanBeActivated()
         {
-            // Gravity should almost always be active
+            // Gravity should always be active
             return true;
         }
         
@@ -77,7 +82,9 @@ namespace Sol
         
         private void FixedUpdate()
         {
-            if (_isActive && _gravityEnabled)
+            // Always process gravity, regardless of _isActive
+            // This ensures gravity is always applied
+            if (_gravityEnabled)
             {
                 ProcessGravity();
             }
@@ -86,6 +93,13 @@ namespace Sol
         public void ProcessGravity()
         {
             if (_rigidbody == null || !_gravityEnabled) return;
+            
+            // Get gravity multiplier from stats if available
+            float gravityMultiplier = 1.0f;
+            if (_statsService != null)
+            {
+                gravityMultiplier = _statsService.GetStat("GravityMultiplier");
+            }
             
             // Don't apply gravity when grounded and not moving upward
             bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
@@ -107,11 +121,11 @@ namespace Sol
             }
             else
             {
-                // Calculate gravity multiplier for better feel
-                float gravityMultiplier = _rigidbody.linearVelocity.y < 0 ? _fallMultiplier : 1.0f;
+                // Apply different multiplier when falling
+                float currentMultiplier = _rigidbody.linearVelocity.y < 0 ? gravityMultiplier : 1.0f;
                 
                 // Apply gravity with multiplier
-                gravityForce = _currentGravity * _currentGravityScale * gravityMultiplier;
+                gravityForce = _currentGravity * _currentGravityScale * currentMultiplier;
             }
             
             // Apply gravity force
@@ -120,22 +134,16 @@ namespace Sol
             // Update current gravity for debugging
             _currentGravity = _useCustomGravity ? _customGravity : _defaultGravityDirection.normalized * _defaultGravityStrength;
             
-            // Clamp to terminal velocity (only in the gravity direction)
-            if (Vector3.Dot(_rigidbody.linearVelocity, _currentGravity.normalized) > Mathf.Abs(_terminalVelocity))
+            // Clamp to terminal velocity
+            float currentTerminalVelocity = _statsService != null ? 
+                _statsService.GetStat("TerminalVelocity") : _terminalVelocity;
+                
+            // Only clamp vertical velocity (simplified from your original code)
+            if (_rigidbody.linearVelocity.y < currentTerminalVelocity)
             {
-                Vector3 terminalVelocityVector = _currentGravity.normalized * _terminalVelocity;
-                
-                // Project current velocity onto gravity direction
-                Vector3 velocityInGravityDirection = Vector3.Project(_rigidbody.linearVelocity, _currentGravity.normalized);
-                
-                // Calculate velocity perpendicular to gravity
-                Vector3 velocityPerpendicular = _rigidbody.linearVelocity - velocityInGravityDirection;
-                
-                // Apply terminal velocity limit only to the component in gravity direction
-                if (Vector3.Dot(velocityInGravityDirection, _currentGravity.normalized) > Mathf.Abs(_terminalVelocity))
-                {
-                    _rigidbody.linearVelocity = velocityPerpendicular + terminalVelocityVector;
-                }
+                Vector3 clampedVelocity = _rigidbody.linearVelocity;
+                clampedVelocity.y = currentTerminalVelocity;
+                _rigidbody.linearVelocity = clampedVelocity;
             }
         }
         

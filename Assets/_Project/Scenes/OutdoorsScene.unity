@@ -6305,6 +6305,7 @@ GameObject:
   - component: {fileID: 2100861483}
   - component: {fileID: 2100861484}
   - component: {fileID: 2100861485}
+  - component: {fileID: 2100861486}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -6499,6 +6500,7 @@ MonoBehaviour:
   _backwardSpeedMultiplier: 0.75
   _rotateWithCamera: 1
   _rotationSpeed: 10
+  _airDeceleration: 0.5
 --- !u!114 &2100861478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6640,8 +6642,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4f316acd51b51545a49dc0449d98b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _jumpForce: 6
-  _horizontalVelocityRetention: 1
+  _defaultJumpForce: 5
+  _defaultJumpDirectionBoost: 1
+  _defaultDoubleJumpCount: 0
+  _debugJump: 1
+  _jumpCooldown: 0.1
+--- !u!114 &2100861486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100861468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63a724e91c58d8a499f27bd163afcdd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultGravityScale: 1
+  _defaultGravityDirection: {x: 0, y: -1, z: 0}
+  _defaultGravityStrength: 9.81
+  _fallMultiplier: 2.5
+  _terminalVelocity: -20
+  _debugGravity: 0
+  _currentGravityScale: 0
+  _currentGravity: {x: 0, y: 0, z: 0}
+  _gravityEnabled: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
