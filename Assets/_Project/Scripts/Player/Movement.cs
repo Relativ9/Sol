@@ -20,6 +20,9 @@ namespace Sol
         [SerializeField] private bool _rotateWithCamera = true;
         [SerializeField] private float _rotationSpeed = 10f;
         
+        [Header("Air Movement")]
+        [SerializeField] private float _airDeceleration = 0.5f; // Much lower deceleration in air
+        
         // Dependencies
         private IPlayerContext _context;
         private IStatsService _statsService;
@@ -37,10 +40,6 @@ namespace Sol
         private float _currentSpeed; // Current interpolated speed
         private bool _isMovingBackward;
         private float _lastCameraYaw; // Store the last camera yaw to detect changes
-        
-        // [Header("Air Control")]
-        // [SerializeField] private float _airControlMultiplier = 0.5f; // How much control in air (0-1)
-        // [SerializeField] private float _airDrag = 0.1f; // How quickly air velocity decreases
         
         public void Initialize(IPlayerContext context)
         {
@@ -75,27 +74,24 @@ namespace Sol
         
         public bool CanBeActivated()
         {
-            
-            // We can still be active when not grounded, but we'll handle movement differently
+            // Only activate when grounded
+            bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded :
+                            _context.GetStateValue<bool>("IsGrounded", false);
             bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
             bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
-        
-            return canMove && !isInWater;
             
-            // bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
-            //                 _context.GetStateValue<bool>("IsGrounded", false);
-            // bool canMove = !_context.GetStateValue<bool>("IsStunned", false);
-            // bool isInWater = _context.GetStateValue<bool>("IsInWater", false);
-            //
-            // return isGrounded && canMove && !isInWater;
+            return isGrounded && canMove && !isInWater;
         }
         
         private void Update()
         {
-            if (!_isActive) return;
+            // Always update rotation with camera, regardless of movement input or active state
+            if (_rotateWithCamera && _cameraController != null)
+            {
+                UpdateRotation();
+            }
             
-            // Always update rotation with camera, regardless of movement input
-            UpdateRotation();
+            if (!_isActive) return;
             
             // Get input and calculate direction in Update for responsive controls
             _rawInput = _context.GetMovementInput();
@@ -135,14 +131,12 @@ namespace Sol
         
         private void UpdateRotation()
         {
-            if (!_rotateWithCamera || _cameraController == null) return;
-    
             // Get the camera's yaw rotation
             float currentYaw = _cameraController.GetCameraYaw();
-    
+            
             // Create rotation based on camera yaw
             Quaternion targetRotation = Quaternion.Euler(0, currentYaw, 0);
-    
+            
             // Apply a small amount of smoothing to character rotation
             // This makes the character rotation look natural without affecting camera control
             transform.rotation = Quaternion.Slerp(
@@ -172,104 +166,123 @@ namespace Sol
                 
                 // Apply the modifier
                 _statsService.ApplyOrReplaceModifier(
-                    "moveSpeed", 
-                    runModifier, 
-                    ModifierCatagory.Temporary, 
+                    "moveSpeed",
+                    runModifier,
+                    ModifierCatagory.Temporary,
                     _runModifierSourceId
                 );
-                
-                if (_debugMovement)
-                {
-                    //Debug.Log($"Applied run modifier with multiplier: {runMultiplier}");
-                }
             }
             else
             {
                 // Remove the running modifier
                 _statsService.RemoveModifiersFromSource("moveSpeed", _runModifierSourceId);
-                
-                if (_debugMovement)
-                {
-                    //Debug.Log("Removed run modifier");
-                }
             }
         }
         
         private void FixedUpdate()
         {
-            if (_isActive)
-            {
-                ProcessMovement();
-            }
+            // Always process movement to handle deceleration in air
+            ProcessMovement();
         }
         
         public void ProcessMovement()
         {
             if (_rigidbody == null) return;
             
+            // Check if jump has priority
             bool jumpHasPriority = _context.GetStateValue<bool>("JumpPriority", false);
-            if (jumpHasPriority) return; // Don't modify velocity during jump priority period 
-
+            if (jumpHasPriority) return; // Don't modify velocity during jump priority period
             
-            // Get target speed from stats service
-            float targetSpeed = _statsService != null 
-                ? _statsService.GetStat("moveSpeed") 
-                : _defaultSpeed;
+            // Check if grounded
+            bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded :
+                            _context.GetStateValue<bool>("IsGrounded", false);
             
-            float deceleration = _statsService != null 
-                ? _statsService.GetStat("deceleration") 
-                : _defaultDeceleration;
-            
-            // Smoothly transition to the target speed
-            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
-            
-            // Get current horizontal velocity
+            // Get current velocity
             Vector3 currentVelocity = _rigidbody.linearVelocity;
             Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
             
-            if (_debugMovement)
+            // Only process movement input if grounded and active
+            if (isGrounded && _isActive)
             {
-                //Debug.Log($"HasInput: {_hasInput}, IsRunning: {_isRunning}, IsBackward: {_isMovingBackward}, TargetSpeed: {targetSpeed}, CurrentSpeed: {_currentSpeed}");
-            }
-            
-            if (_hasMoveInput)
-            {
-                // Apply backward movement multiplier if moving backward
-                float speedMultiplier = _isMovingBackward ? _backwardSpeedMultiplier : 1.0f;
+                // Get target speed from stats service
+                float targetSpeed = _statsService != null
+                    ? _statsService.GetStat("moveSpeed")
+                    : _defaultSpeed;
                 
-                // Calculate target velocity based on input direction and interpolated speed
-                Vector3 targetVelocity = _moveDirection * (_currentSpeed * speedMultiplier);
+                float deceleration = _statsService != null
+                    ? _statsService.GetStat("deceleration")
+                    : _defaultDeceleration;
                 
-                // Apply the new velocity directly to the rigidbody
-                _rigidbody.linearVelocity = new Vector3(
-                    targetVelocity.x,
-                    currentVelocity.y,
-                    targetVelocity.z
-                );
-            }
-            else if (horizontalVelocity.magnitude > 0.1f)
-            {
-                // Calculate how much to reduce velocity this frame
-                float reductionAmount = deceleration * Time.fixedDeltaTime;
-                float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - reductionAmount);
+                // Smoothly transition to the target speed
+                _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
                 
-                if (newMagnitude > 0.1f)
+                if (_hasMoveInput)
                 {
-                    // Apply reduced velocity in the same direction
-                    Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
+                    // Apply backward movement multiplier if moving backward
+                    float speedMultiplier = _isMovingBackward ? _backwardSpeedMultiplier : 1.0f;
                     
+                    // Calculate target velocity based on input direction and interpolated speed
+                    Vector3 targetVelocity = _moveDirection * (_currentSpeed * speedMultiplier);
+                    
+                    // Apply the new velocity directly to the rigidbody
                     _rigidbody.linearVelocity = new Vector3(
-                        deceleratedVelocity.x,
+                        targetVelocity.x,
                         currentVelocity.y,
-                        deceleratedVelocity.z
+                        targetVelocity.z
                     );
                 }
-                else
+                else if (horizontalVelocity.magnitude > 0.1f)
                 {
-                    // Below threshold, stop horizontal movement completely
-                    _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
+                    // Calculate how much to reduce velocity this frame
+                    float reductionAmount = deceleration * Time.fixedDeltaTime;
+                    float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - reductionAmount);
+                    
+                    if (newMagnitude > 0.1f)
+                    {
+                        // Apply reduced velocity in the same direction
+                        Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
+                        
+                        _rigidbody.linearVelocity = new Vector3(
+                            deceleratedVelocity.x,
+                            currentVelocity.y,
+                            deceleratedVelocity.z
+                        );
+                    }
+                    else
+                    {
+                        // Below threshold, stop horizontal movement completely
+                        _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
+                    }
                 }
             }
+            else if (!isGrounded)
+            {
+                // In air - apply very minimal deceleration to preserve momentum
+                // but still have some air resistance
+                if (horizontalVelocity.magnitude > 0.1f)
+                {
+                    float airReductionAmount = _airDeceleration * Time.fixedDeltaTime;
+                    float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - airReductionAmount);
+                    
+                    if (newMagnitude > 0.1f)
+                    {
+                        // Apply very slight deceleration in air
+                        Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
+                        
+                        _rigidbody.linearVelocity = new Vector3(
+                            deceleratedVelocity.x,
+                            currentVelocity.y,
+                            deceleratedVelocity.z
+                        );
+                    }
+                }
+                
+                // Update the context with our current state
+                _context.SetStateValue("IsInAir", true);
+            }
+            
+            // Update the context with our current state
+            _context.SetStateValue("IsInAir", !isGrounded);
         }
         
         private Vector3 CalculateStrafingDirection(Vector2 input)
@@ -334,6 +347,8 @@ namespace Sol
         public void OnActivate()
         {
             _isActive = true;
+            UpdateRunningState();
+            // Reset running state based on current input when reactivated
             Debug.Log("Movement behavior activated");
         }
         
@@ -351,12 +366,8 @@ namespace Sol
             _context.SetStateValue("MoveInputZ", 0f);
             _context.SetStateValue("MovementSpeed", 0f);
             
-            // Ensure we stop when deactivated
-            if (_rigidbody != null)
-            {
-                Vector3 currentVelocity = _rigidbody.linearVelocity;
-                _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
-            }
+            // Note: We don't stop the rigidbody when deactivated anymore
+            // This allows momentum to be preserved when going airborne
             
             Debug.Log("Movement behavior deactivated");
         }

@@ -29,9 +29,17 @@ namespace Sol
             _baseValues["stamina"] = _playerStats.baseStamina;
             _baseValues["focus"] = _playerStats.baseFocus;
             
-            // Jump stats
+            //Jump stats
             _baseValues["JumpForce"] = _playerStats.baseJumpForce;
             _baseValues["JumpCooldown"] = _playerStats.baseJumpCooldown;
+            _baseValues["JumpDirectionBoost"] = _playerStats.baseJumpDirectionBoost;
+            _baseValues["MaxDoubleJump"] = _playerStats.baseMaxDoubleJump;
+            
+            //Gravity Stats
+            _baseValues["GravityMultiplier"] = _playerStats.baseGravityMultiplier;
+            _baseValues["TerminalVelocity"] = _playerStats.baseTerminalVelocity;
+            // statsRegistry.RegisterStat("gravityMultiplier", 2.5f); // Default fall multiplier
+            // statsRegistry.RegisterStat("terminalVelocity", -20f); // Maximum fall speed
 
             foreach (string statName in _baseValues.Keys)
             {

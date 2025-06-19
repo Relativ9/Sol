@@ -11,9 +11,15 @@ namespace Sol
         public float baseDeceleration = 8f;
         public float baseCrouchSpeed = 3f;
         
+        [Header("Jump")]
         public float baseJumpForce = 5f;
+        public float baseJumpDirectionBoost = 1.0f;
+        public int baseMaxDoubleJump = 0;
         public float baseJumpCooldown = 0.1f;
 
+        [Header("Gravity")]
+        public float baseGravityMultiplier = 1f;
+        public float baseTerminalVelocity = -20f;
     
         [Header("Combat")]
         public float baseHealth = 100f;

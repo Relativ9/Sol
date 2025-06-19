@@ -17,6 +17,11 @@ MonoBehaviour:
   baseDeceleration: 8
   baseCrouchSpeed: 3
   baseJumpForce: 5
+  baseJumpDirectionBoost: 1
+  baseMaxDoubleJump: 1
+  baseJumpCooldown: 0.1
+  baseGravityMultiplier: 2
+  baseTerminalVelocity: -20
   baseHealth: 100
   baseStamina: 100
   baseFocus: 100
