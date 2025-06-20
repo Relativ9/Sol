@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6eee5ab6e68d040b1d33109f2dedbb, type: 3}
   m_Name: BasePlayerStats
   m_EditorClassIdentifier: 
-  baseMoveSpeed: 3
-  baseRunMultiplier: 3
+  baseMoveSpeed: 2
+  baseRunMultiplier: 3.5
   baseDeceleration: 8
   baseCrouchSpeed: 3
   baseJumpForce: 5
