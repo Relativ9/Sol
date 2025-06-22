@@ -137,6 +137,15 @@ namespace Sol
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleWeapon"",
+                    ""type"": ""Button"",
+                    ""id"": ""c81d7dfa-1427-411f-b8b7-1375787e4600"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -238,6 +247,17 @@ namespace Sol
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""47e5d49d-b122-4acd-a2ef-a8c850c61cba"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleWeapon"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -268,6 +288,7 @@ namespace Sol
             m_Main_MainHand = m_Main.FindAction("MainHand", throwIfNotFound: true);
             m_Main_Run = m_Main.FindAction("Run", throwIfNotFound: true);
             m_Main_Jump = m_Main.FindAction("Jump", throwIfNotFound: true);
+            m_Main_ToggleWeapon = m_Main.FindAction("ToggleWeapon", throwIfNotFound: true);
         }
 
         ~@PlayerInput()
@@ -353,6 +374,7 @@ namespace Sol
         private readonly InputAction m_Main_MainHand;
         private readonly InputAction m_Main_Run;
         private readonly InputAction m_Main_Jump;
+        private readonly InputAction m_Main_ToggleWeapon;
         /// <summary>
         /// Provides access to input actions defined in input action map "Main".
         /// </summary>
@@ -384,6 +406,10 @@ namespace Sol
             /// Provides access to the underlying input action "Main/Jump".
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_Main_Jump;
+            /// <summary>
+            /// Provides access to the underlying input action "Main/ToggleWeapon".
+            /// </summary>
+            public InputAction @ToggleWeapon => m_Wrapper.m_Main_ToggleWeapon;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -425,6 +451,9 @@ namespace Sol
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @ToggleWeapon.started += instance.OnToggleWeapon;
+                @ToggleWeapon.performed += instance.OnToggleWeapon;
+                @ToggleWeapon.canceled += instance.OnToggleWeapon;
             }
 
             /// <summary>
@@ -451,6 +480,9 @@ namespace Sol
                 @Jump.started -= instance.OnJump;
                 @Jump.performed -= instance.OnJump;
                 @Jump.canceled -= instance.OnJump;
+                @ToggleWeapon.started -= instance.OnToggleWeapon;
+                @ToggleWeapon.performed -= instance.OnToggleWeapon;
+                @ToggleWeapon.canceled -= instance.OnToggleWeapon;
             }
 
             /// <summary>
@@ -539,6 +571,13 @@ namespace Sol
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnJump(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ToggleWeapon" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnToggleWeapon(InputAction.CallbackContext context);
         }
     }
 }

@@ -175,8 +175,10 @@ namespace Sol
             }
             
             // Apply to animator parameters
+
             _animator.SetFloat(_horizontalParameter, _smoothedDirection.x);
             _animator.SetFloat(_verticalParameter, _smoothedDirection.y);
+            
             _animator.SetFloat(_speedParameter, _smoothedSpeed);
             
             // Store for debugging
