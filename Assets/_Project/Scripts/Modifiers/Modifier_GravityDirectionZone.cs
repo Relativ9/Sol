@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Sol
 {
-    public class CustomGravityZone : MonoBehaviour
+    public class Modifier_GravityDirectionZone : MonoBehaviour
     {
         [Header("Gravity Settings")]
         [SerializeField] private bool _useTransformDirection = true;
@@ -28,38 +28,45 @@ namespace Sol
         
         private void Update()
         {
-            // If the transform direction is used, update the gravity direction when the zone rotates
-            if (_playerInZone && _useTransformDirection && _gravityController != null)
+            if (_playerInZone && _gravityController != null && _playerTransform != null)
             {
-                Vector3 gravityDir = -transform.up; // Use the negative up direction of the transform
+                Vector3 gravityDir;
+                
+                if (_useTransformDirection)
+                {
+                    // Calculate direction from player to this object's center
+                    gravityDir = (transform.position - _playerTransform.position).normalized;
+                }
+                else
+                {
+                    // Use the custom direction
+                    gravityDir = _customGravityDirection.normalized;
+                }
+                
+                // Apply the gravity direction
                 _gravityController.SetCustomGravityDirection(gravityDir);
             }
         }
         
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+            _playerTransform = other.transform;
+            _playerInZone = true;
+            
+            // Get the gravity controller
+            _gravityController = other.GetComponent<IGravityController>();
+            if (_gravityController == null)
             {
-                _playerTransform = other.transform;
-                _playerInZone = true;
-                
-                // Get the gravity controller
-                _gravityController = other.GetComponent<IGravityController>();
-                if (_gravityController == null)
-                {
-                    Debug.LogWarning("Player does not have a GravityController component");
-                    return;
-                }
-                
-                // Apply custom gravity direction
-                Vector3 gravityDir = _useTransformDirection ? -transform.up : _customGravityDirection.normalized;
-                _gravityController.SetCustomGravityDirection(gravityDir);
-                
-                // Play effects
-                PlayEnterEffects();
-                
-                Debug.Log($"Player entered gravity zone. New gravity direction: {gravityDir}");
+                Debug.LogWarning("Player does not have a GravityController component");
+                return;
             }
+            
+            // Initial gravity direction will be set in Update
+            
+            // Play effects
+            PlayEnterEffects();
+            
+            Debug.Log("Player entered gravity zone.");
         }
         
         private void OnTriggerExit(Collider other)
@@ -67,6 +74,7 @@ namespace Sol
             if (other.CompareTag("Player") && _gravityController != null)
             {
                 _playerInZone = false;
+                _playerTransform = null;
                 
                 // Reset to default gravity
                 _gravityController.ResetToDefaultGravity();
@@ -98,8 +106,18 @@ namespace Sol
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.cyan;
-            Vector3 direction = _useTransformDirection ? -transform.up : _customGravityDirection.normalized;
-            Gizmos.DrawRay(transform.position, direction * 2f);
+            
+            // Show the direction that would be used
+            if (_useTransformDirection)
+            {
+                // Show a sphere to represent center-directed gravity
+                Gizmos.DrawWireSphere(transform.position, 1f);
+            }
+            else
+            {
+                // Show the custom direction
+                Gizmos.DrawRay(transform.position, _customGravityDirection.normalized * 2f);
+            }
             
             // Draw the affected zone
             Gizmos.color = new Color(0, 1, 1, 0.2f); // Transparent cyan

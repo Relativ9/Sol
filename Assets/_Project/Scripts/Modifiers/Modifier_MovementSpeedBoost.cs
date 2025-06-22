@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Sol
 {
-    public class SpeedBoostPad : MonoBehaviour
+    public class Modifier_MovementSpeedBoost : MonoBehaviour
     {
         [Header("Boost Settings")] [SerializeField]
         private float _speedBoostAmount = 20f;

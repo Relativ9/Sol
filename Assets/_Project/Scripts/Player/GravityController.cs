@@ -62,15 +62,8 @@ namespace Sol
             Vector3 gravityForce;
             if (_useCustomGravityDirection)
             {
-                if (_rigidbody.linearVelocity.y <= 0)
-                {
-                    gravityForce = _customGravityDirection * gravityScale;
-                }
-                else
-                {
-                    gravityForce = _customGravityDirection * _defaultGravityMultiplier;
-                }
-                
+
+                gravityForce = _customGravityDirection * gravityScale;
             }
             else
             {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Sol
 {
-    public interface IBaseJumping
+    public interface IJumping
     {
         void HandleJumpInput();
     }

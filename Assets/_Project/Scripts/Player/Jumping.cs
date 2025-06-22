@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Sol
 {
-    public class Jumping : MonoBehaviour, IPlayerComponent, IBaseJumping
+    public class Jumping : MonoBehaviour, IPlayerComponent, IJumping
     { 
                 [SerializeField] private float _defaultJumpForce = 5f;
         [SerializeField] private float _defaultJumpDirectionBoost = 1.0f; // How much horizontal velocity to boost
