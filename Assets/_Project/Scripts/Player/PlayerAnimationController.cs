@@ -222,7 +222,22 @@ namespace Sol
         {
             if (_animator != null)
             {
-                _animator.SetTrigger(triggerName);
+                // Determine which layer to set the trigger on
+                if (triggerName == "Unsheathe"|| triggerName == "Sheathe" || triggerName.Contains("Attack"))
+                {
+                    // These are upper body animations, so set the trigger on both layers
+                    // This ensures proper synchronization
+                    _animator.SetTrigger(triggerName);
+            
+                    // You might also need to set parameters on the upper body layer specifically
+                    _animator.SetLayerWeight(1, 1f); // Ensure upper body layer is active
+                }
+                else
+                {
+                    // Regular animation triggers go to base layer
+                    _animator.SetTrigger(triggerName);
+                    _animator.SetLayerWeight(1, 0f);
+                }
             }
         }
         
