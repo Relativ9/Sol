@@ -243,7 +243,7 @@ namespace Sol
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mouse&Keyboard"",
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -254,7 +254,7 @@ namespace Sol
                     ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Mouse&Keyboard"",
                     ""action"": ""ToggleWeapon"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false

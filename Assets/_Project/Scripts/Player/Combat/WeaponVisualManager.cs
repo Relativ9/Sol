@@ -4,7 +4,7 @@ namespace Sol
 {
     public class WeaponVisualManager : MonoBehaviour, IPlayerComponent, IAnimationEventReceiver
     {
-                [Header("Weapon Transforms")]
+        [Header("Weapon Transforms")]
         [SerializeField] private Transform _rightHandMount;
         [SerializeField] private Transform _leftHandMount;
         [SerializeField] private Transform _backMount;
@@ -29,6 +29,7 @@ namespace Sol
         private WeaponType _currentWeaponType = WeaponType.None;
         private bool _isWeaponDrawn = false;
         private bool _isTransitioning = false;
+        private bool _weaponCreated = false;
         
         public void Initialize(IPlayerContext context)
         {
@@ -74,9 +75,59 @@ namespace Sol
                 _backMount.localPosition = new Vector3(0, 0, -0.2f);
             }
             
-            Debug.Log("Weapon visual manager initialized");
-        }
+            _isWeaponDrawn = _combatController != null && _combatController.IsWeaponDrawn();
         
+            // Create the weapon in the correct initial position (should be on back)
+            PreCreateWeapon();
+        
+            Debug.Log($"Weapon visual manager initialized. Weapon drawn: {_isWeaponDrawn}");
+            // Debug.Log("Weapon visual manager initialized");
+        }
+
+        private void PreCreateWeapon()
+        {
+            // Only do this if we haven't created a weapon yet
+            if (!_weaponCreated && _weaponService != null)
+            {
+                WeaponType weaponType = _weaponService.GetEquippedWeaponType();
+
+                // If we have a valid weapon type, pre-create it
+                if (weaponType != WeaponType.None)
+                {
+                    // Store the weapon type
+                    _currentWeaponType = weaponType;
+
+                    // Determine which prefab to use
+                    GameObject prefab = null;
+                    switch (weaponType)
+                    {
+                        case WeaponType.OneHanded:
+                            prefab = _oneHandedWeaponPrefab;
+                            break;
+                        case WeaponType.TwoHanded:
+                            prefab = _twoHandedWeaponPrefab;
+                            break;
+                        // Add other weapon types as needed
+                    }
+
+                    // Create the weapon on the appropriate mount
+                    if (prefab != null)
+                    {
+                        // Always start on back mount since we're starting sheathed
+                        Transform mountPoint = _backMount;
+
+                        _currentWeaponInstance = Instantiate(prefab, mountPoint);
+                        _currentWeaponInstance.transform.localPosition = Vector3.zero;
+                        _currentWeaponInstance.transform.localRotation = Quaternion.identity;
+
+                        _weaponCreated = true;
+
+                        Debug.Log($"Pre-created weapon of type {weaponType} on back mount");
+                    }
+                }
+            }
+        }
+
         private void Update()
         {
             // Only check for state changes if we're not in a transition
@@ -160,6 +211,13 @@ namespace Sol
                 Debug.Log($"Weapon visual manager received animation event: {eventName}");
             }
             
+            // Make sure the weapon exists before trying to move it
+            if (_currentWeaponInstance == null && eventName == _drawWeaponEvent)
+            {
+                Debug.Log("Weapon doesn't exist yet, creating it now");
+                PreCreateWeapon();
+            }
+            
             if (eventName == _drawWeaponEvent)
             {
                 // Move weapon to hand
@@ -173,6 +231,10 @@ namespace Sol
                     {
                         Debug.Log("Weapon moved to hand");
                     }
+                }
+                else
+                {
+                    Debug.LogWarning("Draw weapon event received but no weapon instance exists!");
                 }
                 _isTransitioning = false;
             }
@@ -192,6 +254,7 @@ namespace Sol
                 }
                 _isTransitioning = false;
             }
+        
         }
         
         public bool CanBeActivated()
