@@ -66,11 +66,7 @@ namespace Sol
             }
             
         }
-
-        // void Start()
-        // {
-        //     InitializeComponents();
-        // }
+        
         void Update()
         {
 

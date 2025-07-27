@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
+  m_Name: Transition 1
+  m_EditorClassIdentifier: 
+  season: 1
+  seasonDescription: Transition 1
+  primaryStarActive: 1
+  primaryXAxisEnabled: 1
+  primaryXAxisMode: 1
+  primaryXAxisSpeed: 1
+  primaryXAxisMinRange: 130
+  primaryXAxisMaxRange: 200
+  primaryYAxisEnabled: 1
+  primaryYAxisMode: 0
+  primaryYAxisSpeed: 0.05
+  primaryYAxisMinRange: 0
+  primaryYAxisMaxRange: 360
+  primarySyncXWithY: 1
+  redDwarfActive: 1
+  redDwarfXAxisEnabled: 1
+  redDwarfXAxisMode: 1
+  redDwarfXAxisSpeed: 0.4
+  redDwarfXAxisMinRange: 150
+  redDwarfXAxisMaxRange: 170
+  redDwarfYAxisEnabled: 1
+  redDwarfYAxisMode: 0
+  redDwarfYAxisSpeed: 0.05
+  redDwarfYAxisMinRange: 0
+  redDwarfYAxisMaxRange: 360
+  redDwarfSyncXWithY: 1
+  weatherEnabled: 1
+  snowChancePerDay: 0.5
+  minSnowDurationHours: 2
+  maxSnowDurationHours: 8
+  minClearDurationHours: 4
+  maxClearDurationHours: 16
+  weatherCheckIntervalHours: 1
