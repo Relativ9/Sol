@@ -6,7 +6,6 @@ namespace Sol
     /// <summary>
     /// Central time management system with calendar support
     /// Manages celestial time, seasonal transitions, and day/year progression
-    /// Enforces Primary Star Y-axis synchronization with day length
     /// </summary>
     public class TimeManager : MonoBehaviour, ITimeManager
     {
@@ -15,8 +14,6 @@ namespace Sol
         [SerializeField] private int daysPerYear = 200;
         [SerializeField] private int currentDay = 1;
         [SerializeField] private int currentYear = 1;
-        [Tooltip("Automatically synchronizes ALL celestial body Y-axis speeds to match day length (360° per day). This ensures realistic planetary rotation effects.")]
-        [SerializeField] private bool enforceCelestialDaySync = true; // Consider renaming from enforcePrimaryStarDaySync
         
         [Header("Time Configuration")]
         [SerializeField] private float timeScale = 1f;
@@ -61,7 +58,6 @@ namespace Sol
         public int DaysPerSeason => seasonalDataArray.Length > 0 ? daysPerYear / seasonalDataArray.Length : 40;
         public float SeasonDurationInSeconds => DaysPerSeason * dayLengthInSeconds;
         public float DayProgress => (_celestialTime - _dayStartTime) / dayLengthInSeconds;
-        public bool EnforceCelestialDaySync => enforceCelestialDaySync; // Property uses the field
 
         // Events - implemented as auto-properties to match interface
         public System.Action<Season> OnSeasonChanged { get; set; }
@@ -94,12 +90,6 @@ namespace Sol
             {
                 targetSeason = currentSeason;
                 _transitionProgress = 1f;
-            }
-    
-            // Enforce celestial sync on startup
-            if (enforceCelestialDaySync)
-            {
-                ApplyCelestialDaySync(); // UPDATED CALL
             }
     
             if (logSeasonChanges)
@@ -211,48 +201,6 @@ namespace Sol
             Season[] seasons = { Season.PolarSummer, Season.Transition1, Season.Equinox, Season.Transition2, Season.LongNight };
             return seasons[Mathf.Clamp(index, 0, seasons.Length - 1)];
         }
-        
-        /// <summary>
-        /// Enforces Y-axis synchronization with day length for all celestial bodies across all seasonal data
-        /// All celestial bodies should complete one full azimuth rotation per day due to planetary rotation
-        /// </summary>
-        private void ApplyCelestialDaySync()
-        {
-            if (!enforceCelestialDaySync) return;
-
-            bool anyChanges = false;
-            float requiredSpeed = 360f / dayLengthInSeconds;
-
-            foreach (SeasonalData data in seasonalDataArray)
-            {
-                if (data != null)
-                {
-                    if (!data.AreAllCelestialYAxisSyncedWithDay(dayLengthInSeconds))
-                    {
-                        // Get list of unsynced bodies for logging
-                        string[] unsyncedBodies = data.GetUnsyncedCelestialBodies(dayLengthInSeconds);
-                
-                        // Apply sync to all celestial bodies
-                        data.SetAllCelestialYAxisSpeeds(requiredSpeed);
-                        anyChanges = true;
-                
-                        if (logSeasonChanges)
-                        {
-                            Debug.Log($"Synchronized celestial Y-axis speeds in {data.Season} season to {requiredSpeed:F3} deg/sec");
-                            foreach (string body in unsyncedBodies)
-                            {
-                                Debug.Log($"  - {body}");
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (anyChanges && logSeasonChanges)
-            {
-                Debug.Log($"All celestial Y-axis speeds synchronized with day length: {dayLengthInSeconds} seconds ({requiredSpeed:F3} deg/sec)");
-            }
-        }
 
         private void ValidateCalendarSettings()
         {
@@ -271,33 +219,6 @@ namespace Sol
             if (seasonalDataArray.Length == 0)
             {
                 Debug.LogWarning("No seasonal data configured! Add seasonal data assets.");
-            }
-            
-            if (enforceCelestialDaySync)
-            {
-                ValidateCelestialSync(); // UPDATED CALL
-            }
-        }
-
-        // Update the validation method:
-        private void ValidateCelestialSync()
-        {
-            foreach (SeasonalData data in seasonalDataArray)
-            {
-                if (data != null)
-                {
-                    if (!data.AreAllCelestialYAxisSyncedWithDay(dayLengthInSeconds))
-                    {
-                        string[] unsyncedBodies = data.GetUnsyncedCelestialBodies(dayLengthInSeconds);
-                        float expectedSpeed = data.GetRequiredCelestialYAxisSpeed(dayLengthInSeconds);
-                
-                        Debug.LogWarning($"Celestial Y-axis speeds in {data.Season} season don't match day length! Expected: {expectedSpeed:F3} deg/sec");
-                        foreach (string body in unsyncedBodies)
-                        {
-                            Debug.LogWarning($"  - {body}");
-                        }
-                    }
-                }
             }
         }
 
@@ -444,20 +365,6 @@ namespace Sol
         public void SetDayLength(float lengthInSeconds)
         {
             dayLengthInSeconds = Mathf.Max(1f, lengthInSeconds);
-    
-            if (enforceCelestialDaySync)
-            {
-                ApplyCelestialDaySync(); // UPDATED CALL
-            }
-        }
-        public void SetEnforcePrimaryStarDaySync(bool enforce)
-        {
-            enforceCelestialDaySync = enforce;
-    
-            if (enforce)
-            {
-                ApplyCelestialDaySync(); // UPDATED CALL
-            }
         }
 
         // Editor validation
@@ -474,10 +381,6 @@ namespace Sol
             if (Application.isPlaying && _seasonalDataCache != null)
             {
                 BuildSeasonalDataCache();
-                if (enforceCelestialDaySync)
-                {
-                    ApplyCelestialDaySync(); // UPDATED CALL
-                }
             }
         }
     }

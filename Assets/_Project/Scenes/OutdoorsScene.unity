@@ -967,12 +967,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   celestialBodyName: PrimaryStar
   useSeasonalTransitions: 1
+  celestialCalculator: {fileID: 0}
+  createCalculatorIfMissing: 1
   useOptimization: 1
   updateFrequency: 24
   rotationActive: 1
   overrideCelestialTime: 0
   manualCelestialTime: 0
   showDebugInfo: 0
+  logSynchronizationStatus: 0
 --- !u!1 &159748578
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,7 +1126,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 500}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 400, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &164334679
@@ -9931,12 +9934,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432432459}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 578510089}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &443819648
 GameObject:
@@ -10600,6 +10603,51 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8739090428522079082, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &578510087
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 578510089}
+  - component: {fileID: 578510088}
+  m_Layer: 0
+  m_Name: SkyAndFogController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &578510088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 578510087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5691536bfa33f8459e6a8ebfee0badb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &578510089
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 578510087}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 432432461}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &595651513
 GameObject:
   m_ObjectHideFlags: 0
@@ -10841,6 +10889,72 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -9082362208595849712, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &650760656
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 650760658}
+  - component: {fileID: 650760657}
+  - component: {fileID: 650760659}
+  m_Layer: 0
+  m_Name: WindZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &650760657
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650760656}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 0.6
+  m_WindTurbulence: 1
+  m_WindPulseMagnitude: 0.5
+  m_WindPulseFrequency: 0.1
+--- !u!4 &650760658
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650760656}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &650760659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 650760656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ebf2e90bed0eac4dad106e568e52550, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  windZone: {fileID: 650760657}
+  baseWindMain: 1
+  baseWindTurbulence: 1
+  affectWindMain: 1
+  affectWindTurbulence: 1
+  timeScaleMultiplier: 1
+  enableLogging: 0
 --- !u!1 &651374367
 GameObject:
   m_ObjectHideFlags: 0
@@ -11019,6 +11133,60 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -1918406353201951979, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &702943492
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 702943494}
+  - component: {fileID: 702943493}
+  m_Layer: 0
+  m_Name: Custom Pass
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &702943493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702943492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26d6499a6bd256e47b859377446493a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  fadeRadius: 0
+  priority: 0
+  customPasses: []
+  injectionPoint: 1
+  m_TargetCamera: {fileID: 0}
+  useTargetCamera: 0
+  references:
+    version: 2
+    RefIds: []
+--- !u!4 &702943494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702943492}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.4311907, y: 2.3283448, z: -15.859511}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &711337461 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -9166285093476956020, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -13077,8 +13245,7 @@ MonoBehaviour:
   daysPerYear: 200
   currentDay: 1
   currentYear: 1
-  enforceCelestialDaySync: 1
-  timeScale: 100
+  timeScale: 500
   celestialTimeMultiplier: 1
   pauseTime: 0
   seasonalDataArray:
@@ -13755,7 +13922,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 9910e66423ef28547afede5fc3c8ce17, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13799,7 +13966,7 @@ ParticleSystemRenderer:
   m_VertexStreams: 00010304
   m_UseCustomTrailVertexStreams: 0
   m_TrailVertexStreams: 00010304
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
@@ -13890,9 +14057,9 @@ ParticleSystem:
     enabled: 1
     startLifetime:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 10
-      minScalar: 5
+      minMaxState: 3
+      scalar: 3
+      minScalar: 2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -14220,7 +14387,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationX:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -14273,7 +14440,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotationY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 0
       minScalar: 0
       maxCurve:
@@ -14326,8 +14493,8 @@ ParticleSystem:
         m_RotationOrder: 4
     startRotation:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 0
+      minMaxState: 3
+      scalar: 6.283185
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -14379,14 +14546,14 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 1000
+    maxNumParticles: 5000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.2
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -14439,7 +14606,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 5
+    type: 18
     angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -14645,7 +14812,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 200
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -14913,11 +15080,11 @@ ParticleSystem:
         m_RotationOrder: 4
     separateAxes: 0
   RotationModule:
-    enabled: 0
+    enabled: 1
     x:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 0.2617994
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -14970,7 +15137,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 0.2617994
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -15023,7 +15190,7 @@ ParticleSystem:
     curve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.7853982
+      scalar: 0.7853981
       minScalar: 0.7853982
       maxCurve:
         serializedVersion: 2
@@ -15073,9 +15240,9 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-    separateAxes: 0
+    separateAxes: 1
   ColorModule:
-    enabled: 0
+    enabled: 1
     gradient:
       serializedVersion: 2
       minMaxState: 1
@@ -15083,9 +15250,9 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 1, b: 1, a: 1}
+        key0: {r: 1, g: 1, b: 1, a: 0}
         key1: {r: 1, g: 1, b: 1, a: 1}
-        key2: {r: 0, g: 0, b: 0, a: 0}
+        key2: {r: 0, g: 0, b: 0, a: 1}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
         key5: {r: 0, g: 0, b: 0, a: 0}
@@ -15100,17 +15267,17 @@ ParticleSystem:
         ctime6: 0
         ctime7: 0
         atime0: 0
-        atime1: 65535
-        atime2: 0
+        atime1: 19853
+        atime2: 65535
         atime3: 0
         atime4: 0
         atime5: 0
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: -1
+        m_ColorSpace: 0
         m_NumColorKeys: 2
-        m_NumAlphaKeys: 2
+        m_NumAlphaKeys: 3
       minGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -16128,7 +16295,7 @@ ParticleSystem:
     randomizePerFrame: 0
   ExternalForcesModule:
     serializedVersion: 2
-    enabled: 0
+    enabled: 1
     multiplierCurve:
       serializedVersion: 2
       minMaxState: 0
@@ -16460,12 +16627,12 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
   NoiseModule:
-    enabled: 0
+    enabled: 1
     strength:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 1
-      minScalar: 1
+      minMaxState: 3
+      scalar: 0.8
+      minScalar: 0.1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -16516,7 +16683,7 @@ ParticleSystem:
         m_RotationOrder: 4
     strengthY:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -16569,7 +16736,7 @@ ParticleSystem:
         m_RotationOrder: 4
     strengthZ:
       serializedVersion: 2
-      minMaxState: 0
+      minMaxState: 3
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -16622,7 +16789,7 @@ ParticleSystem:
         m_RotationOrder: 4
     separateAxes: 0
     frequency: 0.5
-    damping: 1
+    damping: 0
     octaves: 1
     octaveMultiplier: 0.5
     octaveScale: 2
@@ -16630,7 +16797,7 @@ ParticleSystem:
     scrollSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 2
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -18545,17 +18712,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weatherManager: {fileID: 1761106422}
   timeManager: {fileID: 1441384673}
-  weatherInfoText: {fileID: 560909892}
-  timeInfoText: {fileID: 164334680}
-  seasonInfoText: {fileID: 821220401}
-  weatherStatsText: {fileID: 616751363}
-  transitionInfoText: {fileID: 1337297897}
-  enableContinuousLogging: 0
-  logWeatherEvents: 1
-  logTimeScaleChanges: 1
-  uiUpdateFrequency: 0.5
-  trackWeatherStatistics: 1
-  resetStatsOnSeasonChange: 1
+  statusText: {fileID: 164334680}
+  updateFrequency: 1
+  logWeatherChanges: 1
+  logDetailedTiming: 1
 --- !u!4 &1562301784
 Transform:
   m_ObjectHideFlags: 0
@@ -18564,14 +18724,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1562301779}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.5, y: 9.12, z: 12.45}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 9.5, y: 21.55, z: 12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 315526943}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1575862954
 GameObject:
   m_ObjectHideFlags: 0
@@ -19203,12 +19363,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   celestialBodyName: Red Dwarf
   useSeasonalTransitions: 1
+  celestialCalculator: {fileID: 0}
+  createCalculatorIfMissing: 1
   useOptimization: 1
   updateFrequency: 24
   rotationActive: 1
   overrideCelestialTime: 0
   manualCelestialTime: 0
   showDebugInfo: 0
+  logSynchronizationStatus: 0
 --- !u!4 &1669363833 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5473560659282289409, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -19332,9 +19495,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca5fb02999d575489b014d49059fe3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableWeatherSystem: 1
-  weatherTransitionDuration: 5
-  weatherTransitionCurve:
+  snowParticleSystem: {fileID: 1562301782}
+  emissionTransitionDuration: 10
+  emissionCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -19358,12 +19521,32 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  showDebugInfo: 0
-  logWeatherChanges: 1
-  logWeatherEvents: 0
-  snowParticleSystem: {fileID: 0}
-  autoFindParticleSystem: 1
-  snowParticleSystemName: SnowParticleSystem
+  snowIntensificationDuration: 50
+  snowProgressionCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  enableLogging: 1
 --- !u!4 &1761106423
 Transform:
   m_ObjectHideFlags: 0
@@ -21635,7 +21818,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 157207114}
   - {fileID: 1655173279}
-  - {fileID: 432432461}
+  - {fileID: 578510089}
   - {fileID: 2013410475}
   - {fileID: 443819651}
   - {fileID: 2100861472}
@@ -21652,3 +21835,5 @@ SceneRoots:
   - {fileID: 1441384674}
   - {fileID: 1761106423}
   - {fileID: 1562301784}
+  - {fileID: 650760658}
+  - {fileID: 702943494}

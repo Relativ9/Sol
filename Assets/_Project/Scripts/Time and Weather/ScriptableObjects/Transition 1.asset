@@ -10,38 +10,34 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
-  m_Name: LongNight
+  m_Name: Transition 1
   m_EditorClassIdentifier: 
-  season: 4
-  seasonDescription: Long Night
+  season: 1
   primaryStarActive: 1
   primaryXAxisEnabled: 1
-  primaryXAxisMode: 1
+  primaryXAxisMode: 0
   primaryXAxisSpeed: 1
+  primarySyncXWithY: 1
   primaryXAxisMinRange: 150
   primaryXAxisMaxRange: 220
   primaryYAxisEnabled: 1
-  primaryYAxisMode: 0
+  primaryYAxisMode: 1
   primaryYAxisSpeed: 0.05
+  primaryYAxisOverrideSpeed: 0
   primaryYAxisMinRange: 0
   primaryYAxisMaxRange: 360
-  primarySyncXWithY: 1
   redDwarfActive: 1
   redDwarfXAxisEnabled: 1
   redDwarfXAxisMode: 1
   redDwarfXAxisSpeed: 0.4
-  redDwarfXAxisMinRange: 140
-  redDwarfXAxisMaxRange: 190
+  redDwarfSyncXWithY: 0
+  redDwarfXAxisMinRange: -20
+  redDwarfXAxisMaxRange: 20
   redDwarfYAxisEnabled: 1
   redDwarfYAxisMode: 0
   redDwarfYAxisSpeed: 0.05
+  redDwarfYAxisOverrideSpeed: 0
   redDwarfYAxisMinRange: 0
   redDwarfYAxisMaxRange: 360
-  redDwarfSyncXWithY: 1
-  weatherEnabled: 1
-  snowChancePerDay: 0.5
-  minSnowDurationHours: 2
-  maxSnowDurationHours: 8
-  minClearDurationHours: 4
-  maxClearDurationHours: 16
-  weatherCheckIntervalHours: 1
+  weatherData: {fileID: 11400000, guid: ebd9f1fccbc3c234b9fe2cf69c333134, type: 2}
+  overrideWeatherEnabled: 0

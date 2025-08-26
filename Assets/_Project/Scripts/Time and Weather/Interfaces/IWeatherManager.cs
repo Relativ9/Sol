@@ -86,5 +86,8 @@ namespace Sol
         /// Forces an immediate weather evaluation check
         /// </summary>
         void ForceWeatherCheck();
+        
+        WeatherState CurrentState { get; }
+        void ForceWeatherState(WeatherState state, float durationHours);
     }
 }
