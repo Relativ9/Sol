@@ -58,7 +58,7 @@ namespace Sol
 
             string status = $"<b>Weather System Status</b>\n\n";
             status += $"Current Weather: <color={(weatherManager.CurrentState == WeatherState.Snowing ? "cyan" : "yellow")}>{weatherManager.CurrentState}</color>\n";
-            status += $"Is Snowing: {(weatherManager.IsSnowing ? "<color=cyan>Yes</color>" : "<color=yellow>No</color>")}\n";
+            status += $"Is Snowing: {(weatherManager.IsSnowing ? "<color=green>Yes</color>" : "<color=yellow>No</color>")}\n";
             status += $"Season: <color=orange>{timeManager.CurrentSeason}</color>\n";
             status += $"Day: {timeManager.CurrentDay}/{timeManager.DaysPerYear}\n";
             status += $"Time Scale: {timeManager.TimeScale:F1}x\n\n";
@@ -110,7 +110,7 @@ namespace Sol
             
             // Real-time remaining
             float realTimeRemaining = timeRemaining / timeManager.TimeScale;
-            countdownInfo += $"Real-time remaining: <color=lime>{realTimeRemaining / 60f:F1} minutes</color>\n";
+            countdownInfo += $"Real-time remaining: <color=blue>{realTimeRemaining / 60f:F1} minutes</color>\n";
             
             // Status
             if (timeRemaining > 60f) // More than 1 minute

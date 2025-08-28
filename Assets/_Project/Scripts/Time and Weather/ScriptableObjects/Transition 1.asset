@@ -28,13 +28,13 @@ MonoBehaviour:
   primaryYAxisMaxRange: 360
   redDwarfActive: 1
   redDwarfXAxisEnabled: 1
-  redDwarfXAxisMode: 1
+  redDwarfXAxisMode: 0
   redDwarfXAxisSpeed: 0.4
-  redDwarfSyncXWithY: 0
-  redDwarfXAxisMinRange: -20
-  redDwarfXAxisMaxRange: 20
+  redDwarfSyncXWithY: 1
+  redDwarfXAxisMinRange: 140
+  redDwarfXAxisMaxRange: 180
   redDwarfYAxisEnabled: 1
-  redDwarfYAxisMode: 0
+  redDwarfYAxisMode: 1
   redDwarfYAxisSpeed: 0.05
   redDwarfYAxisOverrideSpeed: 0
   redDwarfYAxisMinRange: 0

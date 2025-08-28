@@ -742,7 +742,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 0.8254717, g: 0.94156736, b: 1, a: 1}
-  m_Intensity: 9900
+  m_Intensity: 90000
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -785,14 +785,14 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 0.5, y: 0.5}
   m_BounceIntensity: 5
-  m_ColorTemperature: 10868
+  m_ColorTemperature: 6600
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
   m_ShadowRadius: 0
-  m_ShadowAngle: 2
+  m_ShadowAngle: 1.47
   m_LightUnit: 2
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 0
@@ -857,10 +857,10 @@ MonoBehaviour:
   m_AreaLightShadowCone: 120
   m_UseScreenSpaceShadows: 0
   m_InteractsWithSky: 1
-  m_AngularDiameter: 2
+  m_AngularDiameter: 1.47
   diameterMultiplerMode: 0
   diameterMultiplier: 1
-  diameterOverride: 2
+  diameterOverride: 1.47
   celestialBodyShadingSource: 1
   sunLightOverride: {fileID: 0}
   sunColor: {r: 1, g: 1, b: 1, a: 1}
@@ -869,7 +869,7 @@ MonoBehaviour:
   moonPhaseRotation: 0
   earthshine: 1
   flareSize: 4.5
-  flareTint: {r: 0.7311321, g: 0.96823573, b: 1, a: 1}
+  flareTint: {r: 0.5058824, g: 0.95294124, b: 1, a: 1}
   flareFalloff: 4
   flareMultiplier: 1
   surfaceTexture: {fileID: 0}
@@ -1126,7 +1126,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -1000, y: 0}
   m_SizeDelta: {x: 400, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &164334679
@@ -10479,7 +10479,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &560909890
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10706,7 +10706,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &616751361
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11531,7 +11531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &821220399
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12856,7 +12856,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1337297897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13241,8 +13241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce193bf981a168f4cb6c1ea54c316d21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dayLengthInSeconds: 7200
-  daysPerYear: 200
+  dayLengthInSeconds: 72000
+  daysPerYear: 832
   currentDay: 1
   currentYear: 1
   timeScale: 500
@@ -13251,11 +13251,11 @@ MonoBehaviour:
   seasonalDataArray:
   - {fileID: 11400000, guid: 8454b5d7c8f8ecc45a889b86e98e1d86, type: 2}
   - {fileID: 11400000, guid: 03dd2f841fe4f6d4ba15015d3b5c0ae5, type: 2}
-  - {fileID: 11400000, guid: f9d37c6ab1d8d654cba56fec85d768b8, type: 2}
   - {fileID: 11400000, guid: a7c9db57506e5a840b18f62c357aee1e, type: 2}
+  - {fileID: 11400000, guid: f9d37c6ab1d8d654cba56fec85d768b8, type: 2}
   - {fileID: 11400000, guid: 142b34f6f6c8a4747bab65f1c9ce150a, type: 2}
   currentSeason: 0
-  targetSeason: 4
+  targetSeason: 1
   enableSeasonalTransitions: 1
   seasonTransitionDuration: 10
   transitionCurve:
@@ -19176,7 +19176,7 @@ MonoBehaviour:
   m_AngularDiameter: 1
   diameterMultiplerMode: 0
   diameterMultiplier: 1
-  diameterOverride: 0.2
+  diameterOverride: 0.8
   celestialBodyShadingSource: 1
   sunLightOverride: {fileID: 0}
   sunColor: {r: 1, g: 1, b: 1, a: 1}
@@ -19185,11 +19185,11 @@ MonoBehaviour:
   moonPhaseRotation: 0
   earthshine: 1
   flareSize: 1
-  flareTint: {r: 1, g: 0.22532359, b: 0, a: 1}
+  flareTint: {r: 1, g: 0.427451, b: 0, a: 1}
   flareFalloff: 4
   flareMultiplier: 0.1
   surfaceTexture: {fileID: 0}
-  surfaceTint: {r: 1, g: 0.2858676, b: 0.06132078, a: 1}
+  surfaceTint: {r: 1, g: 0.4431373, b: 0, a: 1}
   m_Distance: 1
   m_UseRayTracedShadows: 0
   m_NumRayTracingSamples: 4
@@ -19280,7 +19280,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1200
+  m_Intensity: 10000
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -19323,7 +19323,7 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 0.5, y: 0.5}
   m_BounceIntensity: 1
-  m_ColorTemperature: 2161
+  m_ColorTemperature: 2200
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
