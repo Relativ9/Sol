@@ -18,7 +18,7 @@ MonoBehaviour:
   primaryXAxisMode: 0
   primaryXAxisSpeed: 10
   primarySyncXWithY: 1
-  primaryXAxisMinRange: 100
+  primaryXAxisMinRange: 120
   primaryXAxisMaxRange: 180
   primaryYAxisEnabled: 1
   primaryYAxisMode: 1
@@ -32,7 +32,7 @@ MonoBehaviour:
   redDwarfXAxisSpeed: 0.4
   redDwarfSyncXWithY: 1
   redDwarfXAxisMinRange: 120
-  redDwarfXAxisMaxRange: 180
+  redDwarfXAxisMaxRange: 160
   redDwarfYAxisEnabled: 1
   redDwarfYAxisMode: 1
   redDwarfYAxisSpeed: 0.05

@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
   m_Name: LongNight
   m_EditorClassIdentifier: 
-  season: 4
+  season: 2
   primaryStarActive: 1
   primaryXAxisEnabled: 1
   primaryXAxisMode: 0
   primaryXAxisSpeed: 1
   primarySyncXWithY: 1
-  primaryXAxisMinRange: 150
-  primaryXAxisMaxRange: 220
+  primaryXAxisMinRange: 180
+  primaryXAxisMaxRange: 240
   primaryYAxisEnabled: 1
   primaryYAxisMode: 1
   primaryYAxisSpeed: 0.05
@@ -31,13 +31,13 @@ MonoBehaviour:
   redDwarfXAxisMode: 0
   redDwarfXAxisSpeed: 0.4
   redDwarfSyncXWithY: 1
-  redDwarfXAxisMinRange: 140
-  redDwarfXAxisMaxRange: 190
+  redDwarfXAxisMinRange: 180
+  redDwarfXAxisMaxRange: 220
   redDwarfYAxisEnabled: 1
   redDwarfYAxisMode: 1
   redDwarfYAxisSpeed: 0.05
   redDwarfYAxisOverrideSpeed: 0
   redDwarfYAxisMinRange: 0
   redDwarfYAxisMaxRange: 360
-  weatherData: {fileID: 11400000, guid: ebd9f1fccbc3c234b9fe2cf69c333134, type: 2}
+  weatherData: {fileID: 0}
   overrideWeatherEnabled: 0

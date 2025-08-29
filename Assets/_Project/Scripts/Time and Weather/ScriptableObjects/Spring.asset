@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
-  m_Name: Equinox
+  m_Name: Spring
   m_EditorClassIdentifier: 
-  season: 2
+  season: 3
   primaryStarActive: 1
   primaryXAxisEnabled: 1
   primaryXAxisMode: 0
   primaryXAxisSpeed: 1
   primarySyncXWithY: 1
-  primaryXAxisMinRange: 100
-  primaryXAxisMaxRange: 210
+  primaryXAxisMinRange: 160
+  primaryXAxisMaxRange: 220
   primaryYAxisEnabled: 1
   primaryYAxisMode: 1
   primaryYAxisSpeed: 0.05
@@ -28,13 +28,13 @@ MonoBehaviour:
   primaryYAxisMaxRange: 360
   redDwarfActive: 1
   redDwarfXAxisEnabled: 1
-  redDwarfXAxisMode: 1
+  redDwarfXAxisMode: 0
   redDwarfXAxisSpeed: 0.4
   redDwarfSyncXWithY: 1
-  redDwarfXAxisMinRange: 160
+  redDwarfXAxisMinRange: 140
   redDwarfXAxisMaxRange: 180
   redDwarfYAxisEnabled: 1
-  redDwarfYAxisMode: 0
+  redDwarfYAxisMode: 1
   redDwarfYAxisSpeed: 0.05
   redDwarfYAxisOverrideSpeed: 0
   redDwarfYAxisMinRange: 0

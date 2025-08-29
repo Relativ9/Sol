@@ -76,13 +76,13 @@ namespace Sol
                 case Season.PolarSummer:
                     targetAlpha = summerAlpha;
                     break;
-                case Season.Transition1:
+                case Season.Fall:
                     targetAlpha = transitionToLongNightAlpha;
                     break;
                 case Season.LongNight:
                     targetAlpha = longNightAlpha;
                     break;
-                case Season.Transition2:
+                case Season.Spring:
                     targetAlpha = transitionFromLongNightAlpha;
                     break;
                 default:
