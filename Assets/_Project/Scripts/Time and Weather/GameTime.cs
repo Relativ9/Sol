@@ -8,13 +8,29 @@ namespace Sol
         [System.Serializable]
         public class GameTime
         {
-            public float totalGameTime;      // Total elapsed game time in seconds
-            public float dayTime;           // Current time within the day (0-1, where 0.5 = noon)
-            public int currentDay;          // Day number since game start
-            public Season currentSeason;    // Current dominant season
-            public float seasonProgress;    // Progress through current season (0-1)
-            public float seasonTransition;  // Blend factor between seasons (0-1)
-            public Season nextSeason;       // Season we're transitioning to
+            // public float totalGameTime;      // Total elapsed game time in seconds
+            // public float dayTime;           // Current time within the day (0-1, where 0.5 = noon)
+            // public int currentDay;          // Day number since game start
+            // public Season currentSeason;    // Current dominant season
+            // public float seasonProgress;    // Progress through current season (0-1)
+            // public float seasonTransition;  // Blend factor between seasons (0-1)
+            // public Season nextSeason;       // Season we're transitioning to
+            
+            // Your existing fields
+            public float totalGameTime;
+            public float dayTime;
+            public int currentDay;
+            public Season currentSeason;
+            public float seasonProgress;
+            public float seasonTransition;
+            public Season nextSeason;
+            public int hours;
+            public int minutes;
+            public int seconds;
+    
+            // Add these calculated properties (no new storage)
+            public int DaysRemainingInSeason { get; set; }  // Set by TimeManager
+            public int TotalDaysInSeason { get; set; }      // Set by TimeManager
         }
 
         /// <summary>
@@ -23,10 +39,9 @@ namespace Sol
         public enum Season
         {
             PolarSummer,    // Perihelion - close to primary star, midnight sun
-            Transition1,    // Spring/Fall equivalent
-            Equinox,        // Balanced distance
-            Transition2,    // Fall/Spring equivalent  
-            LongNight       // Aphelion - far from primary star, long nights
+            Fall,    // Fall equivalent
+            LongNight,       // Long Polar nights, barely any light from Sol for only a few hours every day.
+            Spring    // Spring equivalent  
         }
 
         /// <summary>

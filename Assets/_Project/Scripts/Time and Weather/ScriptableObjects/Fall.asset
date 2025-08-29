@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
-  m_Name: Transition 2
+  m_Name: Fall
   m_EditorClassIdentifier: 
-  season: 3
+  season: 1
   primaryStarActive: 1
   primaryXAxisEnabled: 1
   primaryXAxisMode: 0
   primaryXAxisSpeed: 1
   primarySyncXWithY: 1
-  primaryXAxisMinRange: 140
-  primaryXAxisMaxRange: 210
+  primaryXAxisMinRange: 160
+  primaryXAxisMaxRange: 220
   primaryYAxisEnabled: 1
   primaryYAxisMode: 1
   primaryYAxisSpeed: 0.05
@@ -31,8 +31,8 @@ MonoBehaviour:
   redDwarfXAxisMode: 0
   redDwarfXAxisSpeed: 0.4
   redDwarfSyncXWithY: 1
-  redDwarfXAxisMinRange: 150
-  redDwarfXAxisMaxRange: 170
+  redDwarfXAxisMinRange: 140
+  redDwarfXAxisMaxRange: 180
   redDwarfYAxisEnabled: 1
   redDwarfYAxisMode: 1
   redDwarfYAxisSpeed: 0.05

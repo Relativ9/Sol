@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace Sol
 {
-
     /// <summary>
     /// Oscillate makes the body moves back and forth between the two rotational values
     /// Continous rotates 360 degrees on the axis at a set speed.
@@ -17,51 +16,105 @@ namespace Sol
     public class SeasonalData : ScriptableObject
     {
         [Header("Season Configuration")]
+        [Tooltip("Which season this configuration applies to")]
         [SerializeField] private Season season = Season.LongNight;
         
         [Header("Primary Star Configuration")]
+        [Tooltip("Whether the primary star is visible and active during this season")]
         [SerializeField] private bool primaryStarActive = true;
         
         [Header("Primary Star X-Axis (Elevation)")]
+        [Tooltip("Enable X-axis rotation to create elevation changes (sun rising/setting effect)")]
         [SerializeField] private bool primaryXAxisEnabled = false;
+        
+        [Tooltip("Oscillate: moves between min/max values. Continuous: rotates 360° at set speed")]
         [SerializeField] private CelestialRotationMode primaryXAxisMode = CelestialRotationMode.Oscillate;
+        
+        [Tooltip("Rotation speed in degrees per celestial time unit (only used if not synced with Y-axis)")]
         [SerializeField] private float primaryXAxisSpeed = 0.1f;
+        
+        [Tooltip("Sync X-axis speed to complete one full min-max-min cycle per Y-axis rotation (realistic day cycle)")]
         [SerializeField] private bool primarySyncXWithY = false;
-        [SerializeField] private float primaryXAxisMinRange = -30f;
-        [SerializeField] private float primaryXAxisMaxRange = 30f;
+        
+        [Tooltip("Minimum elevation angle in degrees (180 is the horizon, anything above is below. 120 is high in teh sky)")]
+        [Range(120f, 240f)]
+        [SerializeField] private float primaryXAxisMinRange;
+        
+        [Tooltip("Maximum elevation angle in degrees (180 is the horizon, anything above is below. 120 is high in teh sky)")]
+        [Range(120f, 240f)]
+        [SerializeField] private float primaryXAxisMaxRange;
         
         [Header("Primary Star Y-Axis (Azimuth)")]
+        [Tooltip("Enable Y-axis rotation for azimuth movement (sun moving across sky)")]
         [SerializeField] private bool primaryYAxisEnabled = true;
+        
+        [Tooltip("Oscillate: moves between min/max values. Continuous: rotates 360° creating day/night cycle")]
         [SerializeField] private CelestialRotationMode primaryYAxisMode = CelestialRotationMode.Continuous;
+        
+        [Tooltip("Custom rotation speed in degrees per celestial time unit (only used if Override Speed is enabled)")]
         [SerializeField] private float primaryYAxisSpeed = 0.25f;
-        [SerializeField] private bool primaryYAxisOverrideSpeed = false; // New: override day sync
-        [SerializeField] private float primaryYAxisMinRange = 0f; // New: for oscillate mode
-        [SerializeField] private float primaryYAxisMaxRange = 360f; // New: for oscillate mode
+        
+        [Tooltip("Override automatic day sync - use custom speed instead of syncing with TimeManager day length")]
+        [SerializeField] private bool primaryYAxisOverrideSpeed = false;
+        
+        [Tooltip("Minimum azimuth angle in degrees (used in Oscillate mode)")]
+        [SerializeField] private float primaryYAxisMinRange = 0f;
+        
+        [Tooltip("Maximum azimuth angle in degrees (used in Oscillate mode)")]
+        [SerializeField] private float primaryYAxisMaxRange = 360f;
         
         [Header("Red Dwarf Configuration")]
+        [Tooltip("Whether the red dwarf star is visible and active during this season")]
         [SerializeField] private bool redDwarfActive = false;
         
         [Header("Red Dwarf X-Axis (Elevation)")]
+        [Tooltip("Enable X-axis rotation to create elevation changes for the red dwarf")]
         [SerializeField] private bool redDwarfXAxisEnabled = false;
+        
+        [Tooltip("Oscillate: moves between min/max values. Continuous: rotates 360° at set speed")]
         [SerializeField] private CelestialRotationMode redDwarfXAxisMode = CelestialRotationMode.Oscillate;
+        
+        [Tooltip("Rotation speed in degrees per celestial time unit (only used if not synced with Y-axis)")]
         [SerializeField] private float redDwarfXAxisSpeed = 0.05f;
+        
+        [Tooltip("Sync X-axis speed to complete one full min-max-min cycle per Y-axis rotation")]
         [SerializeField] private bool redDwarfSyncXWithY = false;
-        [SerializeField] private float redDwarfXAxisMinRange = -20f;
-        [SerializeField] private float redDwarfXAxisMaxRange = 20f;
+        
+        [Tooltip("Minimum elevation angle in degrees (180 is the horizon, anything above is below. 120 is high in teh sky)")]
+        [Range(120f, 240f)]
+        [SerializeField] private float redDwarfXAxisMinRange;
+        
+        [Tooltip("Maximum elevation angle in degrees (180 is the horizon, anything above is below. 120 is high in teh sky)")]
+        [Range(120f, 240f)]
+        [SerializeField] private float redDwarfXAxisMaxRange;
         
         [Header("Red Dwarf Y-Axis (Azimuth)")]
+        [Tooltip("Enable Y-axis rotation for azimuth movement of the red dwarf")]
         [SerializeField] private bool redDwarfYAxisEnabled = false;
+        
+        [Tooltip("Oscillate: moves between min/max values. Continuous: rotates 360° creating day/night cycle")]
         [SerializeField] private CelestialRotationMode redDwarfYAxisMode = CelestialRotationMode.Continuous;
+        
+        [Tooltip("Custom rotation speed in degrees per celestial time unit (only used if Override Speed is enabled)")]
         [SerializeField] private float redDwarfYAxisSpeed = 0.15f;
-        [SerializeField] private bool redDwarfYAxisOverrideSpeed = false; // New: override day sync
-        [SerializeField] private float redDwarfYAxisMinRange = 0f; // New: for oscillate mode
-        [SerializeField] private float redDwarfYAxisMaxRange = 360f; // New: for oscillate mode
+        
+        [Tooltip("Override automatic day sync - use custom speed instead of syncing with TimeManager day length")]
+        [SerializeField] private bool redDwarfYAxisOverrideSpeed = false;
+        
+        [Tooltip("Minimum azimuth angle in degrees (used in Oscillate mode)")]
+        [SerializeField] private float redDwarfYAxisMinRange = 0f;
+        
+        [Tooltip("Maximum azimuth angle in degrees (used in Oscillate mode)")]
+        [SerializeField] private float redDwarfYAxisMaxRange = 360f;
         
         [Header("Weather Configuration")]
+        [Tooltip("Weather data asset to use for this season (leave empty to disable weather)")]
         [SerializeField] private WeatherData weatherData;
+        
+        [Tooltip("Force disable weather for this season even if weather data is assigned")]
         [SerializeField] private bool overrideWeatherEnabled = false;
 
-        // Properties
+        // Properties (unchanged)
         public Season Season => season;
         
         // Primary Star Properties
@@ -75,9 +128,9 @@ namespace Sol
         public bool PrimaryYAxisEnabled => primaryYAxisEnabled;
         public CelestialRotationMode PrimaryYAxisMode => primaryYAxisMode;
         public float PrimaryYAxisSpeed => primaryYAxisSpeed;
-        public bool PrimaryYAxisOverrideSpeed => primaryYAxisOverrideSpeed; // New
-        public float PrimaryYAxisMinRange => primaryYAxisMinRange; // New
-        public float PrimaryYAxisMaxRange => primaryYAxisMaxRange; // New
+        public bool PrimaryYAxisOverrideSpeed => primaryYAxisOverrideSpeed;
+        public float PrimaryYAxisMinRange => primaryYAxisMinRange;
+        public float PrimaryYAxisMaxRange => primaryYAxisMaxRange;
         
         // Red Dwarf Properties
         public bool RedDwarfActive => redDwarfActive;
@@ -90,36 +143,24 @@ namespace Sol
         public bool RedDwarfYAxisEnabled => redDwarfYAxisEnabled;
         public CelestialRotationMode RedDwarfYAxisMode => redDwarfYAxisMode;
         public float RedDwarfYAxisSpeed => redDwarfYAxisSpeed;
-        public bool RedDwarfYAxisOverrideSpeed => redDwarfYAxisOverrideSpeed; // New
-        public float RedDwarfYAxisMinRange => redDwarfYAxisMinRange; // New
-        public float RedDwarfYAxisMaxRange => redDwarfYAxisMaxRange; // New
+        public bool RedDwarfYAxisOverrideSpeed => redDwarfYAxisOverrideSpeed;
+        public float RedDwarfYAxisMinRange => redDwarfYAxisMinRange;
+        public float RedDwarfYAxisMaxRange => redDwarfYAxisMaxRange;
         
         // Weather Properties
         public WeatherData WeatherData => weatherData;
         public bool HasWeather => weatherData != null && !overrideWeatherEnabled;
 
-        /// <summary>
-        /// Validates that seasonal data configuration is reasonable
-        /// </summary>
-        /// <returns>True if settings are valid</returns>
+        // Rest of the methods remain unchanged...
         public bool IsValid()
         {
-            // Basic validation - weather data exists or is intentionally disabled
             bool weatherValid = weatherData != null || overrideWeatherEnabled;
-            
-            // Validate celestial settings are reasonable
             bool celestialValid = ValidateCelestialSettings();
-            
             return weatherValid && celestialValid;
         }
 
-        /// <summary>
-        /// Validates that celestial settings are reasonable
-        /// </summary>
-        /// <returns>True if settings are valid</returns>
         private bool ValidateCelestialSettings()
         {
-            // Check for reasonable speed ranges
             if (primaryStarActive)
             {
                 if (primaryXAxisEnabled && (primaryXAxisSpeed < 0f || primaryXAxisSpeed > 10f))
@@ -176,7 +217,7 @@ namespace Sol
                 redDwarfXAxisMaxRange = temp;
             }
 
-            // Ensure min/max ranges are valid for Y-axis (new)
+            // Ensure min/max ranges are valid for Y-axis
             if (primaryYAxisMinRange > primaryYAxisMaxRange)
             {
                 float temp = primaryYAxisMinRange;
