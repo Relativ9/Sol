@@ -1,11 +1,17 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 namespace Sol
 {
     [CustomEditor(typeof(SeasonalData))]
     public class SeasonalDataEditor : Editor
     {
+        private bool _showStars = true;
+        private bool _showMoons = true;
+        private Dictionary<int, bool> _starFoldouts = new Dictionary<int, bool>();
+        private Dictionary<int, bool> _moonFoldouts = new Dictionary<int, bool>();
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -22,9 +28,9 @@ namespace Sol
 
             EditorGUILayout.Space();
 
-            // Draw celestial sections
-            DrawPrimaryStarSection();
-            DrawRedDwarfSection();
+            // Draw celestial body sections
+            DrawStarsSection();
+            DrawMoonsSection();
 
             EditorGUILayout.Space();
 
@@ -34,44 +40,279 @@ namespace Sol
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void DrawPrimaryStarSection()
+        private void DrawStarsSection()
         {
-            EditorGUILayout.LabelField("Primary Star Settings", EditorStyles.boldLabel);
+            var starsProperty = serializedObject.FindProperty("stars");
             
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryStarActive"));
+            EditorGUILayout.BeginHorizontal();
+            _showStars = EditorGUILayout.Foldout(_showStars, $"Stars ({starsProperty.arraySize})", true, EditorStyles.boldLabel);
             
-            if (serializedObject.FindProperty("primaryStarActive").boolValue)
+            if (GUILayout.Button("+", GUILayout.Width(25)))
+            {
+                starsProperty.InsertArrayElementAtIndex(starsProperty.arraySize);
+                var newElement = starsProperty.GetArrayElementAtIndex(starsProperty.arraySize - 1);
+                SetDefaultCelestialBodyValues(newElement, "New Star", false);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (_showStars)
             {
                 EditorGUI.indentLevel++;
-                DrawPrimaryXAxisControls();
-                DrawPrimaryYAxisControls();
+                
+                for (int i = 0; i < starsProperty.arraySize; i++)
+                {
+                    DrawCelestialBodyElement(starsProperty, i, "Star", _starFoldouts, false);
+                }
+                
+                if (starsProperty.arraySize == 0)
+                {
+                    EditorGUILayout.HelpBox("No stars configured. Add at least one star for this season.", MessageType.Warning);
+                }
+                
                 EditorGUI.indentLevel--;
             }
+
+            EditorGUILayout.Space();
         }
 
-        private void DrawPrimaryXAxisControls()
+        private void DrawMoonsSection()
+        {
+            var moonsProperty = serializedObject.FindProperty("moons");
+            
+            EditorGUILayout.BeginHorizontal();
+            _showMoons = EditorGUILayout.Foldout(_showMoons, $"Moons ({moonsProperty.arraySize})", true, EditorStyles.boldLabel);
+            
+            if (GUILayout.Button("+", GUILayout.Width(25)))
+            {
+                moonsProperty.InsertArrayElementAtIndex(moonsProperty.arraySize);
+                var newElement = moonsProperty.GetArrayElementAtIndex(moonsProperty.arraySize - 1);
+                SetDefaultCelestialBodyValues(newElement, "New Moon", true);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (_showMoons)
+            {
+                EditorGUI.indentLevel++;
+                
+                for (int i = 0; i < moonsProperty.arraySize; i++)
+                {
+                    DrawCelestialBodyElement(moonsProperty, i, "Moon", _moonFoldouts, true);
+                }
+                
+                if (moonsProperty.arraySize == 0)
+                {
+                    EditorGUILayout.HelpBox("No moons configured. Moons are optional.", MessageType.Info);
+                }
+                
+                EditorGUI.indentLevel--;
+            }
+
+            EditorGUILayout.Space();
+        }
+        
+        private void DrawCelestialBodyElement(SerializedProperty arrayProperty, int index, string typeName, Dictionary<int, bool> foldouts, bool isMoon)
+        {
+            var element = arrayProperty.GetArrayElementAtIndex(index);
+            var nameProperty = element.FindPropertyRelative("name");
+            var activeProperty = element.FindPropertyRelative("active");
+
+            // Initialize foldout state if needed
+            if (!foldouts.ContainsKey(index))
+                foldouts[index] = false;
+
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+            // Header with name, active toggle, and delete button
+            EditorGUILayout.BeginHorizontal();
+            
+            string displayName = string.IsNullOrEmpty(nameProperty.stringValue) ? $"Unnamed {typeName}" : nameProperty.stringValue;
+            string headerText = $"{displayName} {(activeProperty.boolValue ? "" : "(Inactive)")}";
+            
+            foldouts[index] = EditorGUILayout.Foldout(foldouts[index], headerText, true);
+            
+            EditorGUILayout.PropertyField(activeProperty, GUIContent.none, GUILayout.Width(15));
+            
+            if (GUILayout.Button("×", GUILayout.Width(20)))
+            {
+                arrayProperty.DeleteArrayElementAtIndex(index);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
+                return;
+            }
+            
+            EditorGUILayout.EndHorizontal();
+
+            if (foldouts[index])
+            {
+                EditorGUI.indentLevel++;
+                
+                // Basic configuration
+                EditorGUILayout.PropertyField(nameProperty, new GUIContent("Name"));
+                
+                if (activeProperty.boolValue)
+                {
+                    // Moon-specific settings - ONLY DRAW ONCE HERE
+                    if (isMoon)
+                    {
+                        EditorGUILayout.LabelField("Moon-Specific Settings", EditorStyles.miniBoldLabel);
+                        EditorGUI.indentLevel++;
+                        
+                        var orbitalPeriodProperty = element.FindPropertyRelative("orbitalPeriod");
+                        EditorGUILayout.PropertyField(orbitalPeriodProperty, new GUIContent("Orbital Period (Days)", "How many days for one complete orbit. Creates monthly drift effect."));
+                        
+                        if (orbitalPeriodProperty.floatValue <= 0)
+                        {
+                            EditorGUILayout.HelpBox("Orbital period must be greater than 0", MessageType.Error);
+                        }
+                        
+                        var invertCycleProperty = element.FindPropertyRelative("invertDayNightCycle");
+                        EditorGUILayout.PropertyField(invertCycleProperty, new GUIContent("Invert Day/Night Cycle", "Moon rises when stars set (useful for night moons)"));
+                        
+                        if (invertCycleProperty.boolValue)
+                        {
+                            EditorGUILayout.HelpBox("This moon will follow an inverted cycle - rising when stars set", MessageType.Info);
+                        }
+                        
+                        EditorGUI.indentLevel--;
+                        EditorGUILayout.Space();
+                    }
+                    
+                    // X-Axis controls
+                    DrawXAxisControls(element);
+                    
+                    // Y-Axis controls  
+                    DrawYAxisControls(element);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox($"This {typeName.ToLower()} is inactive and will not be visible during this season.", MessageType.Info);
+                }
+                
+                EditorGUI.indentLevel--;
+            }
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space();
+        }
+
+        // private void DrawCelestialBodyElement(SerializedProperty arrayProperty, int index, string typeName, Dictionary<int, bool> foldouts, bool isMoon)
+        // {
+        //     var element = arrayProperty.GetArrayElementAtIndex(index);
+        //     var nameProperty = element.FindPropertyRelative("name");
+        //     var activeProperty = element.FindPropertyRelative("active");
+        //
+        //     // Initialize foldout state if needed
+        //     if (!foldouts.ContainsKey(index))
+        //         foldouts[index] = false;
+        //
+        //     EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        //
+        //     // Header with name, active toggle, and delete button
+        //     EditorGUILayout.BeginHorizontal();
+        //     
+        //     string displayName = string.IsNullOrEmpty(nameProperty.stringValue) ? $"Unnamed {typeName}" : nameProperty.stringValue;
+        //     string headerText = $"{displayName} {(activeProperty.boolValue ? "" : "(Inactive)")}";
+        //     
+        //     foldouts[index] = EditorGUILayout.Foldout(foldouts[index], headerText, true);
+        //     
+        //     EditorGUILayout.PropertyField(activeProperty, GUIContent.none, GUILayout.Width(15));
+        //     
+        //     if (GUILayout.Button("×", GUILayout.Width(20)))
+        //     {
+        //         arrayProperty.DeleteArrayElementAtIndex(index);
+        //         EditorGUILayout.EndHorizontal();
+        //         EditorGUILayout.EndVertical();
+        //         return;
+        //     }
+        //     
+        //     EditorGUILayout.EndHorizontal();
+        //
+        //     if (foldouts[index])
+        //     {
+        //         EditorGUI.indentLevel++;
+        //         
+        //         // Basic configuration
+        //         EditorGUILayout.PropertyField(nameProperty, new GUIContent("Name"));
+        //         
+        //         if (activeProperty.boolValue)
+        //         {
+        //             // Moon-specific orbital period
+        //             if (isMoon)
+        //             {
+        //                 var orbitalPeriodProperty = element.FindPropertyRelative("orbitalPeriod");
+        //                 EditorGUILayout.PropertyField(orbitalPeriodProperty, new GUIContent("Orbital Period (Days)", "How many days for one complete orbit. Creates monthly drift effect."));
+        //                 
+        //                 if (orbitalPeriodProperty.floatValue <= 0)
+        //                 {
+        //                     EditorGUILayout.HelpBox("Orbital period must be greater than 0", MessageType.Error);
+        //                 }
+        //             }
+        //             
+        //             // X-Axis controls
+        //             DrawXAxisControls(element);
+        //             
+        //             // Y-Axis controls  
+        //             DrawYAxisControls(element);
+        //         }
+        //         else
+        //         {
+        //             EditorGUILayout.HelpBox($"This {typeName.ToLower()} is inactive and will not be visible during this season.", MessageType.Info);
+        //         }
+        //         
+        //         if (isMoon)
+        //         {
+        //             var orbitalPeriodProperty = element.FindPropertyRelative("orbitalPeriod");
+        //             EditorGUILayout.PropertyField(orbitalPeriodProperty, new GUIContent("Orbital Period (Days)", "How many days for one complete orbit. Creates monthly drift effect."));
+        //
+        //             if (orbitalPeriodProperty.floatValue <= 0)
+        //             {
+        //                 EditorGUILayout.HelpBox("Orbital period must be greater than 0", MessageType.Error);
+        //             }
+        //
+        //             var invertCycleProperty = element.FindPropertyRelative("invertDayNightCycle");
+        //             EditorGUILayout.PropertyField(invertCycleProperty, new GUIContent("Invert Day/Night Cycle", "Moon rises when stars set (useful for night moons)"));
+        //
+        //             if (invertCycleProperty.boolValue)
+        //             {
+        //                 EditorGUILayout.HelpBox("This moon will follow an inverted cycle - rising when stars set", MessageType.Info);
+        //             }
+        //         }
+        //         
+        //         EditorGUI.indentLevel--;
+        //     }
+        //     
+        //
+        //
+        //     EditorGUILayout.EndVertical();
+        //     EditorGUILayout.Space();
+        //     
+        // }
+
+        private void DrawXAxisControls(SerializedProperty element)
         {
             EditorGUILayout.LabelField("X-Axis (Elevation)", EditorStyles.miniBoldLabel);
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryXAxisEnabled"), new GUIContent("Enabled"));
+            var xAxisEnabledProperty = element.FindPropertyRelative("xAxisEnabled");
+            EditorGUILayout.PropertyField(xAxisEnabledProperty, new GUIContent("Enabled"));
             
-            if (serializedObject.FindProperty("primaryXAxisEnabled").boolValue)
+            if (xAxisEnabledProperty.boolValue)
             {
                 EditorGUI.indentLevel++;
                 
-                var modeProp = serializedObject.FindProperty("primaryXAxisMode");
-                var syncProp = serializedObject.FindProperty("primarySyncXWithY");
+                var xAxisModeProperty = element.FindPropertyRelative("xAxisMode");
+                var syncXWithYProperty = element.FindPropertyRelative("syncXWithY");
                 
-                EditorGUILayout.PropertyField(modeProp, new GUIContent("Rotation Mode"));
-                EditorGUILayout.PropertyField(syncProp, new GUIContent("Sync with Y-Axis"));
+                EditorGUILayout.PropertyField(xAxisModeProperty, new GUIContent("Rotation Mode"));
+                EditorGUILayout.PropertyField(syncXWithYProperty, new GUIContent("Sync with Y-Axis", "Automatically sync X-axis speed with Y-axis rotation for realistic day cycles"));
                 
                 // Only show speed if not synced (for oscillate mode)
-                if (modeProp.enumValueIndex == (int)CelestialRotationMode.Oscillate)
+                if (xAxisModeProperty.enumValueIndex == (int)CelestialRotationMode.Oscillate)
                 {
-                    if (!syncProp.boolValue)
+                    if (!syncXWithYProperty.boolValue)
                     {
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryXAxisSpeed"), new GUIContent("Speed"));
+                        var xAxisSpeedProperty = element.FindPropertyRelative("xAxisSpeed");
+                        EditorGUILayout.PropertyField(xAxisSpeedProperty, new GUIContent("Speed", "Oscillation speed in radians per celestial time unit"));
                     }
                     else
                     {
@@ -79,12 +320,20 @@ namespace Sol
                     }
                     
                     // Always show range controls for oscillate mode
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryXAxisMinRange"), new GUIContent("Min Range"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryXAxisMaxRange"), new GUIContent("Max Range"));
+                    var xAxisMinProperty = element.FindPropertyRelative("xAxisMinRange");
+                    var xAxisMaxProperty = element.FindPropertyRelative("xAxisMaxRange");
+                    EditorGUILayout.PropertyField(xAxisMinProperty, new GUIContent("Min Range", "Minimum elevation angle (180° = horizon, 120° = high in sky)"));
+                    EditorGUILayout.PropertyField(xAxisMaxProperty, new GUIContent("Max Range", "Maximum elevation angle (180° = horizon, 120° = high in sky)"));
+                    
+                    if (xAxisMinProperty.floatValue > xAxisMaxProperty.floatValue)
+                    {
+                        EditorGUILayout.HelpBox("Min range should be less than max range", MessageType.Warning);
+                    }
                 }
                 else // Continuous mode
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryXAxisSpeed"), new GUIContent("Speed"));
+                    var xAxisSpeedProperty = element.FindPropertyRelative("xAxisSpeed");
+                    EditorGUILayout.PropertyField(xAxisSpeedProperty, new GUIContent("Speed", "Rotation speed in degrees per celestial time unit"));
                 }
                 
                 EditorGUI.indentLevel--;
@@ -94,161 +343,51 @@ namespace Sol
             EditorGUILayout.Space();
         }
 
-        private void DrawPrimaryYAxisControls()
+        private void DrawYAxisControls(SerializedProperty element)
         {
             EditorGUILayout.LabelField("Y-Axis (Azimuth)", EditorStyles.miniBoldLabel);
             EditorGUI.indentLevel++;
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryYAxisEnabled"), new GUIContent("Enabled"));
+            var yAxisEnabledProperty = element.FindPropertyRelative("yAxisEnabled");
+            EditorGUILayout.PropertyField(yAxisEnabledProperty, new GUIContent("Enabled"));
             
-            if (serializedObject.FindProperty("primaryYAxisEnabled").boolValue)
+            if (yAxisEnabledProperty.boolValue)
             {
                 EditorGUI.indentLevel++;
                 
-                var modeProp = serializedObject.FindProperty("primaryYAxisMode");
-                EditorGUILayout.PropertyField(modeProp, new GUIContent("Rotation Mode"));
+                var yAxisModeProperty = element.FindPropertyRelative("yAxisMode");
+                EditorGUILayout.PropertyField(yAxisModeProperty, new GUIContent("Rotation Mode"));
                 
-                if (modeProp.enumValueIndex == (int)CelestialRotationMode.Continuous)
+                if (yAxisModeProperty.enumValueIndex == (int)CelestialRotationMode.Continuous)
                 {
                     // For continuous mode, show day sync option
-                    EditorGUILayout.HelpBox("Continuous mode syncs with TimeManager day length by default", MessageType.Info);
+                    EditorGUILayout.HelpBox("Continuous mode syncs with TimeManager day length by default (360° per day)", MessageType.Info);
                     
-                    // Add override option (you'll need to add this field to SeasonalData)
-                    var overrideSpeedProp = serializedObject.FindProperty("primaryYAxisOverrideSpeed");
-                    if (overrideSpeedProp != null)
+                    var yAxisOverrideSpeedProperty = element.FindPropertyRelative("yAxisOverrideSpeed");
+                    EditorGUILayout.PropertyField(yAxisOverrideSpeedProperty, new GUIContent("Override Day Sync", "Use custom speed instead of automatic day synchronization"));
+                    
+                    if (yAxisOverrideSpeedProperty.boolValue)
                     {
-                        EditorGUILayout.PropertyField(overrideSpeedProp, new GUIContent("Override Day Sync"));
-                        
-                        if (overrideSpeedProp.boolValue)
-                        {
-                            EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryYAxisSpeed"), new GUIContent("Custom Speed"));
-                        }
-                    }
-                    else
-                    {
-                        // Fallback if override field doesn't exist yet
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryYAxisSpeed"), new GUIContent("Speed (overrides day sync)"));
+                        var yAxisSpeedProperty = element.FindPropertyRelative("yAxisSpeed");
+                        EditorGUILayout.PropertyField(yAxisSpeedProperty, new GUIContent("Custom Speed", "Custom rotation speed in degrees per celestial time unit"));
+                        EditorGUILayout.HelpBox("Using custom speed will break day/night synchronization", MessageType.Warning);
                     }
                 }
                 else // Oscillate mode
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryYAxisSpeed"), new GUIContent("Speed"));
+                    var yAxisSpeedProperty = element.FindPropertyRelative("yAxisSpeed");
+                    EditorGUILayout.PropertyField(yAxisSpeedProperty, new GUIContent("Speed", "Oscillation speed in radians per celestial time unit"));
                     
                     // Show range controls for oscillate mode on Y-axis too
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryYAxisMinRange"), new GUIContent("Min Range"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("primaryYAxisMaxRange"), new GUIContent("Max Range"));
-                }
-                
-                EditorGUI.indentLevel--;
-            }
-
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space();
-        }
-
-        private void DrawRedDwarfSection()
-        {
-            EditorGUILayout.LabelField("Red Dwarf Settings", EditorStyles.boldLabel);
-            
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfActive"));
-            
-            if (serializedObject.FindProperty("redDwarfActive").boolValue)
-            {
-                EditorGUI.indentLevel++;
-                DrawRedDwarfXAxisControls();
-                DrawRedDwarfYAxisControls();
-                EditorGUI.indentLevel--;
-            }
-        }
-
-        private void DrawRedDwarfXAxisControls()
-        {
-            EditorGUILayout.LabelField("X-Axis (Elevation)", EditorStyles.miniBoldLabel);
-            EditorGUI.indentLevel++;
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfXAxisEnabled"), new GUIContent("Enabled"));
-            
-            if (serializedObject.FindProperty("redDwarfXAxisEnabled").boolValue)
-            {
-                EditorGUI.indentLevel++;
-                
-                var modeProp = serializedObject.FindProperty("redDwarfXAxisMode");
-                var syncProp = serializedObject.FindProperty("redDwarfSyncXWithY");
-                
-                EditorGUILayout.PropertyField(modeProp, new GUIContent("Rotation Mode"));
-                EditorGUILayout.PropertyField(syncProp, new GUIContent("Sync with Y-Axis"));
-                
-                // Only show speed if not synced (for oscillate mode)
-                if (modeProp.enumValueIndex == (int)CelestialRotationMode.Oscillate)
-                {
-                    if (!syncProp.boolValue)
-                    {
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfXAxisSpeed"), new GUIContent("Speed"));
-                    }
-                    else
-                    {
-                        EditorGUILayout.HelpBox("Speed is automatically calculated from Y-axis rotation", MessageType.Info);
-                    }
+                    var yAxisMinProperty = element.FindPropertyRelative("yAxisMinRange");
+                    var yAxisMaxProperty = element.FindPropertyRelative("yAxisMaxRange");
+                    EditorGUILayout.PropertyField(yAxisMinProperty, new GUIContent("Min Range", "Minimum azimuth angle in degrees"));
+                    EditorGUILayout.PropertyField(yAxisMaxProperty, new GUIContent("Max Range", "Maximum azimuth angle in degrees"));
                     
-                    // Always show range controls for oscillate mode
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfXAxisMinRange"), new GUIContent("Min Range"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfXAxisMaxRange"), new GUIContent("Max Range"));
-                }
-                else // Continuous mode
-                {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfXAxisSpeed"), new GUIContent("Speed"));
-                }
-                
-                EditorGUI.indentLevel--;
-            }
-
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space();
-        }
-
-        private void DrawRedDwarfYAxisControls()
-        {
-            EditorGUILayout.LabelField("Y-Axis (Azimuth)", EditorStyles.miniBoldLabel);
-            EditorGUI.indentLevel++;
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfYAxisEnabled"), new GUIContent("Enabled"));
-            
-            if (serializedObject.FindProperty("redDwarfYAxisEnabled").boolValue)
-            {
-                EditorGUI.indentLevel++;
-                
-                var modeProp = serializedObject.FindProperty("redDwarfYAxisMode");
-                EditorGUILayout.PropertyField(modeProp, new GUIContent("Rotation Mode"));
-                
-                if (modeProp.enumValueIndex == (int)CelestialRotationMode.Continuous)
-                {
-                    // For continuous mode, show day sync option
-                    EditorGUILayout.HelpBox("Continuous mode syncs with TimeManager day length by default", MessageType.Info);
-                    
-                    // Add override option (you'll need to add this field to SeasonalData)
-                    var overrideSpeedProp = serializedObject.FindProperty("redDwarfYAxisOverrideSpeed");
-                    if (overrideSpeedProp != null)
+                    if (yAxisMinProperty.floatValue > yAxisMaxProperty.floatValue)
                     {
-                        EditorGUILayout.PropertyField(overrideSpeedProp, new GUIContent("Override Day Sync"));
-                        
-                        if (overrideSpeedProp.boolValue)
-                        {
-                            EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfYAxisSpeed"), new GUIContent("Custom Speed"));
-                        }
+                        EditorGUILayout.HelpBox("Min range should be less than max range", MessageType.Warning);
                     }
-                    else
-                    {
-                        // Fallback if override field doesn't exist yet
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfYAxisSpeed"), new GUIContent("Speed (overrides day sync)"));
-                    }
-                }
-                else // Oscillate mode
-                {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfYAxisSpeed"), new GUIContent("Speed"));
-                    
-                    // Show range controls for oscillate mode on Y-axis too
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfYAxisMinRange"), new GUIContent("Min Range"));
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("redDwarfYAxisMaxRange"), new GUIContent("Max Range"));
                 }
                 
                 EditorGUI.indentLevel--;
@@ -282,5 +421,52 @@ namespace Sol
                 EditorGUILayout.HelpBox("No weather data assigned - weather will be disabled", MessageType.Warning);
             }
         }
+        
+        private void SetDefaultCelestialBodyValues(SerializedProperty element, string defaultName, bool isMoon)
+        {
+            element.FindPropertyRelative("name").stringValue = defaultName;
+            element.FindPropertyRelative("active").boolValue = true;
+            element.FindPropertyRelative("xAxisEnabled").boolValue = false;
+            element.FindPropertyRelative("xAxisMode").enumValueIndex = (int)CelestialRotationMode.Oscillate;
+            element.FindPropertyRelative("xAxisSpeed").floatValue = 0.1f;
+            element.FindPropertyRelative("syncXWithY").boolValue = false;
+            element.FindPropertyRelative("xAxisMinRange").floatValue = 120f;
+            element.FindPropertyRelative("xAxisMaxRange").floatValue = 240f;
+            element.FindPropertyRelative("yAxisEnabled").boolValue = true;
+            element.FindPropertyRelative("yAxisMode").enumValueIndex = (int)CelestialRotationMode.Continuous;
+            element.FindPropertyRelative("yAxisSpeed").floatValue = isMoon ? 0.15f : 0.25f;
+            element.FindPropertyRelative("yAxisOverrideSpeed").boolValue = false;
+            element.FindPropertyRelative("yAxisMinRange").floatValue = 0f;
+            element.FindPropertyRelative("yAxisMaxRange").floatValue = 360f;
+    
+            if (isMoon)
+            {
+                element.FindPropertyRelative("orbitalPeriod").floatValue = 104f; // Default 1 month orbit
+                element.FindPropertyRelative("invertDayNightCycle").boolValue = true; // Default to inverted for moons
+            }
+        }
+
+        // private void SetDefaultCelestialBodyValues(SerializedProperty element, string defaultName, bool isMoon)
+        // {
+        //     element.FindPropertyRelative("name").stringValue = defaultName;
+        //     element.FindPropertyRelative("active").boolValue = true;
+        //     element.FindPropertyRelative("xAxisEnabled").boolValue = false;
+        //     element.FindPropertyRelative("xAxisMode").enumValueIndex = (int)CelestialRotationMode.Oscillate;
+        //     element.FindPropertyRelative("xAxisSpeed").floatValue = 0.1f;
+        //     element.FindPropertyRelative("syncXWithY").boolValue = false;
+        //     element.FindPropertyRelative("xAxisMinRange").floatValue = 120f;
+        //     element.FindPropertyRelative("xAxisMaxRange").floatValue = 240f;
+        //     element.FindPropertyRelative("yAxisEnabled").boolValue = true;
+        //     element.FindPropertyRelative("yAxisMode").enumValueIndex = (int)CelestialRotationMode.Continuous;
+        //     element.FindPropertyRelative("yAxisSpeed").floatValue = isMoon ? 0.15f : 0.25f;
+        //     element.FindPropertyRelative("yAxisOverrideSpeed").boolValue = false;
+        //     element.FindPropertyRelative("yAxisMinRange").floatValue = 0f;
+        //     element.FindPropertyRelative("yAxisMaxRange").floatValue = 360f;
+        //     
+        //     if (isMoon)
+        //     {
+        //         element.FindPropertyRelative("orbitalPeriod").floatValue = 104f; // Default 1 month orbit
+        //     }
+        // }
     }
 }

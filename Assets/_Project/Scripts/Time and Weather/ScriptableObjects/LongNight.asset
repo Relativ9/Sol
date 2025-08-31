@@ -13,31 +13,22 @@ MonoBehaviour:
   m_Name: LongNight
   m_EditorClassIdentifier: 
   season: 2
-  primaryStarActive: 1
-  primaryXAxisEnabled: 1
-  primaryXAxisMode: 0
-  primaryXAxisSpeed: 1
-  primarySyncXWithY: 1
-  primaryXAxisMinRange: 180
-  primaryXAxisMaxRange: 240
-  primaryYAxisEnabled: 1
-  primaryYAxisMode: 1
-  primaryYAxisSpeed: 0.05
-  primaryYAxisOverrideSpeed: 0
-  primaryYAxisMinRange: 0
-  primaryYAxisMaxRange: 360
-  redDwarfActive: 1
-  redDwarfXAxisEnabled: 1
-  redDwarfXAxisMode: 0
-  redDwarfXAxisSpeed: 0.4
-  redDwarfSyncXWithY: 1
-  redDwarfXAxisMinRange: 180
-  redDwarfXAxisMaxRange: 220
-  redDwarfYAxisEnabled: 1
-  redDwarfYAxisMode: 1
-  redDwarfYAxisSpeed: 0.05
-  redDwarfYAxisOverrideSpeed: 0
-  redDwarfYAxisMinRange: 0
-  redDwarfYAxisMaxRange: 360
+  stars:
+  - name: Sol
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 120
+    xAxisMaxRange: 180
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.25
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 1
+  moons: []
   weatherData: {fileID: 0}
   overrideWeatherEnabled: 0

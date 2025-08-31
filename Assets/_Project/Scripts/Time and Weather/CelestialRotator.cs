@@ -1,430 +1,3 @@
-// using UnityEngine;
-//
-// namespace Sol
-// {
-//     /// <summary>
-//     /// Component that applies celestial rotations to GameObjects
-//     /// Works with TimeManager's SeasonalData and supports seasonal transitions
-//     /// Identifies itself by celestialBodyName to get appropriate settings
-//     /// Integrates with CelestialCalculator for day synchronization
-//     /// </summary>
-//     public class CelestialRotator : MonoBehaviour
-//     {
-//         [Header("Celestial Configuration")]
-//         [SerializeField] private string celestialBodyName = "PrimaryStar";
-//         [SerializeField] private bool useSeasonalTransitions = true;
-//         
-//         [Header("Calculator Integration")]
-//         [SerializeField] private CelestialCalculator celestialCalculator;
-//         [SerializeField] private bool createCalculatorIfMissing = true;
-//         
-//         [Header("Performance")]
-//         [SerializeField] private bool useOptimization = true;
-//         [SerializeField] private float updateFrequency = 20f;
-//         
-//         [Header("Control")]
-//         [SerializeField] private bool rotationActive = true;
-//         [SerializeField] private bool overrideCelestialTime = false;
-//         [SerializeField] private float manualCelestialTime = 0f;
-//         
-//         [Header("Debug")]
-//         [SerializeField] private bool showDebugInfo = false;
-//         [SerializeField] private bool logSynchronizationStatus = false;
-//
-//         // Dependencies
-//         private ITimeManager _timeManager;
-//         private ICelestialCalculator _celestialCalculatorInterface;
-//         private IUpdateFrequencyOptimizer _optimizer;
-//
-//         // State
-//         private Vector3 _baseRotation;
-//         private Vector3 _currentRotation;
-//         private bool _isInitialized = false;
-//
-//         // Performance tracking
-//         private float _lastUpdateTime;
-//         private float _lastSyncLogTime;
-//         private int _frameCount = 0;
-//
-//         // Properties
-//         public string CelestialBodyName => celestialBodyName;
-//         public Vector3 CurrentRotation => _currentRotation;
-//         public bool IsInitialized => _isInitialized;
-//
-//         private void Awake()
-//         {
-//             _baseRotation = transform.rotation.eulerAngles;
-//             _currentRotation = _baseRotation;
-//         }
-//
-//         private void Start()
-//         {
-//             InitializeDependencies();
-//         }
-//
-//         private void Update()
-//         {
-//             if (!_isInitialized || !rotationActive) return;
-//
-//             if (useOptimization)
-//             {
-//                 UpdateWithOptimization();
-//             }
-//             else
-//             {
-//                 UpdateCelestialRotation();
-//                 ApplyRotation();
-//             }
-//
-//             if (showDebugInfo)
-//             {
-//                 DisplayDebugInfo();
-//             }
-//
-//             if (logSynchronizationStatus)
-//             {
-//                 LogSynchronizationStatus();
-//             }
-//         }
-//
-//         private void InitializeDependencies()
-//         {
-//             // Find TimeManager
-//             _timeManager = FindObjectOfType<TimeManager>();
-//             if (_timeManager == null)
-//             {
-//                 Debug.LogError($"CelestialRotator on {gameObject.name}: No TimeManager found in scene!");
-//                 return;
-//             }
-//
-//             // Setup CelestialCalculator
-//             if (celestialCalculator == null && createCalculatorIfMissing)
-//             {
-//                 // Create a new calculator instance
-//                 GameObject calculatorObject = new GameObject($"{celestialBodyName}_Calculator");
-//                 calculatorObject.transform.SetParent(transform);
-//                 celestialCalculator = calculatorObject.AddComponent<CelestialCalculator>();
-//                 
-//                 if (showDebugInfo)
-//                 {
-//                     Debug.Log($"Created CelestialCalculator for {celestialBodyName}");
-//                 }
-//             }
-//
-//             if (celestialCalculator != null)
-//             {
-//                 _celestialCalculatorInterface = celestialCalculator as ICelestialCalculator;
-//                 
-//                 // Initialize calculator with time manager
-//                 _celestialCalculatorInterface?.Initialize(_timeManager);
-//             }
-//             else
-//             {
-//                 Debug.LogError($"CelestialRotator on {gameObject.name}: No CelestialCalculator assigned and createCalculatorIfMissing is false!");
-//                 return;
-//             }
-//
-//             // Setup optimizer
-//             if (useOptimization)
-//             {
-//                 _optimizer = new UpdateFrequencyOptimizer(updateFrequency);
-//             }
-//
-//             _isInitialized = true;
-//
-//             if (showDebugInfo)
-//             {
-//                 Debug.Log($"CelestialRotator initialized for {celestialBodyName} on {gameObject.name}");
-//                 LogInitializationStatus();
-//             }
-//         }
-//
-//         private void UpdateWithOptimization()
-//         {
-//             if (_optimizer == null) return;
-//
-//             // ALWAYS calculate rotation every frame (for smooth time progression)
-//             UpdateCelestialRotation();
-//
-//             // Only apply the rotation at optimized frequency
-//             if (_optimizer.ShouldUpdate(Time.time))
-//             {
-//                 ApplyRotation();
-//                 _lastUpdateTime = Time.time;
-//             }
-//         }
-//
-//         private void UpdateCelestialRotation()
-//         {
-//             if (_celestialCalculatorInterface == null) return;
-//
-//             float celestialTime = overrideCelestialTime ? manualCelestialTime : _timeManager.CelestialTime;
-//
-//             if (useSeasonalTransitions && _timeManager.IsInSeasonTransition)
-//             {
-//                 SeasonalData fromSeason = _timeManager.GetSeasonalData(_timeManager.CurrentSeason);
-//                 SeasonalData toSeason = _timeManager.GetSeasonalData(_timeManager.TargetSeason);
-//
-//                 if (fromSeason != null && toSeason != null)
-//                 {
-//                     _currentRotation = _celestialCalculatorInterface.InterpolateCelestialRotation(
-//                         fromSeason,
-//                         toSeason,
-//                         celestialBodyName,
-//                         _baseRotation,
-//                         celestialTime,
-//                         _timeManager.SeasonTransitionProgress
-//                     );
-//                 }
-//             }
-//             else
-//             {
-//                 SeasonalData currentSeason = _timeManager.GetCurrentSeasonalData();
-//                 if (currentSeason != null)
-//                 {
-//                     _currentRotation = _celestialCalculatorInterface.CalculateCelestialRotation(
-//                         currentSeason,
-//                         celestialBodyName,
-//                         _baseRotation,
-//                         celestialTime
-//                     );
-//                 }
-//             }
-//
-//             _frameCount++;
-//         }
-//
-//         private void ApplyRotation()
-//         {
-//             transform.rotation = Quaternion.Euler(_currentRotation);
-//         }
-//
-//         private void DisplayDebugInfo()
-//         {
-//             if (Time.time - _lastUpdateTime > 1f)
-//             {
-//                 Debug.Log($"[CelestialRotator - {celestialBodyName}] " +
-//                          $"Season: {_timeManager?.CurrentSeason}, " +
-//                          $"Rotation: {_currentRotation:F2}, " +
-//                          $"Transitioning: {_timeManager?.IsInSeasonTransition}, " +
-//                          $"Updates/sec: {_frameCount}, " +
-//                          $"Day Sync: {_celestialCalculatorInterface?.IsDaySynchronizationEnabled()}");
-//                 
-//                 _frameCount = 0;
-//                 _lastUpdateTime = Time.time;
-//             }
-//         }
-//
-//         private void LogSynchronizationStatus()
-//         {
-//             if (Time.time - _lastSyncLogTime < 5f) return; // Log every 5 seconds
-//             if (_celestialCalculatorInterface == null || _timeManager == null || _timeManager.WorldTimeData == null) return;
-//
-//             SeasonalData currentData = _timeManager.GetCurrentSeasonalData();
-//             if (currentData == null) return;
-//
-//             float dayLength = _timeManager.WorldTimeData.dayLengthInSeconds;
-//             float requiredSpeed = _celestialCalculatorInterface.GetRequiredYAxisSpeedForDay(dayLength);
-//
-//             // Check synchronization based on celestial body type
-//             bool isSync = false;
-//             float currentSpeed = 0f;
-//             if (celestialBodyName.ToLower().Contains("primary"))
-//             {
-//                 currentSpeed = currentData.PrimaryYAxisSpeed;
-//                 isSync = _celestialCalculatorInterface.IsYAxisSynchronizedWithDay(currentSpeed, dayLength);
-//             }
-//             else if (celestialBodyName.ToLower().Contains("dwarf"))
-//             {
-//                 currentSpeed = currentData.RedDwarfYAxisSpeed;
-//                 isSync = _celestialCalculatorInterface.IsYAxisSynchronizedWithDay(currentSpeed, dayLength);
-//             }
-//
-//             Debug.Log($"[{celestialBodyName}] Sync Status - Current: {currentSpeed:F3} deg/sec, Required: {requiredSpeed:F3} deg/sec, Synced: {isSync}");
-//             _lastSyncLogTime = Time.time;
-//         }
-//
-//         private void LogInitializationStatus()
-//         {
-//             Debug.Log($"=== {celestialBodyName} Initialization Status ===");
-//             Debug.Log($"TimeManager: {(_timeManager != null ? "Found" : "Missing")}");
-//             Debug.Log($"CelestialCalculator: {(_celestialCalculatorInterface != null ? "Ready" : "Missing")}");
-//             Debug.Log($"Day Synchronization: {(_celestialCalculatorInterface?.IsDaySynchronizationEnabled() ?? false)}");
-//             Debug.Log($"Seasonal Transitions: {useSeasonalTransitions}");
-//             Debug.Log($"Optimization: {useOptimization} ({updateFrequency} Hz)");
-//             Debug.Log($"============================================");
-//         }
-//
-//         // Public API Methods
-//         public void SetCelestialBodyName(string newName)
-//         {
-//             celestialBodyName = newName;
-//             if (showDebugInfo)
-//             {
-//                 Debug.Log($"CelestialRotator celestial body name changed to: {newName}");
-//             }
-//         }
-//
-//         public void SetRotationActive(bool active)
-//         {
-//             rotationActive = active;
-//             
-//             if (showDebugInfo)
-//             {
-//                 Debug.Log($"{celestialBodyName} rotation: {(active ? "Activated" : "Deactivated")}");
-//             }
-//         }
-//
-//         public void SetUpdateFrequency(float frequency)
-//         {
-//             updateFrequency = Mathf.Max(1f, frequency);
-//             
-//             // Recreate optimizer with new frequency if using optimization
-//             if (useOptimization && _optimizer != null)
-//             {
-//                 _optimizer = new UpdateFrequencyOptimizer(updateFrequency);
-//             }
-//             
-//             if (showDebugInfo)
-//             {
-//                 Debug.Log($"{celestialBodyName} update frequency set to: {updateFrequency} Hz");
-//             }
-//         }
-//
-//         public void SetUseOptimization(bool useOpt)
-//         {
-//             useOptimization = useOpt;
-//             
-//             if (useOpt && _optimizer == null)
-//             {
-//                 _optimizer = new UpdateFrequencyOptimizer(updateFrequency);
-//             }
-//             else if (!useOpt)
-//             {
-//                 _optimizer = null;
-//             }
-//             
-//             if (showDebugInfo)
-//             {
-//                 Debug.Log($"{celestialBodyName} optimization: {(useOpt ? "Enabled" : "Disabled")}");
-//             }
-//         }
-//
-//         public void SetDaySynchronization(bool enabled)
-//         {
-//             if (_celestialCalculatorInterface != null)
-//             {
-//                 _celestialCalculatorInterface.SetDaySynchronizationEnabled(enabled);
-//                 
-//                 if (showDebugInfo)
-//                 {
-//                     Debug.Log($"{celestialBodyName} day synchronization: {(enabled ? "Enabled" : "Disabled")}");
-//                 }
-//             }
-//         }
-//
-//         public bool IsDaySynchronizationEnabled()
-//         {
-//             return _celestialCalculatorInterface?.IsDaySynchronizationEnabled() ?? false;
-//         }
-//
-//         public void SetCelestialCalculator(CelestialCalculator newCalculator)
-//         {
-//             celestialCalculator = newCalculator;
-//             _celestialCalculatorInterface = newCalculator as ICelestialCalculator;
-//             
-//             if (_isInitialized && _timeManager != null)
-//             {
-//                 _celestialCalculatorInterface?.Initialize(_timeManager);
-//             }
-//         }
-//
-//         public void ResetToBaseRotation()
-//         {
-//             _currentRotation = _baseRotation;
-//             ApplyRotation();
-//             
-//             if (showDebugInfo)
-//             {
-//                 Debug.Log($"{celestialBodyName} reset to base rotation: {_baseRotation:F2}");
-//             }
-//         }
-//
-//         public void ForceRotationUpdate()
-//         {
-//             if (_isInitialized)
-//             {
-//                 UpdateCelestialRotation();
-//                 ApplyRotation();
-//             }
-//         }
-//
-//         // Editor validation
-//         private void OnValidate()
-//         {
-//             updateFrequency = Mathf.Max(1f, updateFrequency);
-//             
-//             if (string.IsNullOrEmpty(celestialBodyName))
-//             {
-//                 celestialBodyName = "PrimaryStar";
-//             }
-//         }
-//
-//         // Context menu methods for easy testing
-//         [ContextMenu("Log Initialization Status")]
-//         private void ContextMenuLogInitStatus()
-//         {
-//             LogInitializationStatus();
-//         }
-//
-//         [ContextMenu("Log Synchronization Status")]
-//         private void ContextMenuLogSyncStatus()
-//         {
-//             LogSynchronizationStatus();
-//         }
-//
-//         [ContextMenu("Force Rotation Update")]
-//         private void ContextMenuForceUpdate()
-//         {
-//             ForceRotationUpdate();
-//         }
-//
-//         [ContextMenu("Toggle Day Synchronization")]
-//         private void ContextMenuToggleDaySync()
-//         {
-//             if (_celestialCalculatorInterface != null)
-//             {
-//                 bool currentState = _celestialCalculatorInterface.IsDaySynchronizationEnabled();
-//                 SetDaySynchronization(!currentState);
-//             }
-//         }
-//
-//         // Gizmos for visual debugging
-//         private void OnDrawGizmosSelected()
-//         {
-//             if (!showDebugInfo || !_isInitialized) return;
-//
-//             Gizmos.color = Color.red;
-//             Gizmos.DrawRay(transform.position, transform.right * 2f);
-//             
-//             Gizmos.color = Color.green;
-//             Gizmos.DrawRay(transform.position, transform.up * 2f);
-//             
-//             Gizmos.color = Color.blue;
-//             Gizmos.DrawRay(transform.position, transform.forward * 2f);
-//         }
-//
-//         // Cleanup
-//         private void OnDestroy()
-//         {
-//             if (_celestialCalculatorInterface != null)
-//             {
-//                 _celestialCalculatorInterface.Cleanup();
-//             }
-//         }
-//     }
-// }
-
 using UnityEngine;
 
 namespace Sol
@@ -432,6 +5,7 @@ namespace Sol
     /// <summary>
     /// Manages celestial body rotation based on seasonal data and time progression.
     /// Handles smooth transitions between seasons with performance optimization.
+    /// Supports both stars and moons with orbital period calculations.
     /// </summary>
     [System.Serializable]
     public class CelestialRotator : MonoBehaviour
@@ -445,8 +19,12 @@ namespace Sol
         [Tooltip("Transform to rotate (if null, uses this GameObject's transform)")]
         [SerializeField] private Transform celestialBodyTransform;
 
-        [Tooltip("Name identifier for this celestial body")]
-        [SerializeField] private string celestialBodyName = "PrimaryStar";
+        [Tooltip("Name identifier for this celestial body (Sol, Notr, Iskarn, Rynth, Veldris)")]
+        [SerializeField] private string celestialBodyName = "Sol";
+
+        [Header("Celestial Body Type")]
+        [Tooltip("Is this celestial body a moon? (enables orbital period drift calculations)")]
+        [SerializeField] private bool isMoon = false;
 
         [Header("Rotation Settings")]
         [Tooltip("Base rotation offset applied before calculations")]
@@ -475,6 +53,10 @@ namespace Sol
         private Season _lastSeason;
         private bool _isInitialized;
         private float _lastUpdateTime;
+        
+        private Vector3 _originalBaseRotation;
+        private bool _hasStoredOriginal = false;
+        private int _lastDayCalculated = -1;
 
         #endregion
 
@@ -494,6 +76,11 @@ namespace Sol
         /// Name of this celestial body
         /// </summary>
         public string CelestialBodyName => celestialBodyName;
+
+        /// <summary>
+        /// Whether this celestial body is a moon
+        /// </summary>
+        public bool IsMoon => isMoon;
 
         /// <summary>
         /// Whether the rotator is initialized
@@ -573,7 +160,7 @@ namespace Sol
 
             if (enableDebugLogging)
             {
-                Debug.Log($"[CelestialRotator - {celestialBodyName}] Initialized successfully");
+                Debug.Log($"[CelestialRotator - {celestialBodyName}] Initialized successfully as {(isMoon ? "Moon" : "Star")}");
             }
         }
 
@@ -584,7 +171,7 @@ namespace Sol
         private void UpdateWithOptimization()
         {
             if (_optimizer == null) return;
-
+            
             // ALWAYS calculate rotation every frame (for smooth time progression)
             UpdateCelestialRotation();
 
@@ -592,12 +179,16 @@ namespace Sol
             if (_optimizer.ShouldUpdate(Time.time))
             {
                 ApplyRotation();
+                UpdateMoonOrbitalDrift();
                 _lastUpdateTime = Time.time;
             }
         }
 
         private void UpdateWithoutOptimization()
         {
+            // Update moon orbital drift first
+            UpdateMoonOrbitalDrift();
+    
             // Calculate and apply rotation every frame
             UpdateCelestialRotation();
             ApplyRotation();
@@ -616,6 +207,7 @@ namespace Sol
             }
 
             // Get current seasonal data
+            
             SeasonalData seasonalData = timeManager.GetSeasonalData(timeManager.CurrentSeason);
             if (seasonalData == null)
             {
@@ -626,20 +218,258 @@ namespace Sol
                 return;
             }
 
+            // Validate that the celestial body exists in the seasonal data
+            var celestialBody = seasonalData.GetCelestialBodyByName(celestialBodyName);
+            if (celestialBody == null)
+            {
+                if (enableDebugLogging)
+                {
+                    Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] Celestial body not found in seasonal data for {timeManager.CurrentSeason}");
+                }
+                return;
+            }
+
+            // Get effective base rotation (includes moon orbital drift)
+            Vector3 effectiveBaseRotation = GetEffectiveBaseRotation();
+
             // Calculate new target rotation
             if (timeManager.IsInSeasonTransition)
             {
-                _targetRotation = CalculateTransitionRotation();
+                _targetRotation = CalculateTransitionRotation(effectiveBaseRotation);
             }
             else
             {
                 _targetRotation = _calculator.CalculateCelestialRotation(
                     seasonalData,
                     celestialBodyName,
-                    baseRotationOffset,
-                    timeManager.CelestialTime
+                    effectiveBaseRotation,  // Use the effective base rotation
+                    timeManager.CelestialTime,
+                    isMoon
                 );
             }
+            // SeasonalData seasonalData = timeManager.GetSeasonalData(timeManager.CurrentSeason);
+            // if (seasonalData == null)
+            // {
+            //     if (enableDebugLogging)
+            //     {
+            //         Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] No seasonal data for {timeManager.CurrentSeason}");
+            //     }
+            //     return;
+            // }
+            //
+            // // Validate that the celestial body exists in the seasonal data
+            // var celestialBody = seasonalData.GetCelestialBodyByName(celestialBodyName);
+            // if (celestialBody == null)
+            // {
+            //     if (enableDebugLogging)
+            //     {
+            //         Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] Celestial body not found in seasonal data for {timeManager.CurrentSeason}");
+            //     }
+            //     return;
+            // }
+            //
+            // // Calculate new target rotation
+            // if (timeManager.IsInSeasonTransition)
+            // {
+            //     _targetRotation = CalculateTransitionRotation();
+            // }
+            // else
+            // {
+            //     _targetRotation = _calculator.CalculateCelestialRotation(
+            //         seasonalData,
+            //         celestialBodyName,
+            //         baseRotationOffset,
+            //         timeManager.CelestialTime,
+            //         isMoon
+            //     );
+            // }
+        }
+        
+        // private void UpdateMoonOrbitalDrift()
+        // {
+        //     if (!isMoon || timeManager?.WorldTimeData == null) return;
+        //
+        //     // Store original base rotation on first run
+        //     if (!_hasStoredOriginal)
+        //     {
+        //         _originalBaseRotation = baseRotationOffset;
+        //         _hasStoredOriginal = true;
+        //     }
+        //
+        //     int currentDay = timeManager.CurrentDayOfYear;
+        //     
+        //     // Only recalculate if the day has changed
+        //     if (currentDay == _lastDayCalculated) return;
+        //     
+        //     _lastDayCalculated = currentDay;
+        //
+        //     // Get the celestial body data to access orbital period
+        //     SeasonalData seasonalData = timeManager.GetSeasonalData(timeManager.CurrentSeason);
+        //     if (seasonalData != null)
+        //     {
+        //         var celestialBody = seasonalData.GetCelestialBodyByName(celestialBodyName);
+        //         if (celestialBody != null)
+        //         {
+        //             // Calculate orbital progress (0-1) based on current day and orbital period
+        //             float orbitalProgress = (currentDay % celestialBody.orbitalPeriod) / celestialBody.orbitalPeriod;
+        //             
+        //             // Convert to degrees (0-360)
+        //             float orbitalDrift = orbitalProgress * 360f;
+        //             
+        //             // Update the actual baseRotationOffset field
+        //             baseRotationOffset = _originalBaseRotation;
+        //             baseRotationOffset.y += orbitalDrift;
+        //             
+        //             // Clamp all rotation values to 0-360 range for performance and readability
+        //             baseRotationOffset.x = ClampAngle(baseRotationOffset.x);
+        //             baseRotationOffset.y = ClampAngle(baseRotationOffset.y);
+        //             baseRotationOffset.z = ClampAngle(baseRotationOffset.z);
+        //             
+        //             if (enableDebugLogging)
+        //             {
+        //                 Debug.Log($"[CelestialRotator - {celestialBodyName}] Updated base rotation offset: Day {currentDay}, Progress: {orbitalProgress:F3}, Drift: {orbitalDrift:F1}°, Clamped Y: {baseRotationOffset.y:F1}°");
+        //             }
+        //         }
+        //     }
+        // }
+        
+        private void UpdateMoonOrbitalDrift()
+        {
+            if (!isMoon || timeManager?.WorldTimeData == null) return;
+
+            // Store original base rotation on first run
+            if (!_hasStoredOriginal)
+            {
+                _originalBaseRotation = baseRotationOffset;
+                _hasStoredOriginal = true;
+            }
+
+            // Get the celestial body data to access orbital period
+            SeasonalData seasonalData = timeManager.GetSeasonalData(timeManager.CurrentSeason);
+            if (seasonalData != null)
+            {
+                var celestialBody = seasonalData.GetCelestialBodyByName(celestialBodyName);
+                if (celestialBody != null)
+                {
+                    // Calculate smooth orbital progress using current day + time within day
+                    int currentDay = timeManager.CurrentDayOfYear;
+                    float timeWithinDay = timeManager.CelestialTime; // This should be 0-1 within the current day
+                    
+                    // Total elapsed time in days (including fractional part for smooth movement)
+                    float totalElapsedDays = currentDay + timeWithinDay;
+                    
+                    // Calculate orbital progress (0-1) based on total elapsed time and orbital period
+                    float orbitalProgress = (totalElapsedDays % celestialBody.orbitalPeriod) / celestialBody.orbitalPeriod;
+                    
+                    // Convert to degrees (0-360)
+                    float orbitalDrift = orbitalProgress * 360f;
+                    
+                    // Update the actual baseRotationOffset field
+                    baseRotationOffset = _originalBaseRotation;
+                    baseRotationOffset.y += orbitalDrift;
+                    
+                    // Normalize all angles to 0-360 range
+                    baseRotationOffset.x = Mathf.Repeat(baseRotationOffset.x, 360f);
+                    baseRotationOffset.y = Mathf.Repeat(baseRotationOffset.y, 360f);
+                    baseRotationOffset.z = Mathf.Repeat(baseRotationOffset.z, 360f);
+                    
+                    if (enableDebugLogging && Time.frameCount % 300 == 0) // Log every 5 seconds at 60fps to avoid spam
+                    {
+                        Debug.Log($"[CelestialRotator - {celestialBodyName}] Smooth orbital drift: Day {currentDay}, Time: {timeWithinDay:F3}, Total: {totalElapsedDays:F3}, Progress: {orbitalProgress:F4}, Drift: {orbitalDrift:F2}°");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clamps an angle to the 0-360 degree range
+        /// </summary>
+        private float ClampAngle(float angle)
+        {
+            angle = angle % 360f;
+            if (angle < 0f)
+                angle += 360f;
+            return angle;
+        }
+        
+        // private void UpdateMoonOrbitalDrift()
+        // {
+        //     if (!isMoon || timeManager?.WorldTimeData == null) return;
+        //
+        //     // Store original base rotation on first run
+        //     if (!_hasStoredOriginal)
+        //     {
+        //         _originalBaseRotation = baseRotationOffset;
+        //         _hasStoredOriginal = true;
+        //     }
+        //
+        //     int currentDay = timeManager.CurrentDayOfYear;
+        //
+        //     // Only recalculate if the day has changed
+        //     if (currentDay == _lastDayCalculated) return;
+        //
+        //     _lastDayCalculated = currentDay;
+        //
+        //     // Get the celestial body data to access orbital period
+        //     SeasonalData seasonalData = timeManager.GetSeasonalData(timeManager.CurrentSeason);
+        //     if (seasonalData != null)
+        //     {
+        //         var celestialBody = seasonalData.GetCelestialBodyByName(celestialBodyName);
+        //         if (celestialBody != null)
+        //         {
+        //             // Calculate orbital progress (0-1) based on current day and orbital period
+        //             float orbitalProgress = (currentDay % celestialBody.orbitalPeriod) / celestialBody.orbitalPeriod;
+        //     
+        //             // Convert to degrees (0-360)
+        //             float orbitalDrift = orbitalProgress * 360f;
+        //     
+        //             // Update the actual baseRotationOffset field
+        //             baseRotationOffset = _originalBaseRotation;
+        //             baseRotationOffset.y += orbitalDrift;
+        //     
+        //             if (enableDebugLogging)
+        //             {
+        //                 Debug.Log($"[CelestialRotator - {celestialBodyName}] Updated base rotation offset: Day {currentDay}, Drift: {orbitalDrift:F1}°, New Y: {baseRotationOffset.y:F1}°");
+        //             }
+        //         }
+        //     }
+        // }
+        
+        private Vector3 GetEffectiveBaseRotation()
+        {
+            Vector3 effectiveBase = baseRotationOffset;
+    
+            // Apply moon orbital drift if this is a moon
+            if (isMoon && timeManager?.WorldTimeData != null)
+            {
+                // Get current day of year from time manager
+                int currentDay = timeManager.CurrentDayOfYear;
+        
+                // Get the celestial body data to access orbital period
+                SeasonalData seasonalData = timeManager.GetSeasonalData(timeManager.CurrentSeason);
+                if (seasonalData != null)
+                {
+                    var celestialBody = seasonalData.GetCelestialBodyByName(celestialBodyName);
+                    if (celestialBody != null)
+                    {
+                        // Calculate orbital progress (0-1) based on current day and orbital period
+                        float orbitalProgress = (currentDay % celestialBody.orbitalPeriod) / celestialBody.orbitalPeriod;
+                
+                        // Convert to degrees (0-360)
+                        float orbitalDrift = orbitalProgress * 360f;
+                
+                        // Apply drift to base rotation Y-axis
+                        effectiveBase.y += orbitalDrift;
+                
+                        if (enableDebugLogging)
+                        {
+                            Debug.Log($"[CelestialRotator - {celestialBodyName}] Moon orbital drift: Day {currentDay}, Progress: {orbitalProgress:F3}, Drift: {orbitalDrift:F1}°");
+                        }
+                    }
+                }
+            }
+    
+            return effectiveBase;
         }
 
         private void ApplyRotation()
@@ -649,8 +479,8 @@ namespace Sol
             _currentRotation = _targetRotation;
             _targetTransform.eulerAngles = _currentRotation;
         }
-
-        private Vector3 CalculateTransitionRotation()
+        
+        private Vector3 CalculateTransitionRotation(Vector3 effectiveBaseRotation)
         {
             SeasonalData fromSeason = timeManager.GetSeasonalData(timeManager.CurrentSeason);
             SeasonalData toSeason = timeManager.GetSeasonalData(timeManager.TargetSeason);
@@ -661,18 +491,66 @@ namespace Sol
                 {
                     Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] Missing seasonal data for transition");
                 }
-                return baseRotationOffset;
+                return effectiveBaseRotation;
+            }
+
+            // Validate celestial body exists in both seasons
+            if (fromSeason.GetCelestialBodyByName(celestialBodyName) == null || 
+                toSeason.GetCelestialBodyByName(celestialBodyName) == null)
+            {
+                if (enableDebugLogging)
+                {
+                    Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] Celestial body missing in transition seasons");
+                }
+                return effectiveBaseRotation;
             }
 
             return _calculator.InterpolateCelestialRotation(
                 fromSeason,
                 toSeason,
                 celestialBodyName,
-                baseRotationOffset,
+                effectiveBaseRotation,  // Use the effective base rotation
                 timeManager.CelestialTime,
-                timeManager.SeasonTransitionProgress
+                timeManager.SeasonTransitionProgress,
+                isMoon
             );
         }
+
+        // private Vector3 CalculateTransitionRotation()
+        // {
+        //     SeasonalData fromSeason = timeManager.GetSeasonalData(timeManager.CurrentSeason);
+        //     SeasonalData toSeason = timeManager.GetSeasonalData(timeManager.TargetSeason);
+        //
+        //     if (fromSeason == null || toSeason == null)
+        //     {
+        //         if (enableDebugLogging)
+        //         {
+        //             Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] Missing seasonal data for transition");
+        //         }
+        //         return baseRotationOffset;
+        //     }
+        //
+        //     // Validate celestial body exists in both seasons
+        //     if (fromSeason.GetCelestialBodyByName(celestialBodyName) == null || 
+        //         toSeason.GetCelestialBodyByName(celestialBodyName) == null)
+        //     {
+        //         if (enableDebugLogging)
+        //         {
+        //             Debug.LogWarning($"[CelestialRotator - {celestialBodyName}] Celestial body missing in transition seasons");
+        //         }
+        //         return baseRotationOffset;
+        //     }
+        //
+        //     return _calculator.InterpolateCelestialRotation(
+        //         fromSeason,
+        //         toSeason,
+        //         celestialBodyName,
+        //         baseRotationOffset,
+        //         timeManager.CelestialTime,
+        //         timeManager.SeasonTransitionProgress,
+        //         isMoon
+        //     );
+        // }
 
         #endregion
 
@@ -703,6 +581,20 @@ namespace Sol
             if (_optimizer != null)
             {
                 _optimizer = new UpdateFrequencyOptimizer(updateFrequency);
+            }
+        }
+
+        /// <summary>
+        /// Sets whether this celestial body is a moon
+        /// </summary>
+        /// <param name="moonStatus">True if this is a moon, false if it's a star</param>
+        public void SetMoonStatus(bool moonStatus)
+        {
+            isMoon = moonStatus;
+            
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[CelestialRotator - {celestialBodyName}] Set as {(isMoon ? "Moon" : "Star")}");
             }
         }
 
@@ -750,6 +642,7 @@ namespace Sol
         private void LogStatus()
         {
             Debug.Log($"[CelestialRotator - {celestialBodyName}] " +
+                     $"Type: {(isMoon ? "Moon" : "Star")}, " +
                      $"Initialized: {_isInitialized}, " +
                      $"Current Rotation: {_currentRotation}, " +
                      $"Season: {(timeManager != null ? timeManager.CurrentSeason.ToString() : "No TimeManager")}");
@@ -759,10 +652,21 @@ namespace Sol
         {
             if (string.IsNullOrEmpty(celestialBodyName))
             {
-                celestialBodyName = "PrimaryStar";
+                celestialBodyName = "Sol";
             }
 
             updateFrequency = Mathf.Max(0.1f, updateFrequency);
+
+            // Validate celestial body name against common names
+            string lowerName = celestialBodyName.ToLower();
+            if (lowerName.Contains("primary") || lowerName.Contains("sun"))
+            {
+                celestialBodyName = "Sol";
+            }
+            else if (lowerName.Contains("dwarf") || lowerName.Contains("red"))
+            {
+                celestialBodyName = "Notr";
+            }
         }
         #endif
 

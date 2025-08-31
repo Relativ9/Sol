@@ -725,7 +725,7 @@ GameObject:
   - component: {fileID: 157207115}
   - component: {fileID: 157207116}
   m_Layer: 0
-  m_Name: PrimaryStar
+  m_Name: Sol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -748,7 +748,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -804,12 +804,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157207112}
   serializedVersion: 2
-  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 1, y: -0, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 446571576}
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
 --- !u!114 &157207115
 MonoBehaviour:
@@ -967,10 +967,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeManager: {fileID: 1441384673}
   celestialBodyTransform: {fileID: 157207114}
-  celestialBodyName: PrimaryStar
+  celestialBodyName: Sol
+  isMoon: 0
   baseRotationOffset: {x: 0, y: 0, z: 0}
   useOptimization: 1
-  updateFrequency: 24
+  updateFrequency: 20
   enableDebugLogging: 0
 --- !u!1 &159748578
 GameObject:
@@ -10030,6 +10031,40 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &446571575
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 446571576}
+  m_Layer: 0
+  m_Name: Celestials
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &446571576
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446571575}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 157207114}
+  - {fileID: 1655173279}
+  - {fileID: 1283548527}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &456147705
 GameObject:
   m_ObjectHideFlags: 0
@@ -11145,7 +11180,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675335751}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11154,8 +11189,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 200}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0, y: 180}
+  m_SizeDelta: {x: 600, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &675335753
 MonoBehaviour:
@@ -11172,7 +11207,6 @@ MonoBehaviour:
   timeManager: {fileID: 1441384673}
   autoUpdate: 1
   updateInterval: 1
-  use12HourFormat: 0
   showDate: 1
   dayFirst: 0
   normalColor: {r: 1, g: 1, b: 1, a: 1}
@@ -11224,14 +11258,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -12756,8 +12790,9 @@ GameObject:
   - component: {fileID: 1283548527}
   - component: {fileID: 1283548526}
   - component: {fileID: 1283548525}
+  - component: {fileID: 1283548528}
   m_Layer: 0
-  m_Name: MoonOne
+  m_Name: Iskarn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12812,7 +12847,7 @@ MonoBehaviour:
   m_AngularDiameter: 4
   diameterMultiplerMode: 0
   diameterMultiplier: 1
-  diameterOverride: 4
+  diameterOverride: 40
   celestialBodyShadingSource: 0
   sunLightOverride: {fileID: 157207113}
   sunColor: {r: 1, g: 1, b: 1, a: 1}
@@ -12922,7 +12957,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -12979,12 +13014,32 @@ Transform:
   m_GameObject: {fileID: 1283548524}
   serializedVersion: 2
   m_LocalRotation: {x: -0.8218038, y: -0.027813124, z: 0.5676652, w: -0.040264804}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 446571576}
   m_LocalEulerAnglesHint: {x: 174.39, y: 429.27, z: 0}
+--- !u!114 &1283548528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283548524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14eae8d6fbd57d842b3a35ff2cbdb238, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeManager: {fileID: 1441384673}
+  celestialBodyTransform: {fileID: 1283548527}
+  celestialBodyName: Iskarn
+  isMoon: 1
+  baseRotationOffset: {x: 0, y: 180, z: 0}
+  useOptimization: 1
+  updateFrequency: 20
+  enableDebugLogging: 0
 --- !u!1 &1283567359
 GameObject:
   m_ObjectHideFlags: 0
@@ -13741,11 +13796,11 @@ MonoBehaviour:
   startingCelestialTime: 0.25
   startingDay: 500
   startingYear: 1
-  timeScale: 9000
+  timeScale: 90000
   autoProgressTime: 1
-  enableDebugLogging: 1
+  enableDebugLogging: 0
   enableTransitionLogging: 0
-  showInspectorDebugInfo: 1
+  showInspectorDebugInfo: 0
   debugCurrentTime: 
   debugCurrentDate: 
   debugCalendarDate: 
@@ -19176,15 +19231,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89917d0e8c6a19f42996993f9087cd3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weatherManager: {fileID: 1761106422}
-  timeManager: {fileID: 1441384673}
-  statusText: {fileID: 164334680}
-  updateFrequency: 1
-  logWeatherChanges: 1
-  logDetailedTiming: 1
-  _lastUpdateTime: 0
-  _lastWeatherState: 0
-  _lastStateChangeTime: 0
 --- !u!4 &1562301784
 Transform:
   m_ObjectHideFlags: 0
@@ -19590,7 +19636,7 @@ GameObject:
   - component: {fileID: 1655173277}
   - component: {fileID: 1655173280}
   m_Layer: 0
-  m_Name: RedDwarf
+  m_Name: Notr
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19811,12 +19857,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1655173276}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.17364809, y: 0, z: -0.9848078, w: 0}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: -0.17364809, y: -0, z: -0.9848078, w: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 446571576}
   m_LocalEulerAnglesHint: {x: 180, y: 200, z: 0}
 --- !u!114 &1655173280
 MonoBehaviour:
@@ -19832,7 +19878,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeManager: {fileID: 1441384673}
   celestialBodyTransform: {fileID: 1655173279}
-  celestialBodyName: RedDwarf
+  celestialBodyName: Notr
+  isMoon: 0
   baseRotationOffset: {x: 0, y: 200, z: 0}
   useOptimization: 1
   updateFrequency: 24
@@ -19960,57 +20007,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca5fb02999d575489b014d49059fe3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snowParticleSystem: {fileID: 1562301782}
-  emissionTransitionDuration: 10
-  emissionCurve:
-    m_Curve:
-    - time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  snowIntensificationDuration: 50
-  snowProgressionCurve:
-    m_Curve:
-    - time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  enableLogging: 1
-  _currentState: 0
-  _stateEndTime: 0
-  _currentStateDuration: 0
-  _stateStartTime: 0
-  _isForced: 0
 --- !u!4 &1761106423
 Transform:
   m_ObjectHideFlags: 0
@@ -22312,8 +22308,7 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 157207114}
-  - {fileID: 1655173279}
+  - {fileID: 446571576}
   - {fileID: 578510089}
   - {fileID: 2013410475}
   - {fileID: 443819651}
@@ -22333,5 +22328,4 @@ SceneRoots:
   - {fileID: 1562301784}
   - {fileID: 650760658}
   - {fileID: 702943494}
-  - {fileID: 1283548527}
   - {fileID: 1826156584}

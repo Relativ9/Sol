@@ -5,10 +5,10 @@ namespace Sol
 {
     /// <summary>
     /// Simple digital clock display using TextMeshPro
-    /// Shows hours:minutes:seconds and month day
+    /// Shows hours:minutes:seconds and month day for 20-hour planetary days
     /// </summary>
     [RequireComponent(typeof(TextMeshProUGUI))]
-    public class ClockAndDate : MonoBehaviour, IClock
+    public class DigitalClock : MonoBehaviour, IClock
     {
         [Header("Clock Configuration")]
         [Tooltip("Time manager reference (auto-found if null)")]
@@ -21,9 +21,6 @@ namespace Sol
         [SerializeField] private float updateInterval = 1f;
 
         [Header("Display Format")]
-        [Tooltip("Show time in 12-hour format (with AM/PM)")]
-        [SerializeField] private bool use12HourFormat = false;
-
         [Tooltip("Show date below time")]
         [SerializeField] private bool showDate = true;
 
@@ -57,8 +54,8 @@ namespace Sol
         {
             if (textComponent == null) return;
 
-            // Format time
-            string timeText = FormatTime(hours, minutes, seconds);
+            // Format time (20-hour format: 00-19)
+            string timeText = $"{hours:D2}:{minutes:D2}:{seconds:D2}";
 
             // Format date if enabled
             string dateText = "";
@@ -156,23 +153,6 @@ namespace Sol
         }
 
         /// <summary>
-        /// Formats time string based on 12/24 hour preference
-        /// </summary>
-        private string FormatTime(int hours, int minutes, int seconds)
-        {
-            if (use12HourFormat)
-            {
-                string ampm = hours >= 12 ? "PM" : "AM";
-                int displayHours = hours == 0 ? 12 : (hours > 12 ? hours - 12 : hours);
-                return $"{displayHours:D2}:{minutes:D2}:{seconds:D2} {ampm}";
-            }
-            else
-            {
-                return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
-            }
-        }
-
-        /// <summary>
         /// Updates text color based on time manager state
         /// </summary>
         private void UpdateTextColor()
@@ -200,15 +180,6 @@ namespace Sol
         }
 
         /// <summary>
-        /// Set 12 or 24 hour format
-        /// </summary>
-        public void Set12HourFormat(bool use12Hour)
-        {
-            use12HourFormat = use12Hour;
-            UpdateFromTimeManager();
-        }
-
-        /// <summary>
         /// Enable or disable date display
         /// </summary>
         public void SetShowDate(bool show)
@@ -229,6 +200,15 @@ namespace Sol
             }
         }
 
+        /// <summary>
+        /// Set date format (day first or month first)
+        /// </summary>
+        public void SetDayFirst(bool dayFirst)
+        {
+            this.dayFirst = dayFirst;
+            UpdateFromTimeManager();
+        }
+
         #endregion
 
         #region Editor Helpers
@@ -242,7 +222,7 @@ namespace Sol
 
             if (textComponent != null)
             {
-                // Show sample time
+                // Show sample time with 20-hour format (0-19 hours)
                 UpdateDisplay(14, 30, 45, "Glavyr", 15);
             }
         }
