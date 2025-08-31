@@ -195,99 +195,6 @@ namespace Sol
             EditorGUILayout.Space();
         }
 
-        // private void DrawCelestialBodyElement(SerializedProperty arrayProperty, int index, string typeName, Dictionary<int, bool> foldouts, bool isMoon)
-        // {
-        //     var element = arrayProperty.GetArrayElementAtIndex(index);
-        //     var nameProperty = element.FindPropertyRelative("name");
-        //     var activeProperty = element.FindPropertyRelative("active");
-        //
-        //     // Initialize foldout state if needed
-        //     if (!foldouts.ContainsKey(index))
-        //         foldouts[index] = false;
-        //
-        //     EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        //
-        //     // Header with name, active toggle, and delete button
-        //     EditorGUILayout.BeginHorizontal();
-        //     
-        //     string displayName = string.IsNullOrEmpty(nameProperty.stringValue) ? $"Unnamed {typeName}" : nameProperty.stringValue;
-        //     string headerText = $"{displayName} {(activeProperty.boolValue ? "" : "(Inactive)")}";
-        //     
-        //     foldouts[index] = EditorGUILayout.Foldout(foldouts[index], headerText, true);
-        //     
-        //     EditorGUILayout.PropertyField(activeProperty, GUIContent.none, GUILayout.Width(15));
-        //     
-        //     if (GUILayout.Button("×", GUILayout.Width(20)))
-        //     {
-        //         arrayProperty.DeleteArrayElementAtIndex(index);
-        //         EditorGUILayout.EndHorizontal();
-        //         EditorGUILayout.EndVertical();
-        //         return;
-        //     }
-        //     
-        //     EditorGUILayout.EndHorizontal();
-        //
-        //     if (foldouts[index])
-        //     {
-        //         EditorGUI.indentLevel++;
-        //         
-        //         // Basic configuration
-        //         EditorGUILayout.PropertyField(nameProperty, new GUIContent("Name"));
-        //         
-        //         if (activeProperty.boolValue)
-        //         {
-        //             // Moon-specific orbital period
-        //             if (isMoon)
-        //             {
-        //                 var orbitalPeriodProperty = element.FindPropertyRelative("orbitalPeriod");
-        //                 EditorGUILayout.PropertyField(orbitalPeriodProperty, new GUIContent("Orbital Period (Days)", "How many days for one complete orbit. Creates monthly drift effect."));
-        //                 
-        //                 if (orbitalPeriodProperty.floatValue <= 0)
-        //                 {
-        //                     EditorGUILayout.HelpBox("Orbital period must be greater than 0", MessageType.Error);
-        //                 }
-        //             }
-        //             
-        //             // X-Axis controls
-        //             DrawXAxisControls(element);
-        //             
-        //             // Y-Axis controls  
-        //             DrawYAxisControls(element);
-        //         }
-        //         else
-        //         {
-        //             EditorGUILayout.HelpBox($"This {typeName.ToLower()} is inactive and will not be visible during this season.", MessageType.Info);
-        //         }
-        //         
-        //         if (isMoon)
-        //         {
-        //             var orbitalPeriodProperty = element.FindPropertyRelative("orbitalPeriod");
-        //             EditorGUILayout.PropertyField(orbitalPeriodProperty, new GUIContent("Orbital Period (Days)", "How many days for one complete orbit. Creates monthly drift effect."));
-        //
-        //             if (orbitalPeriodProperty.floatValue <= 0)
-        //             {
-        //                 EditorGUILayout.HelpBox("Orbital period must be greater than 0", MessageType.Error);
-        //             }
-        //
-        //             var invertCycleProperty = element.FindPropertyRelative("invertDayNightCycle");
-        //             EditorGUILayout.PropertyField(invertCycleProperty, new GUIContent("Invert Day/Night Cycle", "Moon rises when stars set (useful for night moons)"));
-        //
-        //             if (invertCycleProperty.boolValue)
-        //             {
-        //                 EditorGUILayout.HelpBox("This moon will follow an inverted cycle - rising when stars set", MessageType.Info);
-        //             }
-        //         }
-        //         
-        //         EditorGUI.indentLevel--;
-        //     }
-        //     
-        //
-        //
-        //     EditorGUILayout.EndVertical();
-        //     EditorGUILayout.Space();
-        //     
-        // }
-
         private void DrawXAxisControls(SerializedProperty element)
         {
             EditorGUILayout.LabelField("X-Axis (Elevation)", EditorStyles.miniBoldLabel);
@@ -296,45 +203,86 @@ namespace Sol
             var xAxisEnabledProperty = element.FindPropertyRelative("xAxisEnabled");
             EditorGUILayout.PropertyField(xAxisEnabledProperty, new GUIContent("Enabled"));
             
-            if (xAxisEnabledProperty.boolValue)
-            {
-                EditorGUI.indentLevel++;
-                
-                var xAxisModeProperty = element.FindPropertyRelative("xAxisMode");
-                var syncXWithYProperty = element.FindPropertyRelative("syncXWithY");
-                
-                EditorGUILayout.PropertyField(xAxisModeProperty, new GUIContent("Rotation Mode"));
-                EditorGUILayout.PropertyField(syncXWithYProperty, new GUIContent("Sync with Y-Axis", "Automatically sync X-axis speed with Y-axis rotation for realistic day cycles"));
-                
-                // Only show speed if not synced (for oscillate mode)
-                if (xAxisModeProperty.enumValueIndex == (int)CelestialRotationMode.Oscillate)
+            // if (xAxisEnabledProperty.boolValue)
+            // {
+            //     EditorGUI.indentLevel++;
+            //     
+            //     var xAxisModeProperty = element.FindPropertyRelative("xAxisMode");
+            //     var syncXWithYProperty = element.FindPropertyRelative("syncXWithY");
+            //     
+            //     EditorGUILayout.PropertyField(xAxisModeProperty, new GUIContent("Rotation Mode"));
+            //     EditorGUILayout.PropertyField(syncXWithYProperty, new GUIContent("Sync with Y-Axis", "Automatically sync X-axis speed with Y-axis rotation for realistic day cycles"));
+            //     
+            //     // Only show speed if not synced (for oscillate mode)
+            //     if (xAxisModeProperty.enumValueIndex == (int)CelestialRotationMode.Oscillate)
+            //     {
+            //         if (!syncXWithYProperty.boolValue)
+            //         {
+            //             var xAxisSpeedProperty = element.FindPropertyRelative("xAxisSpeed");
+            //             EditorGUILayout.PropertyField(xAxisSpeedProperty, new GUIContent("Speed", "Oscillation speed in radians per celestial time unit"));
+            //         }
+            //         else
+            //         {
+            //             EditorGUILayout.HelpBox("Speed is automatically calculated from Y-axis rotation", MessageType.Info);
+            //         }
+            //         
+            //         // Always show range controls for oscillate mode
+            //         var xAxisMinProperty = element.FindPropertyRelative("xAxisMinRange");
+            //         var xAxisMaxProperty = element.FindPropertyRelative("xAxisMaxRange");
+            //         EditorGUILayout.PropertyField(xAxisMinProperty, new GUIContent("Min Range", "Minimum elevation angle (180° = horizon, 120° = high in sky)"));
+            //         EditorGUILayout.PropertyField(xAxisMaxProperty, new GUIContent("Max Range", "Maximum elevation angle (180° = horizon, 120° = high in sky)"));
+            //         
+            //         if (xAxisMinProperty.floatValue > xAxisMaxProperty.floatValue)
+            //         {
+            //             EditorGUILayout.HelpBox("Min range should be less than max range", MessageType.Warning);
+            //         }
+            //     }
+            //     else // Continuous mode
+            //     {
+            //         var xAxisSpeedProperty = element.FindPropertyRelative("xAxisSpeed");
+            //         EditorGUILayout.PropertyField(xAxisSpeedProperty, new GUIContent("Speed", "Rotation speed in degrees per celestial time unit"));
+            //     }
+            
+                if (xAxisEnabledProperty.boolValue)
                 {
-                    if (!syncXWithYProperty.boolValue)
+                    var usePathCalcProperty = element.FindPropertyRelative("usePathAngleCalculation");
+                    EditorGUILayout.PropertyField(usePathCalcProperty, new GUIContent("Use Path Angle Calculation"));
+                    
+                    if (usePathCalcProperty.boolValue)
                     {
-                        var xAxisSpeedProperty = element.FindPropertyRelative("xAxisSpeed");
-                        EditorGUILayout.PropertyField(xAxisSpeedProperty, new GUIContent("Speed", "Oscillation speed in radians per celestial time unit"));
+                        // Path angle configuration
+                        var pathAngleProperty = element.FindPropertyRelative("desiredPathAngle");
+                        var sunriseElevationProperty = element.FindPropertyRelative("sunriseElevation");
+                        
+                        EditorGUILayout.PropertyField(pathAngleProperty, new GUIContent("Path Angle", "Angle of sun's path across sky"));
+                        EditorGUILayout.PropertyField(sunriseElevationProperty, new GUIContent("Sunrise Elevation", "Elevation when sun rises (180°=horizon)"));
+                        
+                        // Calculate and display the resulting ranges
+                        float minRange, maxRange;
+                        CelestialCalculator.CalculatePathRanges(pathAngleProperty.floatValue, sunriseElevationProperty.floatValue, out minRange, out maxRange);
+                        
+                        EditorGUILayout.HelpBox($"Calculated ranges: Min={minRange:F1}°, Max={maxRange:F1}°", MessageType.Info);
+                        
+                        // Auto-apply the calculated values
+                        element.FindPropertyRelative("xAxisMinRange").floatValue = minRange;
+                        element.FindPropertyRelative("xAxisMaxRange").floatValue = maxRange;
                     }
                     else
                     {
-                        EditorGUILayout.HelpBox("Speed is automatically calculated from Y-axis rotation", MessageType.Info);
+                        // Manual range configuration (your current system)
+                        var xAxisMinProperty = element.FindPropertyRelative("xAxisMinRange");
+                        var xAxisMaxProperty = element.FindPropertyRelative("xAxisMaxRange");
+                        
+                        EditorGUILayout.PropertyField(xAxisMinProperty, new GUIContent("Min Range"));
+                        EditorGUILayout.PropertyField(xAxisMaxProperty, new GUIContent("Max Range"));
+                        
+                        // Warn about gimbal lock
+                        if ((xAxisMinProperty.floatValue >= 80f && xAxisMinProperty.floatValue <= 100f) ||
+                            (xAxisMaxProperty.floatValue >= 80f && xAxisMaxProperty.floatValue <= 100f))
+                        {
+                            EditorGUILayout.HelpBox("Warning: Values near 90° may cause gimbal lock issues", MessageType.Warning);
+                        }
                     }
-                    
-                    // Always show range controls for oscillate mode
-                    var xAxisMinProperty = element.FindPropertyRelative("xAxisMinRange");
-                    var xAxisMaxProperty = element.FindPropertyRelative("xAxisMaxRange");
-                    EditorGUILayout.PropertyField(xAxisMinProperty, new GUIContent("Min Range", "Minimum elevation angle (180° = horizon, 120° = high in sky)"));
-                    EditorGUILayout.PropertyField(xAxisMaxProperty, new GUIContent("Max Range", "Maximum elevation angle (180° = horizon, 120° = high in sky)"));
-                    
-                    if (xAxisMinProperty.floatValue > xAxisMaxProperty.floatValue)
-                    {
-                        EditorGUILayout.HelpBox("Min range should be less than max range", MessageType.Warning);
-                    }
-                }
-                else // Continuous mode
-                {
-                    var xAxisSpeedProperty = element.FindPropertyRelative("xAxisSpeed");
-                    EditorGUILayout.PropertyField(xAxisSpeedProperty, new GUIContent("Speed", "Rotation speed in degrees per celestial time unit"));
-                }
                 
                 EditorGUI.indentLevel--;
             }

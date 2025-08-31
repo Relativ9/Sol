@@ -29,6 +29,23 @@ MonoBehaviour:
     yAxisMinRange: 0
     yAxisMaxRange: 360
     orbitalPeriod: 1
+    invertDayNightCycle: 0
+  - name: Notr
+    active: 1
+    xAxisEnabled: 0
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 0
+    xAxisMinRange: 120
+    xAxisMaxRange: 240
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.25
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 1
+    invertDayNightCycle: 0
   moons: []
   weatherData: {fileID: 0}
   overrideWeatherEnabled: 0

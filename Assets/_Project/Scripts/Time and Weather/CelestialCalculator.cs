@@ -100,6 +100,43 @@ namespace Sol
 
             return CalculateCelestialBodyRotation(celestialBody, baseRotation, celestialTime, isMoon);
         }
+        
+        public static void CalculatePathRanges(float pathAngle, float sunriseElevation, out float minRange, out float maxRange)
+        {
+            // Calculate the elevation change needed for the desired path angle
+            // Over 180° of Y rotation (horizon to horizon)
+            float yAxisSpan = 180f; // Degrees of Y rotation from sunrise to sunset
+    
+            // Calculate elevation change using trigonometry
+            float elevationChange = yAxisSpan * Mathf.Tan(pathAngle * Mathf.Deg2Rad);
+    
+            // Determine min and max based on sunrise elevation
+            if (pathAngle > 0f)
+            {
+                // Rising path: starts at sunrise elevation, goes higher
+                minRange = sunriseElevation;
+                maxRange = sunriseElevation - elevationChange; // Lower X values = higher in sky
+            }
+            else
+            {
+                // Flat path: same elevation throughout
+                minRange = maxRange = sunriseElevation;
+            }
+    
+            // Clamp to avoid gimbal lock zone (80°-100°)
+            minRange = ClampAwayFromGimbalLock(minRange);
+            maxRange = ClampAwayFromGimbalLock(maxRange);
+        }
+        
+        private static float ClampAwayFromGimbalLock(float elevation)
+        {
+            // If in the danger zone, push it to a safe value
+            if (elevation >= 80f && elevation <= 100f)
+            {
+                return elevation < 90f ? 79f : 101f;
+            }
+            return elevation;
+        }
 
         /// <summary>
         /// Calculates rotation for a specific celestial body
