@@ -13,31 +13,55 @@ MonoBehaviour:
   m_Name: Fall
   m_EditorClassIdentifier: 
   season: 1
-  primaryStarActive: 1
-  primaryXAxisEnabled: 1
-  primaryXAxisMode: 0
-  primaryXAxisSpeed: 1
-  primarySyncXWithY: 1
-  primaryXAxisMinRange: 160
-  primaryXAxisMaxRange: 220
-  primaryYAxisEnabled: 1
-  primaryYAxisMode: 1
-  primaryYAxisSpeed: 0.05
-  primaryYAxisOverrideSpeed: 0
-  primaryYAxisMinRange: 0
-  primaryYAxisMaxRange: 360
-  redDwarfActive: 1
-  redDwarfXAxisEnabled: 1
-  redDwarfXAxisMode: 0
-  redDwarfXAxisSpeed: 0.4
-  redDwarfSyncXWithY: 1
-  redDwarfXAxisMinRange: 140
-  redDwarfXAxisMaxRange: 180
-  redDwarfYAxisEnabled: 1
-  redDwarfYAxisMode: 1
-  redDwarfYAxisSpeed: 0.05
-  redDwarfYAxisOverrideSpeed: 0
-  redDwarfYAxisMinRange: 0
-  redDwarfYAxisMaxRange: 360
+  stars:
+  - name: Sol
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 160
+    xAxisMaxRange: 220
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.25
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 1
+    invertDayNightCycle: 0
+  - name: Notr
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 140
+    xAxisMaxRange: 180
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.25
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 1
+    invertDayNightCycle: 0
+  moons:
+  - name: Iskarn
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 120
+    xAxisMaxRange: 240
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.15
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 104
+    invertDayNightCycle: 1
   weatherData: {fileID: 11400000, guid: ebd9f1fccbc3c234b9fe2cf69c333134, type: 2}
   overrideWeatherEnabled: 0
