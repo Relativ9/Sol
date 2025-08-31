@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
+  m_Name: Svik
+  m_EditorClassIdentifier: 
+  season: 1
+  stars:
+  - name: Sol
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 120
+    xAxisMaxRange: 180
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.25
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 1
+    invertDayNightCycle: 0
+  - name: Notr
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 140
+    xAxisMaxRange: 180
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.25
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 1
+    invertDayNightCycle: 0
+  moons:
+  - name: Iskarn
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 150
+    xAxisMaxRange: 200
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.15
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 104
+    invertDayNightCycle: 0
+  - name: Rynth
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 130
+    xAxisMaxRange: 180
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.15
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 178
+    invertDayNightCycle: 0
+  - name: Veldris
+    active: 1
+    xAxisEnabled: 1
+    xAxisMode: 0
+    xAxisSpeed: 0.1
+    syncXWithY: 1
+    xAxisMinRange: 120
+    xAxisMaxRange: 170
+    yAxisEnabled: 1
+    yAxisMode: 1
+    yAxisSpeed: 0.15
+    yAxisOverrideSpeed: 0
+    yAxisMinRange: 0
+    yAxisMaxRange: 360
+    orbitalPeriod: 356
+    invertDayNightCycle: 0
+  weatherData: {fileID: 11400000, guid: ebd9f1fccbc3c234b9fe2cf69c333134, type: 2}
+  overrideWeatherEnabled: 0

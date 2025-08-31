@@ -12,6 +12,7 @@ namespace Sol
     {
         Oscillate,
         Continuous,
+        Fixed,
     }
     
     [CreateAssetMenu(fileName = "SeasonalData", menuName = "Sol/Seasonal Data")]
@@ -50,7 +51,10 @@ namespace Sol
             public bool xAxisEnabled = false;
             
             [Tooltip("Oscillate: moves between min/max values. Continuous: rotates 360° at set speed")]
-            public CelestialRotationMode xAxisMode = CelestialRotationMode.Oscillate;
+            public CelestialRotationMode xAxisMode = CelestialRotationMode.Fixed;
+            
+
+            
             
             [Tooltip("Rotation speed in degrees per celestial time unit")]
             public float xAxisSpeed = 0.1f;
@@ -59,11 +63,11 @@ namespace Sol
             public bool syncXWithY = false;
             
             [Tooltip("Minimum elevation angle in degrees (180 is horizon, 120 is high in sky)")]
-            [Range(120f, 240f)]
+            [Range(95f, 240f)]
             public float xAxisMinRange = 120f;
             
             [Tooltip("Maximum elevation angle in degrees (180 is horizon, 120 is high in sky)")]
-            [Range(120f, 240f)]
+            [Range(95f, 240f)]
             public float xAxisMaxRange = 240f;
             
             [Header("Y-Axis (Azimuth)")]
@@ -91,6 +95,19 @@ namespace Sol
             
             [Tooltip("Invert day/night cycle (moon rises when stars set, useful for night moons)")]
             public bool invertDayNightCycle = false;
+            
+            [Header("Path Configuration")]
+            [Tooltip("Desired path angle in degrees (0°=horizontal, 45°=diagonal, 90°=vertical)")]
+            [Range(0f, 89f)]
+            public float desiredPathAngle = 30f;
+
+            [Tooltip("Starting elevation when sun rises (Y=0°)")]
+            [Range(160f, 200f)]
+            public float sunriseElevation = 180f; // Horizon
+
+            [Tooltip("Use path angle calculation instead of manual min/max ranges")]
+            public bool usePathAngleCalculation = true;
+            
         }
 
         // Properties
