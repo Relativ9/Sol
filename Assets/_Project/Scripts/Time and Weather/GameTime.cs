@@ -38,10 +38,10 @@ namespace Sol
         /// </summary>
         public enum Season
         {
-            PolarSummer,    // Perihelion - close to primary star, midnight sun
-            Fall,    // Fall equivalent
-            LongNight,       // Long Polar nights, barely any light from Sol for only a few hours every day.
-            Spring    // Spring equivalent  
+            Lansomr,    // Perihelion - close to primary star, midnight sun
+            Svik,    // Fall equivalent
+            Evinotr,       // Long Polar nights, barely any light from Sol for only a few hours every day.
+            Gro    // Spring equivalent  
         }
 
         /// <summary>

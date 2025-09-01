@@ -170,10 +170,10 @@ namespace Sol
         {
             return season switch
             {
-                Season.PolarSummer => polarSummerData,
-                Season.Fall => fallData,
-                Season.LongNight => longNightData,
-                Season.Spring => springData,
+                Season.Lansomr => polarSummerData,
+                Season.Svik => fallData,
+                Season.Evinotr => longNightData,
+                Season.Gro => springData,
                 _ => null
             };
         }
@@ -308,7 +308,7 @@ namespace Sol
                     return range.season;
                 }
             }
-            return Season.PolarSummer; // Fallback
+            return Season.Lansomr; // Fallback
         }
 
         /// <summary>
@@ -461,7 +461,7 @@ namespace Sol
             // Spring (starts at day 1)
             seasonRanges[3] = new SeasonRange
             {
-                season = Season.Spring,
+                season = Season.Gro,
                 startDay = currentDay,
                 endDay = currentDay + springDays - 1,
                 duration = springDays
@@ -471,7 +471,7 @@ namespace Sol
             // Polar Summer
             seasonRanges[0] = new SeasonRange
             {
-                season = Season.PolarSummer,
+                season = Season.Lansomr,
                 startDay = currentDay,
                 endDay = currentDay + polarSummerDays - 1,
                 duration = polarSummerDays
@@ -481,7 +481,7 @@ namespace Sol
             // Fall
             seasonRanges[1] = new SeasonRange
             {
-                season = Season.Fall,
+                season = Season.Svik,
                 startDay = currentDay,
                 endDay = currentDay + fallDays - 1,
                 duration = fallDays
@@ -491,7 +491,7 @@ namespace Sol
             // Long Night
             seasonRanges[2] = new SeasonRange
             {
-                season = Season.LongNight,
+                season = Season.Evinotr,
                 startDay = currentDay,
                 endDay = currentDay + longNightDays - 1,
                 duration = longNightDays
@@ -564,20 +564,20 @@ namespace Sol
             months.Clear();
             
             // Spring months (days 1-208)
-            months.Add(new MonthDefinition { name = "Glavyr", season = Season.Spring, index = 0 });
-            months.Add(new MonthDefinition { name = "Levorn", season = Season.Spring, index = 1 });
+            months.Add(new MonthDefinition { name = "Glavyr", season = Season.Gro, index = 0 });
+            months.Add(new MonthDefinition { name = "Levorn", season = Season.Gro, index = 1 });
             
             // PolarSummer months (days 209-416)
-            months.Add(new MonthDefinition { name = "Skjorn", season = Season.PolarSummer, index = 2 });
-            months.Add(new MonthDefinition { name = "Glausk", season = Season.PolarSummer, index = 3 });
+            months.Add(new MonthDefinition { name = "Skjorn", season = Season.Lansomr, index = 2 });
+            months.Add(new MonthDefinition { name = "Glausk", season = Season.Lansomr, index = 3 });
             
             // Fall months (days 417-624)
-            months.Add(new MonthDefinition { name = "Farnok", season = Season.Fall, index = 4 });
-            months.Add(new MonthDefinition { name = "Tvarn", season = Season.Fall, index = 5 });
+            months.Add(new MonthDefinition { name = "Farnok", season = Season.Svik, index = 4 });
+            months.Add(new MonthDefinition { name = "Tvarn", season = Season.Svik, index = 5 });
             
             // LongNight months (days 625-832)
-            months.Add(new MonthDefinition { name = "Nurlith", season = Season.LongNight, index = 6 });
-            months.Add(new MonthDefinition { name = "Thrukn", season = Season.LongNight, index = 7 });
+            months.Add(new MonthDefinition { name = "Nurlith", season = Season.Evinotr, index = 6 });
+            months.Add(new MonthDefinition { name = "Thrukn", season = Season.Evinotr, index = 7 });
         }
 
         #endregion
