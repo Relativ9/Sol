@@ -73,16 +73,16 @@ namespace Sol
         {
             switch (timeManager.CurrentSeason)
             {
-                case Season.PolarSummer:
+                case Season.Lansomr:
                     targetAlpha = summerAlpha;
                     break;
-                case Season.Fall:
+                case Season.Svik:
                     targetAlpha = transitionToLongNightAlpha;
                     break;
-                case Season.LongNight:
+                case Season.Evinotr:
                     targetAlpha = longNightAlpha;
                     break;
-                case Season.Spring:
+                case Season.Gro:
                     targetAlpha = transitionFromLongNightAlpha;
                     break;
                 default:

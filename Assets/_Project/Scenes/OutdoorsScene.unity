@@ -965,12 +965,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14eae8d6fbd57d842b3a35ff2cbdb238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeManager: {fileID: 1441384673}
-  celestialBodyTransform: {fileID: 157207114}
   celestialBodyName: Sol
   isMoon: 0
   baseRotationOffset: {x: 0, y: 0, z: 0}
-  useOptimization: 1
+  useQuaternionRotation: 1
+  smoothRotation: 0
+  rotationSmoothSpeed: 2
+  enablePerformanceOptimization: 1
   updateFrequency: 20
   enableDebugLogging: 0
 --- !u!1 &159748578
@@ -1551,12 +1552,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14eae8d6fbd57d842b3a35ff2cbdb238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeManager: {fileID: 1441384673}
-  celestialBodyTransform: {fileID: 277559466}
   celestialBodyName: Veldris
   isMoon: 1
   baseRotationOffset: {x: 0, y: 20, z: 0}
-  useOptimization: 1
+  useQuaternionRotation: 1
+  smoothRotation: 1
+  rotationSmoothSpeed: 2
+  enablePerformanceOptimization: 1
   updateFrequency: 20
   enableDebugLogging: 0
 --- !u!114 &277559468
@@ -10302,7 +10304,7 @@ GameObject:
   m_Component:
   - component: {fileID: 446571576}
   m_Layer: 0
-  m_Name: Celestials
+  m_Name: Celestial Bodies
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13295,12 +13297,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14eae8d6fbd57d842b3a35ff2cbdb238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeManager: {fileID: 1441384673}
-  celestialBodyTransform: {fileID: 1283548527}
   celestialBodyName: Iskarn
   isMoon: 1
   baseRotationOffset: {x: 0, y: 180, z: 0}
-  useOptimization: 1
+  useQuaternionRotation: 1
+  smoothRotation: 1
+  rotationSmoothSpeed: 2
+  enablePerformanceOptimization: 1
   updateFrequency: 20
   enableDebugLogging: 0
 --- !u!1 &1283567359
@@ -20139,12 +20142,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14eae8d6fbd57d842b3a35ff2cbdb238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeManager: {fileID: 1441384673}
-  celestialBodyTransform: {fileID: 1655173279}
   celestialBodyName: Notr
   isMoon: 0
   baseRotationOffset: {x: 0, y: 200, z: 0}
-  useOptimization: 1
+  useQuaternionRotation: 1
+  smoothRotation: 1
+  rotationSmoothSpeed: 2
+  enablePerformanceOptimization: 1
   updateFrequency: 24
   enableDebugLogging: 0
 --- !u!4 &1669363833 stripped
@@ -22613,12 +22617,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14eae8d6fbd57d842b3a35ff2cbdb238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeManager: {fileID: 1441384673}
-  celestialBodyTransform: {fileID: 2128289269}
   celestialBodyName: Rynth
   isMoon: 1
   baseRotationOffset: {x: 0, y: 90, z: 0}
-  useOptimization: 1
+  useQuaternionRotation: 1
+  smoothRotation: 1
+  rotationSmoothSpeed: 2
+  enablePerformanceOptimization: 1
   updateFrequency: 20
   enableDebugLogging: 0
 --- !u!114 &2128289271

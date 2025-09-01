@@ -340,7 +340,7 @@ namespace Sol
 
             // Initialize transition state
             isInSeasonTransition = false;
-            targetSeason = Season.PolarSummer;
+            targetSeason = Season.Lansomr;
             seasonTransitionProgress = 0f;
 
             // Initialize calendar state
@@ -360,7 +360,7 @@ namespace Sol
             if (worldTimeData == null || worldTimeData.MonthsPerYear == 0)
             {
                 // No calendar system configured
-                currentMonth = new Month("Unknown", Season.Spring, 0);
+                currentMonth = new Month("Unknown", Season.Gro, 0);
                 currentDayOfMonth = 1;
                 previousMonth = currentMonth;
                 return;
@@ -381,7 +381,7 @@ namespace Sol
             {
                 Debug.LogError($"[TimeManager] Error initializing calendar: {ex.Message}");
                 // Fallback to safe values
-                currentMonth = new Month("Unknown", Season.Spring, 0);
+                currentMonth = new Month("Unknown", Season.Gro, 0);
                 currentDayOfMonth = 1;
                 previousMonth = currentMonth;
             }
@@ -688,14 +688,14 @@ namespace Sol
         /// <param name="halfTransition">Half of the total transition duration in days</param>
         private void HandleYearBoundaryTransition(int halfTransition)
         {
-            if (currentSeason == Season.Spring)
+            if (currentSeason == Season.Gro)
             {
                 int daysFromYearEnd = worldTimeData.totalDaysInYear - currentDay;
                 if (daysFromYearEnd <= halfTransition)
                 {
                     // Transitioning from Spring to PolarSummer
                     isInSeasonTransition = true;
-                    targetSeason = Season.PolarSummer;
+                    targetSeason = Season.Lansomr;
                     seasonTransitionProgress = 0.5f + (0.5f * (halfTransition - daysFromYearEnd) / halfTransition);
                     
                     LogTransitionState("Year boundary transition (Spring → PolarSummer)");
@@ -703,11 +703,11 @@ namespace Sol
                 }
             }
 
-            if (currentSeason == Season.PolarSummer && currentDay <= halfTransition)
+            if (currentSeason == Season.Lansomr && currentDay <= halfTransition)
             {
                 // Coming from Spring into PolarSummer
                 isInSeasonTransition = true;
-                targetSeason = Season.PolarSummer;
+                targetSeason = Season.Lansomr;
                 seasonTransitionProgress = 0.5f * (currentDay / halfTransition);
                 
                 LogTransitionState("Year boundary transition (Spring → PolarSummer completion)");
@@ -724,11 +724,11 @@ namespace Sol
         {
             return season switch
             {
-                Season.PolarSummer => Season.Fall,
-                Season.Fall => Season.LongNight,
-                Season.LongNight => Season.Spring,
-                Season.Spring => Season.PolarSummer,
-                _ => Season.PolarSummer
+                Season.Lansomr => Season.Svik,
+                Season.Svik => Season.Evinotr,
+                Season.Evinotr => Season.Gro,
+                Season.Gro => Season.Lansomr,
+                _ => Season.Lansomr
             };
         }
 
@@ -897,7 +897,7 @@ namespace Sol
         /// <returns>Season containing the specified day</returns>
         public Season GetSeasonForDay(int dayOfYear)
         {
-            if (worldTimeData == null) return Season.PolarSummer;
+            if (worldTimeData == null) return Season.Lansomr;
             return worldTimeData.GetSeasonForDay(dayOfYear);
         }
 
