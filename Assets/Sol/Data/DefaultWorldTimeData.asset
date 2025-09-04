@@ -12,12 +12,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bdd632e0a40379459148d4013ed9619, type: 3}
   m_Name: DefaultWorldTimeData
   m_EditorClassIdentifier: 
-  dayLengthInSeconds: 7200
+  dayLengthInSeconds: 1440
   totalDaysInYear: 832
   hoursPerDay: 20
   minutesPerHour: 60
   secondsPerMinute: 60
-  seasons: []
+  seasons:
+  - seasonName: Spring
+    lengthInDays: 208
+    seasonalData: {fileID: 11400000, guid: 6b1de9f223c978848bb62e5d65e3f9ee, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0, g: 0, b: 1, a: 1}
+    seasonColor: {r: 0.9, g: 0.27, b: 0.27, a: 1}
+  - seasonName: Summer
+    lengthInDays: 208
+    seasonalData: {fileID: 11400000, guid: 4291c59b12a25954e83abfd23d2713fd, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0, g: 0, b: 1, a: 1}
+    seasonColor: {r: 0.585, g: 0.9, b: 0.27, a: 1}
+  - seasonName: Autumn
+    lengthInDays: 208
+    seasonalData: {fileID: 11400000, guid: c487e4caadefadf438a18cf7b571b32e, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0, g: 0, b: 1, a: 1}
+    seasonColor: {r: 0.27, g: 0.9, b: 0.9, a: 1}
+  - seasonName: Winter
+    lengthInDays: 208
+    seasonalData: {fileID: 11400000, guid: 7c918b002d37c954f8598c33e8654f16, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0, g: 0, b: 1, a: 1}
+    seasonColor: {r: 0.585, g: 0.27, b: 0.9, a: 1}
   seasonTransitionDays: 20
   daysPerMonth: 104
   months: []
