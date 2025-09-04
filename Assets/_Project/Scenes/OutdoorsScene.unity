@@ -968,7 +968,6 @@ MonoBehaviour:
   celestialBodyName: Sol
   isMoon: 0
   baseRotationOffset: {x: 0, y: 0, z: 0}
-  useQuaternionRotation: 1
   smoothRotation: 0
   rotationSmoothSpeed: 2
   enablePerformanceOptimization: 1
@@ -1555,7 +1554,6 @@ MonoBehaviour:
   celestialBodyName: Veldris
   isMoon: 1
   baseRotationOffset: {x: 0, y: 20, z: 0}
-  useQuaternionRotation: 1
   smoothRotation: 1
   rotationSmoothSpeed: 2
   enablePerformanceOptimization: 1
@@ -13300,8 +13298,7 @@ MonoBehaviour:
   celestialBodyName: Iskarn
   isMoon: 1
   baseRotationOffset: {x: 0, y: 180, z: 0}
-  useQuaternionRotation: 1
-  smoothRotation: 1
+  smoothRotation: 0
   rotationSmoothSpeed: 2
   enablePerformanceOptimization: 1
   updateFrequency: 20
@@ -14060,18 +14057,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldTimeData: {fileID: 11400000, guid: 7f3a3ebdbd5da5f45adddde98d687f39, type: 2}
   startingCelestialTime: 0.25
-  startingDay: 500
+  startingDay: 1
   startingYear: 1
   timeScale: 900
-  autoProgressTime: 1
+  pauseTime: 0
   enableDebugLogging: 0
-  enableTransitionLogging: 0
-  showInspectorDebugInfo: 0
-  debugCurrentTime: 
-  debugCurrentDate: 
-  debugCalendarDate: 
-  debugSeasonInfo: 
-  debugTransitionInfo: 
 --- !u!4 &1441384674
 Transform:
   m_ObjectHideFlags: 0
@@ -20145,7 +20135,6 @@ MonoBehaviour:
   celestialBodyName: Notr
   isMoon: 0
   baseRotationOffset: {x: 0, y: 200, z: 0}
-  useQuaternionRotation: 1
   smoothRotation: 1
   rotationSmoothSpeed: 2
   enablePerformanceOptimization: 1
@@ -22620,7 +22609,6 @@ MonoBehaviour:
   celestialBodyName: Rynth
   isMoon: 1
   baseRotationOffset: {x: 0, y: 90, z: 0}
-  useQuaternionRotation: 1
   smoothRotation: 1
   rotationSmoothSpeed: 2
   enablePerformanceOptimization: 1

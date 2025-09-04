@@ -10,20 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
-  m_Name: Svik
+  m_Name: Gro
   m_EditorClassIdentifier: 
   stars:
   - name: Sol
     active: 1
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
     yAxisSpeed: 0.25
     yAxisOverrideSpeed: 1
-    orbitalAngle: 60
+    orbitalAngle: 22.6
     baseElevation: 180
     orbitalPeriod: 1
     phaseOffset: 0
   - name: Notr
     active: 1
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
     yAxisSpeed: 0.25
     yAxisOverrideSpeed: 1
@@ -34,6 +36,7 @@ MonoBehaviour:
   moons:
   - name: Iskarn
     active: 1
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
     yAxisSpeed: 0.15
     yAxisOverrideSpeed: 1
@@ -43,19 +46,23 @@ MonoBehaviour:
     phaseOffset: 200
   - name: Rynth
     active: 1
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
     yAxisSpeed: 0.15
-    yAxisOverrideSpeed: 0
+    yAxisOverrideSpeed: 1
     orbitalAngle: 45
     baseElevation: 185.7
     orbitalPeriod: 178
     phaseOffset: 120
   - name: Veldris
     active: 1
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
     yAxisSpeed: 0.15
-    yAxisOverrideSpeed: 0
+    yAxisOverrideSpeed: 1
     orbitalAngle: 45
     baseElevation: 135.3
     orbitalPeriod: 356
     phaseOffset: 180
+  useCommonOrbitalAngle: 1
+  commonOrbitalAngle: 90
