@@ -17,29 +17,59 @@ MonoBehaviour:
   hoursPerDay: 20
   minutesPerHour: 60
   secondsPerMinute: 60
-  polarSummerDays: 362
-  fallDays: 129
-  longNightDays: 212
-  springDays: 129
+  seasons:
+  - seasonName: Gro
+    lengthInDays: 156
+    seasonalData: {fileID: 11400000, guid: 29e7a8a457f9e0947af0e330c35bf3ff, type: 2}
+    overrideAmbientColors: 1
+    seasonDayAmbient: {r: 0.23057711, g: 1, b: 0.16509432, a: 0}
+    seasonNightAmbient: {r: 0.6511626, g: 0, b: 1, a: 0}
+    seasonColor: {r: 0.31062692, g: 0.7830189, b: 0.28439835, a: 1}
+  - seasonName: Lansomr
+    lengthInDays: 260
+    seasonalData: {fileID: 11400000, guid: 258f99c482d944c41969626a8aeddfee, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 1, g: 1, b: 1, a: 1}
+  - seasonName: Svik
+    lengthInDays: 156
+    seasonalData: {fileID: 11400000, guid: 03dd2f841fe4f6d4ba15015d3b5c0ae5, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 1, g: 1, b: 1, a: 1}
+  - seasonName: Evinotr
+    lengthInDays: 260
+    seasonalData: {fileID: 11400000, guid: f31ba32c6b777184781655801ff9bba5, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 1, g: 1, b: 1, a: 1}
   seasonTransitionDays: 20
-  polarSummerData: {fileID: 11400000, guid: 8454b5d7c8f8ecc45a889b86e98e1d86, type: 2}
-  fallData: {fileID: 11400000, guid: 03dd2f841fe4f6d4ba15015d3b5c0ae5, type: 2}
-  longNightData: {fileID: 11400000, guid: a7c9db57506e5a840b18f62c357aee1e, type: 2}
-  springData: {fileID: 11400000, guid: 142b34f6f6c8a4747bab65f1c9ce150a, type: 2}
-  seasonRanges:
-  - season: 0
-    startDay: 1
-    endDay: 362
-    duration: 362
-  - season: 1
-    startDay: 363
-    endDay: 491
-    duration: 129
-  - season: 2
-    startDay: 492
-    endDay: 703
-    duration: 212
-  - season: 3
-    startDay: 704
-    endDay: 832
-    duration: 129
+  daysPerMonth: 104
+  months:
+  - name: Glavyr
+    index: 0
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Levorn
+    index: 1
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Skjorn
+    index: 2
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Glausk
+    index: 3
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Farnok
+    index: 4
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Tvarn
+    index: 5
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Nurlith
+    index: 6
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Thrukn
+    index: 7
+    monthColor: {r: 1, g: 1, b: 1, a: 1}

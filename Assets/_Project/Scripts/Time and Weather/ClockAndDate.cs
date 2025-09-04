@@ -133,7 +133,7 @@ namespace Sol
         /// </summary>
         private void UpdateFromTimeManager()
         {
-            if (timeManager?.WorldTimeData == null) return;
+            // if (timeManager?.WorldTimeData == null) return;
 
             // Get time components from TimeManager
             var gameTime = timeManager.GetCurrentGameTime();

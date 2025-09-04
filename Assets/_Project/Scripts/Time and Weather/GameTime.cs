@@ -20,17 +20,51 @@ namespace Sol
             public float totalGameTime;
             public float dayTime;
             public int currentDay;
-            public Season currentSeason;
             public float seasonProgress;
             public float seasonTransition;
-            public Season nextSeason;
             public int hours;
             public int minutes;
             public int seconds;
+            
+            [Tooltip("Current season index (0-based)")]
+            public int currentSeasonIndex;
+    
+            [Tooltip("Current season name")]
+            public string currentSeasonName;
+    
+            [Tooltip("Next season index during transitions")]
+            public int nextSeasonIndex = -1; // -1 means no transition
+    
+            [Tooltip("Next season name during transitions")]
+            public string nextSeasonName;
     
             // Add these calculated properties (no new storage)
             public int DaysRemainingInSeason { get; set; }  // Set by TimeManager
             public int TotalDaysInSeason { get; set; }      // Set by TimeManager
+            
+            /// <summary>
+            /// Gets current season name for display
+            /// </summary>
+            public string GetCurrentSeasonDisplayName()
+            {
+                return !string.IsNullOrEmpty(currentSeasonName) ? currentSeasonName : "Unknown Season";
+            }
+    
+            /// <summary>
+            /// Gets next season name for display during transitions
+            /// </summary>
+            public string GetNextSeasonDisplayName()
+            {
+                return !string.IsNullOrEmpty(nextSeasonName) ? nextSeasonName : currentSeasonName;
+            }
+    
+            /// <summary>
+            /// Checks if currently in a season transition
+            /// </summary>
+            public bool IsInSeasonTransition()
+            {
+                return nextSeasonIndex >= 0 && seasonTransition > 0f;
+            }
         }
 
         /// <summary>
@@ -68,4 +102,5 @@ namespace Sol
             public static System.Action<TimeOfDay, TimeOfDay> OnTimeOfDayChanged;
             public static System.Action<int> OnNewDay;
         }
+        
 }
