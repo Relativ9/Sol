@@ -12,88 +12,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
   m_Name: Evinotr
   m_EditorClassIdentifier: 
-  season: 1
   stars:
   - name: Sol
     active: 1
-    xAxisEnabled: 1
-    xAxisMode: 0
-    xAxisSpeed: 0.1
-    syncXWithY: 1
-    xAxisMinRange: 180
-    xAxisMaxRange: 240
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisMode: 1
     yAxisSpeed: 0.25
-    yAxisOverrideSpeed: 0
-    yAxisMinRange: 0
-    yAxisMaxRange: 360
+    yAxisOverrideSpeed: 1
+    orbitalAngle: 30
+    baseElevation: 180
     orbitalPeriod: 1
-    invertDayNightCycle: 0
+    phaseOffset: 0
   - name: Notr
     active: 1
-    xAxisEnabled: 1
-    xAxisMode: 0
-    xAxisSpeed: 0.1
-    syncXWithY: 1
-    xAxisMinRange: 140
-    xAxisMaxRange: 180
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisMode: 1
     yAxisSpeed: 0.25
-    yAxisOverrideSpeed: 0
-    yAxisMinRange: 0
-    yAxisMaxRange: 360
+    yAxisOverrideSpeed: 1
+    orbitalAngle: 30
+    baseElevation: 180
     orbitalPeriod: 1
-    invertDayNightCycle: 0
+    phaseOffset: 0
   moons:
   - name: Iskarn
     active: 1
-    xAxisEnabled: 1
-    xAxisMode: 0
-    xAxisSpeed: 0.1
-    syncXWithY: 1
-    xAxisMinRange: 150
-    xAxisMaxRange: 200
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisMode: 1
     yAxisSpeed: 0.15
     yAxisOverrideSpeed: 0
-    yAxisMinRange: 0
-    yAxisMaxRange: 360
+    orbitalAngle: 30
+    baseElevation: 180
     orbitalPeriod: 104
-    invertDayNightCycle: 1
+    phaseOffset: 0
   - name: Rynth
     active: 1
-    xAxisEnabled: 1
-    xAxisMode: 0
-    xAxisSpeed: 0.1
-    syncXWithY: 1
-    xAxisMinRange: 130
-    xAxisMaxRange: 180
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisMode: 1
     yAxisSpeed: 0.15
     yAxisOverrideSpeed: 0
-    yAxisMinRange: 0
-    yAxisMaxRange: 360
+    orbitalAngle: 30
+    baseElevation: 180
     orbitalPeriod: 178
-    invertDayNightCycle: 1
+    phaseOffset: 0
   - name: Veldris
     active: 1
-    xAxisEnabled: 1
-    xAxisMode: 0
-    xAxisSpeed: 0.1
-    syncXWithY: 1
-    xAxisMinRange: 120
-    xAxisMaxRange: 170
+    overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisMode: 1
     yAxisSpeed: 0.15
     yAxisOverrideSpeed: 0
-    yAxisMinRange: 0
-    yAxisMaxRange: 360
+    orbitalAngle: 30
+    baseElevation: 180
     orbitalPeriod: 356
-    invertDayNightCycle: 0
-  weatherData: {fileID: 11400000, guid: ebd9f1fccbc3c234b9fe2cf69c333134, type: 2}
-  overrideWeatherEnabled: 0
+    phaseOffset: 0
+  useCommonOrbitalAngle: 1
+  commonOrbitalAngle: 23.5
