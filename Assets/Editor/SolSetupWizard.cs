@@ -97,6 +97,14 @@ namespace Sol.Editor
                 // Initialize with default moon
                 moons.Add(new MoonConfig());
             }
+            
+            [SerializeField] private string _skyFogProfilePath = "Assets/SolSetupWizard/DefaultSkyFogProfile.asset";
+            public string skyFogProfilePath => _skyFogProfilePath;
+
+            public void SetSkyFogProfile(string path)
+            {
+                _skyFogProfilePath = path;
+            }
         }
 
         #endregion

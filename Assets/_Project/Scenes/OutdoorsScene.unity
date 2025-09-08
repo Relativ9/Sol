@@ -14057,9 +14057,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldTimeData: {fileID: 11400000, guid: 7f3a3ebdbd5da5f45adddde98d687f39, type: 2}
   startingCelestialTime: 0.25
-  startingDay: 1
+  startingDay: 600
   startingYear: 1
-  timeScale: 900
+  timeScale: 1000
   pauseTime: 0
   enableDebugLogging: 0
 --- !u!4 &1441384674

@@ -43,6 +43,6 @@ MonoBehaviour:
     orbitalAngle: 23.5
     baseElevation: 180
     orbitalPeriod: 29.5
-    phaseOffset: 180
+    phaseOffset: 131
   useCommonOrbitalAngle: 1
   commonOrbitalAngle: -7.833333
