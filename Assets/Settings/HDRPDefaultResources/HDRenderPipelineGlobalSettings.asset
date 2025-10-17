@@ -156,6 +156,7 @@ MonoBehaviour:
       sssCustomDownsampleSteps: 0
       msaaMode: 1
       materialQuality: 0
+  m_Version: 14
   m_Settings:
     m_SettingsList:
       m_List:
@@ -194,6 +195,7 @@ MonoBehaviour:
       - rid: 2450634753878786072
       - rid: 2450634753878786073
       - rid: 2450634753878786074
+      - rid: 8983520531514392576
     m_RuntimeSettings:
       m_List: []
   renderingLayerNames:
@@ -236,7 +238,6 @@ MonoBehaviour:
     obsoleteHasProbeVolumes:
       m_Keys: []
       m_Values: 
-  m_Version: 14
   references:
     version: 2
     RefIds:
@@ -873,3 +874,7 @@ MonoBehaviour:
         m_IncludeReferencedInScenes: 1
         m_IncludeAssetsByLabel: 1
         m_LabelToInclude: HDRP:IncludeInBuild
+    - rid: 8983520531514392576
+      type: {class: RenderingDebuggerRuntimeResources, ns: UnityEngine.Rendering, asm: Unity.RenderPipelines.Core.Runtime}
+      data:
+        m_version: 0
