@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
   m_Name: WinterSeasonData
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.SeasonalData
   stars:
   - name: Sol
     active: 1
@@ -29,10 +29,10 @@ MonoBehaviour:
     yAxisEnabled: 1
     yAxisSpeed: 1
     yAxisOverrideSpeed: 1
-    orbitalAngle: 23.5
-    baseElevation: 180
+    orbitalAngle: 17.7
+    baseElevation: 235
     orbitalPeriod: 1
-    phaseOffset: 0
+    phaseOffset: 190
   moons:
   - name: Luna
     active: 1
@@ -43,6 +43,6 @@ MonoBehaviour:
     orbitalAngle: 23.5
     baseElevation: 180
     orbitalPeriod: 29.5
-    phaseOffset: 131
+    phaseOffset: 180
   useCommonOrbitalAngle: 1
   commonOrbitalAngle: 23.5
