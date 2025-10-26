@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bdd632e0a40379459148d4013ed9619, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.WorldTimeData
+  dayLengthInSeconds: 1440
+  totalDaysInYear: 360
+  hoursPerDay: 24
+  minutesPerHour: 60
+  secondsPerMinute: 60
+  seasons:
+  - seasonName: Spring
+    lengthInDays: 90
+    seasonalData: {fileID: 11400000, guid: 2bbdf630601521806839ea0ab47f1014, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
+    seasonColor: {r: 0.4, g: 1, b: 0.4, a: 1}
+  - seasonName: Summer
+    lengthInDays: 90
+    seasonalData: {fileID: 11400000, guid: a4e1e48d274faeb80950f20293ac055b, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
+    seasonColor: {r: 1, g: 1, b: 0.4, a: 1}
+  - seasonName: Autumn
+    lengthInDays: 90
+    seasonalData: {fileID: 11400000, guid: 7f343e6e43fac0cde8045a211d8a5fd5, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
+    seasonColor: {r: 1, g: 0.6, b: 0.2, a: 1}
+  - seasonName: Winter
+    lengthInDays: 90
+    seasonalData: {fileID: 11400000, guid: 82e696361cd2f022caee5a86ef6e78eb, type: 2}
+    overrideAmbientColors: 0
+    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
+    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
+    seasonColor: {r: 0.7, g: 0.9, b: 1, a: 1}
+  seasonTransitionDays: 10
+  daysPerMonth: 30
+  months:
+  - name: Glavyr
+    index: 0
+    monthColor: {r: 0.95, g: 0.57, b: 0.57, a: 1}
+  - name: Tharven
+    index: 1
+    monthColor: {r: 0.95, g: 0.722, b: 0.57, a: 1}
+  - name: Solmyr
+    index: 2
+    monthColor: {r: 0.95, g: 0.874, b: 0.57, a: 1}
+  - name: Aethon
+    index: 3
+    monthColor: {r: 0.87399995, g: 0.95, b: 0.57, a: 1}
+  - name: Lumis
+    index: 4
+    monthColor: {r: 0.72199994, g: 0.95, b: 0.57, a: 1}
+  - name: Verdis
+    index: 5
+    monthColor: {r: 0.57, g: 0.95, b: 0.57, a: 1}
+  - name: Harvyx
+    index: 6
+    monthColor: {r: 0.57, g: 0.95, b: 0.722, a: 1}
+  - name: Frosten
+    index: 7
+    monthColor: {r: 0.57, g: 0.95, b: 0.87399995, a: 1}
+  - name: Stormyr
+    index: 8
+    monthColor: {r: 0.57, g: 0.8739999, b: 0.95, a: 1}
+  - name: Wintern
+    index: 9
+    monthColor: {r: 0.57, g: 0.72199994, b: 0.95, a: 1}
+  - name: Icelyn
+    index: 10
+    monthColor: {r: 0.57, g: 0.57, b: 0.95, a: 1}
+  - name: Newyr
+    index: 11
+    monthColor: {r: 0.722, g: 0.57, b: 0.95, a: 1}

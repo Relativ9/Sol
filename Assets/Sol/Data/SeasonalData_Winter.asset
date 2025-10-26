@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
-  m_Name: AutumnSeasonData
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sol.SeasonalData
   stars:
   - name: Sol
@@ -19,7 +19,7 @@ MonoBehaviour:
     yAxisEnabled: 1
     yAxisSpeed: 1
     yAxisOverrideSpeed: 1
-    orbitalAngle: 23.5
+    orbitalAngle: 24.75
     baseElevation: 180
     orbitalPeriod: 1
     phaseOffset: 0
@@ -30,9 +30,9 @@ MonoBehaviour:
     yAxisEnabled: 1
     yAxisSpeed: 1
     yAxisOverrideSpeed: 1
-    orbitalAngle: 23.5
+    orbitalAngle: 24.75
     baseElevation: 180
     orbitalPeriod: 29.5
     phaseOffset: 180
   useCommonOrbitalAngle: 1
-  commonOrbitalAngle: 7.8333344
+  commonOrbitalAngle: 23.5

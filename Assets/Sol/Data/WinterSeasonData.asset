@@ -23,16 +23,6 @@ MonoBehaviour:
     baseElevation: 180
     orbitalPeriod: 1
     phaseOffset: 0
-  - name: Sun 2
-    active: 1
-    overrideOrbitalAngle: 0
-    yAxisEnabled: 1
-    yAxisSpeed: 1
-    yAxisOverrideSpeed: 1
-    orbitalAngle: 17.7
-    baseElevation: 235
-    orbitalPeriod: 1
-    phaseOffset: 190
   moons:
   - name: Luna
     active: 1
