@@ -7,149 +7,77 @@ namespace Sol.Editor
     /// <summary>
     /// Setup wizard for the Sol Time & Celestial System.
     /// Provides one-click setup for new projects with sensible defaults and sample configurations.
+    /// 
+    /// ARCHITECTURE NOTE: This class is purely presentation layer (UI/UX).
+    /// All business logic is delegated to SolSetupUtilities.
+    /// Configuration data is defined in SolSetupConfig (shared DTO).
     /// </summary>
     public class SolSetupWizard : EditorWindow
     {
         #region Window Management
-        
+
         [MenuItem("Tools/Sol/Setup Wizard", priority = 1)]
         public static void ShowWindow()
         {
             SolSetupWizard window = GetWindow<SolSetupWizard>("Sol Setup Wizard");
             window.minSize = new Vector2(600, 700);
-            window.maxSize = new Vector2(600, 1000);
+            window.maxSize = new Vector2(600, 1400);
             window.Show();
-        }
-
-        #endregion
-
-        #region Setup Configuration
-
-        [System.Serializable]
-        public class CelestialBodyConfig
-        {
-            public string name = "Sol";
-            public bool active = true;
-            public bool yAxisEnabled = true;
-            public float yAxisSpeed = 1.0f;
-            public bool yAxisOverrideSpeed = true;
-            public float orbitalAngle = 23.5f;
-            public float baseElevation = 180f;
-            public float orbitalPeriod = 1f;
-            public float phaseOffset = 0f;
-    
-            [Header("Light Settings")]
-            public bool createDirectionalLight = true;
-            public float lightTemperature = 6500f; // Kelvin temperature
-            public float lightIntensity = 1.0f;
-            public bool castShadows = true; // Will be overridden for additional suns
-        }
-
-        [System.Serializable]
-        public class MoonConfig : CelestialBodyConfig
-        {
-            public bool reflectSunLight = true;
-            public string sunToReflect = "Sol";
-    
-            public MoonConfig()
-            {
-                name = "Luna";
-                orbitalPeriod = 29.5f;
-                phaseOffset = 180f;
-                lightTemperature = 4000f; // Cooler moonlight
-                lightIntensity = 0.2f;
-                castShadows = false; // Moons typically don't cast shadows
-            }
-        }
-
-        [System.Serializable]
-        public class SetupConfig
-        {
-            [Header("Scene Setup")]
-            public bool createTimeManager = true;
-            public bool createWorldTimeData = true;
-
-            [Header("Seasonal Data")]
-            public bool createSeasonalData = true;
-            public int numberOfSeasons = 4;
-            public string[] seasonNames = { "Spring", "Summer", "Autumn", "Winter" };
-
-            [Header("Celestial Bodies")]
-            public List<CelestialBodyConfig> suns = new List<CelestialBodyConfig>();
-            public List<MoonConfig> moons = new List<MoonConfig>();
-
-            [Header("Sky and Fog")]
-            public bool createSkyAndFog = true;
-            public string hdrpProfilePath = ""; // Path to existing HDRP profile
-
-            [Header("Demo Content")]
-            public bool createDemoScene = false;
-
-            [Header("Asset Paths")]
-            public string dataFolderPath = "Assets/Sol/Data";
-            public string prefabFolderPath = "Assets/Sol/Prefabs";
-
-            public SetupConfig()
-            {
-                // Initialize with default sun
-                suns.Add(new CelestialBodyConfig());
-                
-                // Initialize with default moon
-                moons.Add(new MoonConfig());
-            }
-            
-            [SerializeField] private string _skyFogProfilePath = "Assets/SolSetupWizard/DefaultSkyFogProfile.asset";
-            public string skyFogProfilePath => _skyFogProfilePath;
-
-            public void SetSkyFogProfile(string path)
-            {
-                _skyFogProfilePath = path;
-            }
         }
 
         #endregion
 
         #region Private Fields
 
-        private SetupConfig config = new SetupConfig();
-        private Vector2 scrollPosition;
-        private bool showAdvancedOptions = false;
-        private bool showSunSettings = true;
-        private bool showMoonSettings = true;
-        private GUIStyle headerStyle;
-        private GUIStyle boxStyle;
-        private bool isSetupInProgress = false;
-        private string setupStatus = "";
+        private SetupConfig _config;
+        private Vector2 _scrollPosition;
+        private bool _showAdvancedOptions = false;
+        private bool _showSunSettings = true;
+        private bool _showMoonSettings = true;
+        private GUIStyle _headerStyle;
+        private GUIStyle _boxStyle;
+        private bool _isSetupInProgress = false;
+        private string _setupStatus = "";
 
         #endregion
 
-        #region GUI Drawing
+        #region Unity Lifecycle
 
         private void OnEnable()
         {
-            InitializeStyles();
+            Debug.Log("[Sol Wizard] Window opened");
+            
+            if (_config == null)
+            {
+                _config = new SetupConfig();
+                Debug.Log("[Sol Wizard] Configuration initialized with defaults");
+            }
         }
 
         private void InitializeStyles()
         {
-            headerStyle = new GUIStyle(EditorStyles.largeLabel)
+            _headerStyle = new GUIStyle(EditorStyles.largeLabel)
             {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter
             };
 
-            boxStyle = new GUIStyle(EditorStyles.helpBox)
+            _boxStyle = new GUIStyle(EditorStyles.helpBox)
             {
                 padding = new RectOffset(10, 10, 10, 10)
             };
         }
 
+        #endregion
+
+        #region GUI Drawing
+
         private void OnGUI()
         {
-            if (headerStyle == null) InitializeStyles();
+            if (_headerStyle == null) InitializeStyles();
 
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
 
             DrawHeader();
             EditorGUILayout.Space(10);
@@ -169,7 +97,7 @@ namespace Sol.Editor
             DrawDemoContentSection();
             EditorGUILayout.Space(10);
 
-            if (showAdvancedOptions)
+            if (_showAdvancedOptions)
             {
                 DrawAdvancedOptionsSection();
                 EditorGUILayout.Space(10);
@@ -180,7 +108,7 @@ namespace Sol.Editor
 
             DrawSetupButtons();
 
-            if (isSetupInProgress)
+            if (_isSetupInProgress)
             {
                 DrawProgressSection();
             }
@@ -190,9 +118,9 @@ namespace Sol.Editor
 
         private void DrawHeader()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             
-            EditorGUILayout.LabelField("Sol Time & Celestial System", headerStyle);
+            EditorGUILayout.LabelField("Sol Time & Celestial System", _headerStyle);
             EditorGUILayout.Space(5);
             
             EditorGUILayout.HelpBox(
@@ -206,18 +134,18 @@ namespace Sol.Editor
 
         private void DrawSceneSetupSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Scene Setup", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
-            config.createTimeManager = EditorGUILayout.Toggle(
+            _config.createTimeManager = EditorGUILayout.Toggle(
                 new GUIContent("Create TimeManager", "Creates the core TimeManager component that controls time progression"),
-                config.createTimeManager
+                _config.createTimeManager
             );
 
-            config.createWorldTimeData = EditorGUILayout.Toggle(
+            _config.createWorldTimeData = EditorGUILayout.Toggle(
                 new GUIContent("Create WorldTimeData", "Creates the WorldTimeData asset that defines day length, time scale, and other time settings"),
-                config.createWorldTimeData
+                _config.createWorldTimeData
             );
 
             EditorGUILayout.EndVertical();
@@ -225,41 +153,41 @@ namespace Sol.Editor
 
         private void DrawSeasonalDataSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Seasonal Data", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
-            config.createSeasonalData = EditorGUILayout.Toggle(
+            _config.createSeasonalData = EditorGUILayout.Toggle(
                 new GUIContent("Create Seasonal Data", "Creates a SeasonalData asset with default seasonal configurations"),
-                config.createSeasonalData
+                _config.createSeasonalData
             );
 
-            if (config.createSeasonalData)
+            if (_config.createSeasonalData)
             {
                 EditorGUI.indentLevel++;
                 
-                config.numberOfSeasons = EditorGUILayout.IntSlider(
+                _config.numberOfSeasons = EditorGUILayout.IntSlider(
                     new GUIContent("Number of Seasons", "How many seasons to create (2-12)"),
-                    config.numberOfSeasons, 2, 12
+                    _config.numberOfSeasons, 2, 12
                 );
 
-                // Resize season names array if needed
-                if (config.seasonNames.Length != config.numberOfSeasons)
+                // Ensure seasonNames array matches numberOfSeasons
+                if (_config.seasonNames.Length != _config.numberOfSeasons)
                 {
-                    System.Array.Resize(ref config.seasonNames, config.numberOfSeasons);
-                    for (int i = 0; i < config.seasonNames.Length; i++)
+                    System.Array.Resize(ref _config.seasonNames, _config.numberOfSeasons);
+                    for (int i = 0; i < _config.seasonNames.Length; i++)
                     {
-                        if (string.IsNullOrEmpty(config.seasonNames[i]))
+                        if (string.IsNullOrEmpty(_config.seasonNames[i]))
                         {
-                            config.seasonNames[i] = $"Season {i + 1}";
+                            _config.seasonNames[i] = $"Season {i + 1}";
                         }
                     }
                 }
 
                 EditorGUILayout.LabelField("Season Names:", EditorStyles.miniBoldLabel);
-                for (int i = 0; i < config.seasonNames.Length; i++)
+                for (int i = 0; i < _config.seasonNames.Length; i++)
                 {
-                    config.seasonNames[i] = EditorGUILayout.TextField($"Season {i + 1}", config.seasonNames[i]);
+                    _config.seasonNames[i] = EditorGUILayout.TextField($"Season {i + 1}", _config.seasonNames[i]);
                 }
 
                 EditorGUI.indentLevel--;
@@ -270,29 +198,29 @@ namespace Sol.Editor
 
         private void DrawCelestialBodiesSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Celestial Bodies", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
             // Suns Section
-            showSunSettings = EditorGUILayout.Foldout(showSunSettings, $"Suns ({config.suns.Count})", true);
-            if (showSunSettings)
+            _showSunSettings = EditorGUILayout.Foldout(_showSunSettings, $"Suns ({_config.suns.Count})", true);
+            if (_showSunSettings)
             {
                 EditorGUI.indentLevel++;
                 
-                for (int i = 0; i < config.suns.Count; i++)
+                for (int i = 0; i < _config.suns.Count; i++)
                 {
-                    DrawCelestialBodyConfig(config.suns[i], $"Sun {i + 1}", false);
+                    DrawCelestialBodyConfig(_config.suns[i], $"Sun {i + 1}", false);
                 }
                 
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Add Sun"))
                 {
-                    config.suns.Add(new CelestialBodyConfig { name = $"Sun {config.suns.Count + 1}" });
+                    _config.suns.Add(CelestialBodyConfig.CreateDefaultSun());
                 }
-                if (config.suns.Count > 1 && GUILayout.Button("Remove Last Sun"))
+                if (_config.suns.Count > 1 && GUILayout.Button("Remove Last Sun"))
                 {
-                    config.suns.RemoveAt(config.suns.Count - 1);
+                    _config.suns.RemoveAt(_config.suns.Count - 1);
                 }
                 EditorGUILayout.EndHorizontal();
                 
@@ -302,24 +230,24 @@ namespace Sol.Editor
             EditorGUILayout.Space(5);
 
             // Moons Section
-            showMoonSettings = EditorGUILayout.Foldout(showMoonSettings, $"Moons ({config.moons.Count})", true);
-            if (showMoonSettings)
+            _showMoonSettings = EditorGUILayout.Foldout(_showMoonSettings, $"Moons ({_config.moons.Count})", true);
+            if (_showMoonSettings)
             {
                 EditorGUI.indentLevel++;
                 
-                for (int i = 0; i < config.moons.Count; i++)
+                for (int i = 0; i < _config.moons.Count; i++)
                 {
-                    DrawMoonConfig(config.moons[i], $"Moon {i + 1}");
+                    DrawCelestialBodyConfig(_config.moons[i], $"Moon {i + 1}", true);
                 }
                 
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Add Moon"))
                 {
-                    config.moons.Add(new MoonConfig { name = $"Moon {config.moons.Count + 1}" });
+                    _config.moons.Add(CelestialBodyConfig.CreateDefaultMoon());
                 }
-                if (config.moons.Count > 1 && GUILayout.Button("Remove Last Moon"))
+                if (_config.moons.Count > 1 && GUILayout.Button("Remove Last Moon"))
                 {
-                    config.moons.RemoveAt(config.moons.Count - 1);
+                    _config.moons.RemoveAt(_config.moons.Count - 1);
                 }
                 EditorGUILayout.EndHorizontal();
                 
@@ -344,7 +272,7 @@ namespace Sol.Editor
                 bodyConfig.lightTemperature = EditorGUILayout.Slider("Light Temperature (K)", bodyConfig.lightTemperature, 1000f, 20000f);
                 bodyConfig.lightIntensity = EditorGUILayout.FloatField("Light Intensity", bodyConfig.lightIntensity);
         
-                if (!isMoon) // Only show shadow casting for suns
+                if (!isMoon)
                 {
                     bodyConfig.castShadows = EditorGUILayout.Toggle("Cast Shadows", bodyConfig.castShadows);
                 }
@@ -365,82 +293,78 @@ namespace Sol.Editor
             bodyConfig.baseElevation = EditorGUILayout.Slider("Base Elevation", bodyConfig.baseElevation, 0f, 360f);
             bodyConfig.orbitalPeriod = EditorGUILayout.FloatField("Orbital Period (days)", bodyConfig.orbitalPeriod);
             bodyConfig.phaseOffset = EditorGUILayout.Slider("Phase Offset", bodyConfig.phaseOffset, 0f, 360f);
-    
-            EditorGUILayout.EndVertical();
-        }
 
-        private void DrawMoonConfig(MoonConfig moonConfig, string label)
-        {
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
-            
-            DrawCelestialBodyConfig(moonConfig, "", true);
-            
-            moonConfig.reflectSunLight = EditorGUILayout.Toggle("Reflect Sun Light", moonConfig.reflectSunLight);
-            if (moonConfig.reflectSunLight)
+            // Moon-specific settings
+            if (isMoon)
             {
-                EditorGUI.indentLevel++;
+                EditorGUILayout.Space(5);
+                bodyConfig.isMoon = true;
+                bodyConfig.reflectSunLight = EditorGUILayout.Toggle("Reflect Sun Light", bodyConfig.reflectSunLight);
                 
-                // Create dropdown for available suns
-                List<string> sunNames = new List<string>();
-                foreach (var sun in config.suns)
+                if (bodyConfig.reflectSunLight)
                 {
-                    sunNames.Add(sun.name);
-                }
-                
-                if (sunNames.Count > 0)
-                {
-                    int currentIndex = sunNames.IndexOf(moonConfig.sunToReflect);
-                    if (currentIndex < 0) currentIndex = 0;
+                    EditorGUI.indentLevel++;
                     
-                    int newIndex = EditorGUILayout.Popup("Sun to Reflect", currentIndex, sunNames.ToArray());
-                    moonConfig.sunToReflect = sunNames[newIndex];
+                    // Get list of sun names for popup
+                    List<string> sunNames = new List<string>();
+                    foreach (var sun in _config.suns)
+                    {
+                        sunNames.Add(sun.name);
+                    }
+                    
+                    if (sunNames.Count > 0)
+                    {
+                        int currentIndex = sunNames.IndexOf(bodyConfig.sunToReflect);
+                        if (currentIndex < 0) currentIndex = 0;
+                        
+                        int newIndex = EditorGUILayout.Popup("Sun to Reflect", currentIndex, sunNames.ToArray());
+                        bodyConfig.sunToReflect = sunNames[newIndex];
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("Sun to Reflect", "No suns available");
+                    }
+                    
+                    EditorGUI.indentLevel--;
                 }
-                else
-                {
-                    EditorGUILayout.LabelField("Sun to Reflect", "No suns available");
-                }
-                
-                EditorGUI.indentLevel--;
             }
-            
+    
             EditorGUILayout.EndVertical();
         }
 
         private void DrawSkyAndFogSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Sky and Fog", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
-            config.createSkyAndFog = EditorGUILayout.Toggle(
+            _config.createSkyAndFog = EditorGUILayout.Toggle(
                 new GUIContent("Create Sky and Fog Volume", "Creates HDRP Sky and Fog volume with default profile"),
-                config.createSkyAndFog
+                _config.createSkyAndFog
             );
 
-            if (config.createSkyAndFog)
+            if (_config.createSkyAndFog)
             {
                 EditorGUI.indentLevel++;
                 
                 EditorGUILayout.BeginHorizontal();
-                config.hdrpProfilePath = EditorGUILayout.TextField("HDRP Profile Path", config.hdrpProfilePath);
-                        if (GUILayout.Button("Browse", GUILayout.Width(60)))
+                _config.hdrpProfilePath = EditorGUILayout.TextField("HDRP Profile Path", _config.hdrpProfilePath);
+                if (GUILayout.Button("Browse", GUILayout.Width(60)))
                 {
                     string path = EditorUtility.OpenFilePanel("Select HDRP Volume Profile", "Assets", "asset");
                     if (!string.IsNullOrEmpty(path))
                     {
-                        // Convert absolute path to relative path
                         if (path.StartsWith(Application.dataPath))
                         {
-                            config.hdrpProfilePath = "Assets" + path.Substring(Application.dataPath.Length);
+                            _config.hdrpProfilePath = "Assets" + path.Substring(Application.dataPath.Length);
                         }
                     }
                 }
                 EditorGUILayout.EndHorizontal();
                 
-                if (string.IsNullOrEmpty(config.hdrpProfilePath))
+                if (string.IsNullOrEmpty(_config.hdrpProfilePath))
                 {
-                    EditorGUILayout.HelpBox("Leave empty to create a default HDRP profile", MessageType.Info);
+                    EditorGUILayout.HelpBox("Leave empty to use SolDefaultSkyProfile", MessageType.Info);
                 }
                 
                 EditorGUI.indentLevel--;
@@ -451,13 +375,13 @@ namespace Sol.Editor
 
         private void DrawDemoContentSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Demo Content", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
-            config.createDemoScene = EditorGUILayout.Toggle(
+            _config.createDemoScene = EditorGUILayout.Toggle(
                 new GUIContent("Create Demo Scene", "Creates demo objects in the current scene to showcase the system"),
-                config.createDemoScene
+                _config.createDemoScene
             );
 
             EditorGUILayout.EndVertical();
@@ -465,18 +389,18 @@ namespace Sol.Editor
 
         private void DrawAdvancedOptionsSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Advanced Options", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
-            config.dataFolderPath = EditorGUILayout.TextField(
+            _config.dataFolderPath = EditorGUILayout.TextField(
                 new GUIContent("Data Folder Path", "Where to create SeasonalData and WorldTimeData assets"),
-                config.dataFolderPath
+                _config.dataFolderPath
             );
 
-            config.prefabFolderPath = EditorGUILayout.TextField(
+            _config.prefabFolderPath = EditorGUILayout.TextField(
                 new GUIContent("Prefab Folder Path", "Where to create prefab assets"),
-                config.prefabFolderPath
+                _config.prefabFolderPath
             );
 
             EditorGUILayout.EndVertical();
@@ -484,14 +408,14 @@ namespace Sol.Editor
 
         private void DrawAdvancedToggle()
         {
-            showAdvancedOptions = EditorGUILayout.Foldout(showAdvancedOptions, "Advanced Options", true);
+            _showAdvancedOptions = EditorGUILayout.Foldout(_showAdvancedOptions, "Advanced Options", true);
         }
 
         private void DrawSetupButtons()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             
-            EditorGUI.BeginDisabledGroup(isSetupInProgress);
+            EditorGUI.BeginDisabledGroup(_isSetupInProgress);
             
             EditorGUILayout.BeginHorizontal();
             
@@ -514,9 +438,9 @@ namespace Sol.Editor
 
         private void DrawProgressSection()
         {
-            EditorGUILayout.BeginVertical(boxStyle);
+            EditorGUILayout.BeginVertical(_boxStyle);
             EditorGUILayout.LabelField("Setup Progress", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField(setupStatus);
+            EditorGUILayout.LabelField(_setupStatus);
             EditorGUILayout.EndVertical();
         }
 
@@ -524,48 +448,114 @@ namespace Sol.Editor
 
         #region Setup Logic
 
+        /// <summary>
+        /// Performs the complete Sol system setup.
+        /// Validates configuration, then delegates to SolSetupUtilities for business logic.
+        /// </summary>
         private void PerformSetup()
         {
-            isSetupInProgress = true;
-            setupStatus = "Starting setup...";
+            Debug.Log("[Sol Wizard] === SETUP INITIATED ===");
+            
+            _isSetupInProgress = true;
+            _setupStatus = "Validating configuration...";
+            Repaint();
 
             try
             {
-                SolSetupUtilities.PerformCompleteSetup(config, (status) => {
-                    setupStatus = status;
-                    Repaint();
-                });
-
-                setupStatus = "Setup completed successfully!";
+                // STEP 1: Validate configuration
+                List<string> validationErrors = _config.Validate();
                 
-                EditorUtility.DisplayDialog("Sol Setup Complete", 
-                    "Scene setup completed successfully! Your Sol Time & Celestial System is ready to use.", 
-                    "OK");
+                if (validationErrors.Count > 0)
+                {
+                    string errorMessage = "Configuration validation failed:\n\n" + string.Join("\n", validationErrors);
+                    Debug.LogError($"[Sol Wizard] {errorMessage}");
+                    EditorUtility.DisplayDialog("Configuration Error", errorMessage, "OK");
+                    return;
+                }
+
+                Debug.Log("[Sol Wizard] Configuration validated successfully");
+                Debug.Log($"[Sol Wizard] - Create WorldTimeData: {_config.createWorldTimeData}");
+                Debug.Log($"[Sol Wizard] - Create TimeManager: {_config.createTimeManager}");
+                Debug.Log($"[Sol Wizard] - Create Seasonal Data: {_config.createSeasonalData}");
+                Debug.Log($"[Sol Wizard] - Suns: {_config.suns.Count}");
+                Debug.Log($"[Sol Wizard] - Moons: {_config.moons.Count}");
+
+                // STEP 2: Delegate to utilities (business logic layer)
+                _setupStatus = "Executing setup...";
+                Repaint();
+
+                SolSetupUtilities.PerformCompleteSetup(_config, UpdateStatus);
+
+                // STEP 3: Success!
+                _setupStatus = "Setup completed successfully!";
+                Debug.Log("[Sol Wizard] === SETUP COMPLETE ===");
+                
+                EditorUtility.DisplayDialog(
+                    "Sol Setup Complete", 
+                    "Scene setup completed successfully! Your Sol Time & Celestial System is ready to use.",
+                    "OK"
+                );
             }
-            catch (System.Exception e)
+            catch (System.NullReferenceException ex)
             {
-                setupStatus = $"Setup failed: {e.Message}";
-                EditorUtility.DisplayDialog("Setup Error", 
-                    $"An error occurred during setup: {e.Message}", 
-                    "OK");
+                _setupStatus = $"Setup failed: Null reference";
+                Debug.LogError($"[Sol Wizard] NULL REFERENCE: {ex.Message}");
+                Debug.LogError($"[Sol Wizard] Stack: {ex.StackTrace}");
+                
+                EditorUtility.DisplayDialog(
+                    "Setup Error - Null Reference", 
+                    $"A null reference occurred:\n\n{ex.Message}\n\nCheck Console for details.", 
+                    "OK"
+                );
+            }
+            catch (System.Exception ex)
+            {
+                _setupStatus = $"Setup failed: {ex.Message}";
+                Debug.LogError($"[Sol Wizard] EXCEPTION: {ex.Message}");
+                Debug.LogError($"[Sol Wizard] Stack: {ex.StackTrace}");
+                
+                EditorUtility.DisplayDialog(
+                    "Setup Error", 
+                    $"An error occurred:\n\n{ex.Message}\n\nCheck Console for details.", 
+                    "OK"
+                );
             }
             finally
             {
-                isSetupInProgress = false;
+                _isSetupInProgress = false;
                 Repaint();
             }
         }
 
+        /// <summary>
+        /// Updates setup status and repaints window.
+        /// Callback for SolSetupUtilities progress reporting.
+        /// </summary>
+        private void UpdateStatus(string status)
+        {
+            _setupStatus = status;
+            Debug.Log($"[Sol Wizard] {status}");
+            Repaint();
+        }
+
+        /// <summary>
+        /// Resets configuration to defaults.
+        /// </summary>
         private void ResetToDefaults()
         {
-            config = new SetupConfig();
-            setupStatus = "";
-            isSetupInProgress = false;
-            Repaint();
+            if (EditorUtility.DisplayDialog(
+                "Reset Configuration", 
+                "Are you sure you want to reset all settings to defaults?", 
+                "Yes", "Cancel"))
+            {
+                _config = new SetupConfig();
+                _setupStatus = "";
+                _isSetupInProgress = false;
+                Repaint();
+                Debug.Log("[Sol Wizard] Configuration reset to defaults");
+            }
         }
 
         #endregion
     }
 }
-       
-                   
