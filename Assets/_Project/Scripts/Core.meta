@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Sol/Data/Seasons.meta
-guid: 03f78341fbcd91709b3b460d37369f65
-========
 guid: ade63577cdf9011eba1d1e96d27b4776
->>>>>>>> origin/main:Assets/_Project/Scripts/Core.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
