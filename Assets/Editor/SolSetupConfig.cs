@@ -1,204 +1,445 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Sol.Editor
 {
     /// <summary>
-    /// Represents configuration for a celestial body (sun or moon).
-    /// Contains orbital mechanics, light properties, and behavior settings.
+    /// Time scale preset values for common configurations
     /// </summary>
-    [System.Serializable]
-    public class CelestialBodyConfig
+    public enum TimeScalePreset
     {
-        [Header("Identity")]
-        public string name = "Sol";
-        public bool active = true;
-
-        [Header("Orbital Mechanics")]
-        public bool yAxisEnabled = true;
-        public float yAxisSpeed = 1.0f;
-        public bool yAxisOverrideSpeed = true;
-        public float orbitalAngle = 23.5f;  // Axial tilt in degrees
-        public float baseElevation = 180f;   // Starting position in degrees
-        public float orbitalPeriod = 1f;     // How many in-game days for one orbit
-        public float phaseOffset = 0f;       // Phase offset in degrees
-
+        RealTime = 1,
+        DoubleTime = 2,
+        Fast = 10,
+        VeryFast = 20,
+        OneMinute = 60,
+        TwoMinutes = 120,
+        FourMinutes = 240,
+        TenMinutes = 600,
+        OneHour = 3600,
+        Custom = -1
+    }
+    
+    [System.Serializable]
+    public class SeasonalBodyConfig
+    {
+        public string bodyName;
+        public float orbitalAngle = 23.5f;
+        public float baseElevation = 180f;
+        public float orbitalPeriod = 1f;
+        public float phaseOffset = 0f;
+    
         [Header("Light Settings")]
-        public bool createDirectionalLight = true;
-        public float lightTemperature = 6500f; // Kelvin (1000-20000)
-        public float lightIntensity = 100000f; // Lux for HDRP
-        public bool castShadows = true;
-
-        [Header("Moon-Specific (Optional)")]
-        public bool isMoon = false;
-        public bool reflectSunLight = true;
-        public string sunToReflect = "Sol"; // Name of sun to reflect light from
-
-        /// <summary>
-        /// Creates a default sun configuration.
-        /// </summary>
-        public static CelestialBodyConfig CreateDefaultSun()
-        {
-            return new CelestialBodyConfig
-            {
-                name = "Sol",
-                orbitalPeriod = 1f,
-                phaseOffset = 0f,
-                lightTemperature = 6500f,
-                lightIntensity = 100000f,
-                castShadows = true,
-                isMoon = false
-            };
-        }
-
-        /// <summary>
-        /// Creates a default moon configuration.
-        /// </summary>
-        public static CelestialBodyConfig CreateDefaultMoon()
-        {
-            return new CelestialBodyConfig
-            {
-                name = "Luna",
-                orbitalPeriod = 29.5f,
-                phaseOffset = 180f,
-                lightTemperature = 4000f,
-                lightIntensity = 5000f,
-                castShadows = false,
-                isMoon = true,
-                reflectSunLight = true,
-                sunToReflect = "Sol"
-            };
-        }
+        public float lightIntensity = 100000f;
+        public float lightTemperature = 6500f;
+        public Color lightColor = Color.white;
     }
 
     /// <summary>
-    /// Complete configuration for Sol system setup.
-    /// Includes scene setup, seasonal data, celestial bodies, and rendering settings.
-    /// This is a Data Transfer Object (DTO) shared between wizard and utilities.
+    /// Configuration for one complete season
+    /// </summary>
+    [System.Serializable]
+    public class SeasonConfig
+    {
+        public string seasonName;
+        public List<SeasonalBodyConfig> sunConfigs = new List<SeasonalBodyConfig>();
+        public List<SeasonalBodyConfig> moonConfigs = new List<SeasonalBodyConfig>();
+    }
+
+    /// <summary>
+    /// Data Transfer Object for Sol system setup configuration.
     /// </summary>
     [System.Serializable]
     public class SetupConfig
     {
+        #region Scene Setup
+        
         [Header("Scene Setup")]
-        [Tooltip("Create the TimeManager component that controls time progression")]
         public bool createTimeManager = true;
-
-        [Tooltip("Create the WorldTimeData ScriptableObject with time settings")]
         public bool createWorldTimeData = true;
+        
+        #endregion
+
+        #region Calendar Configuration
+
+        [Header("Calendar Configuration")]
+        [Tooltip("Time progression multiplier (60 = 1 real second equals 1 game minute)")]
+        public float timeScale = 10f;
+
+        [Tooltip("Number of hours displayed per day")]
+        public int hoursPerDay = 20;
+
+        [Tooltip("Number of minutes per hour")]
+        public int minutesPerHour = 60;
+
+        [Tooltip("Number of seconds per minute")]
+        public int secondsPerMinute = 60;
+
+        [Tooltip("Total number of days in one year")]
+        public int totalDaysInYear = 832;
+
+        [Tooltip("Number of months in a year")]
+        public int monthsPerYear = 8;
+
+        [Tooltip("Days in each month (should divide evenly into year)")]
+        public int daysPerMonth = 104;
+
+        [Tooltip("Names of the months")]
+        public string[] monthNames = new string[]
+        {
+            "Glavyr", "Tharven", "Solmyr", "Aethon",
+            "Lumis", "Verdis", "Harvyx", "Frosten"
+        };
+
+        [Tooltip("Number of days for smooth season transitions")]
+        public int seasonTransitionDays = 10;
+        
+        [Header("Seasonal Body Configurations")]
+        public List<SeasonConfig> seasonConfigs = new List<SeasonConfig>();
+
+        #endregion
+
+        #region Seasonal Data
 
         [Header("Seasonal Data")]
-        [Tooltip("Create SeasonalData asset with seasonal configurations")]
         public bool createSeasonalData = true;
-
-        [Tooltip("Number of seasons in the world (2-12)")]
-        [Range(2, 12)]
+        
+        [Tooltip("Number of seasons to create (2-12)")]
         public int numberOfSeasons = 4;
-
+        
         [Tooltip("Names for each season")]
-        public string[] seasonNames = { "Spring", "Summer", "Autumn", "Winter" };
+        public string[] seasonNames = new string[] { "Lansomr", "Svik", "Evinotr", "Gro" };
+
+        #endregion
+
+        #region Celestial Bodies
 
         [Header("Celestial Bodies")]
-        [Tooltip("Configuration for all suns in the system")]
-        public List<CelestialBodyConfig> suns = new List<CelestialBodyConfig>();
+        [Tooltip("List of suns in the system (names only, behavior defined per-season)")]
+        public List<CelestialBodyIdentity> suns = new List<CelestialBodyIdentity>();
+        
+        [Tooltip("List of moons in the system (names only, behavior defined per-season)")]
+        public List<CelestialBodyIdentity> moons = new List<CelestialBodyIdentity>();
 
-        [Tooltip("Configuration for all moons in the system")]
-        public List<CelestialBodyConfig> moons = new List<CelestialBodyConfig>();
+        #endregion
+
+        #region Sky and Fog
 
         [Header("Sky and Fog")]
-        [Tooltip("Create HDRP Sky and Fog Volume with profile")]
         public bool createSkyAndFog = true;
-
-        [Tooltip("Path to existing HDRP Volume Profile (leave empty to create default)")]
         public string hdrpProfilePath = "";
 
+        #endregion
+
+        #region Demo Content
+
         [Header("Demo Content")]
-        [Tooltip("Add demo objects to showcase the system")]
         public bool createDemoScene = false;
 
-        [Header("Asset Paths")]
-        [Tooltip("Folder where ScriptableObject data will be created")]
-        public string dataFolderPath = "Assets/Sol/Data";
+        #endregion
 
-        [Tooltip("Folder where prefabs will be created")]
+        #region Advanced Options
+
+        [Header("Advanced Options")]
+        public string dataFolderPath = "Assets/Sol/Data";
         public string prefabFolderPath = "Assets/Sol/Prefabs";
 
-        // Private backing field for sky/fog profile path
-        [SerializeField] 
-        private string _skyFogProfilePath = "Assets/SolSetupWizard/DefaultSkyFogProfile.asset";
+        #endregion
 
-        /// <summary>
-        /// Gets the sky fog profile path (read-only access).
-        /// </summary>
-        public string skyFogProfilePath => _skyFogProfilePath;
+        #region Constructor
 
-        /// <summary>
-        /// Sets the sky fog profile path.
-        /// </summary>
-        public void SetSkyFogProfile(string path)
-        {
-            _skyFogProfilePath = path;
-        }
-
-        /// <summary>
-        /// Default constructor initializes with sensible defaults.
-        /// </summary>
         public SetupConfig()
         {
-            // Initialize with one default sun
-            suns.Add(CelestialBodyConfig.CreateDefaultSun());
+            // Add default sun
+            suns.Add(new CelestialBodyIdentity { name = "Sol", createDirectionalLight = true });
             
-            // Initialize with one default moon
-            moons.Add(CelestialBodyConfig.CreateDefaultMoon());
+            // Add default moon
+            moons.Add(new CelestialBodyIdentity { name = "Luna", createDirectionalLight = true });
         }
 
+        #endregion
+        
+            
         /// <summary>
-        /// Validates the configuration and returns error messages if invalid.
+        /// Initialize seasonal configurations based on current celestial bodies and season names
         /// </summary>
+        public void InitializeSeasonalConfigs()
+        {
+            // Clear existing
+            seasonConfigs.Clear();
+    
+            for (int i = 0; i < numberOfSeasons; i++)
+            {
+                SeasonConfig seasonConfig = new SeasonConfig
+                {
+                    seasonName = i < seasonNames.Length ? seasonNames[i] : $"Season {i + 1}"
+                };
+        
+                // Create configs for each sun
+                foreach (var sun in suns)
+                {
+                    seasonConfig.sunConfigs.Add(new SeasonalBodyConfig
+                    {
+                        bodyName = sun.name,
+                        orbitalAngle = 23.5f,
+                        baseElevation = 180f,
+                        orbitalPeriod = 1f,
+                        phaseOffset = 0f,
+                        lightIntensity = 100000f,
+                        lightTemperature = 6500f,
+                        lightColor = Color.white
+                    });
+                }
+        
+                // Create configs for each moon
+                foreach (var moon in moons)
+                {
+                    seasonConfig.moonConfigs.Add(new SeasonalBodyConfig
+                    {
+                        bodyName = moon.name,
+                        orbitalAngle = 23.5f,
+                        baseElevation = 180f,
+                        orbitalPeriod = 29.5f,
+                        phaseOffset = 0f,
+                        lightIntensity = 500f,
+                        lightTemperature = 4000f,
+                        lightColor = new Color(0.8f, 0.8f, 1f)
+                    });
+                }
+        
+                seasonConfigs.Add(seasonConfig);
+            }
+        }
+
+        #region Validation
+
         public List<string> Validate()
         {
             List<string> errors = new List<string>();
 
-            // Validate season count matches names
-            if (seasonNames == null || seasonNames.Length != numberOfSeasons)
+            // Validate time settings
+            if (timeScale <= 0f)
+                errors.Add("Time scale must be greater than 0");
+
+            if (hoursPerDay <= 0)
+                errors.Add("Hours per day must be greater than 0");
+
+            if (minutesPerHour <= 0)
+                errors.Add("Minutes per hour must be greater than 0");
+
+            if (secondsPerMinute <= 0)
+                errors.Add("Seconds per minute must be greater than 0");
+
+            // Validate year structure
+            if (totalDaysInYear <= 0)
+                errors.Add("Total days in year must be greater than 0");
+
+            if (monthsPerYear <= 0)
+                errors.Add("Months per year must be greater than 0");
+
+            if (daysPerMonth <= 0)
+                errors.Add("Days per month must be greater than 0");
+
+            // Validate calendar alignment
+            int calculatedYearLength = monthsPerYear * daysPerMonth;
+            if (calculatedYearLength != totalDaysInYear)
             {
-                errors.Add($"Season names count ({seasonNames?.Length ?? 0}) doesn't match numberOfSeasons ({numberOfSeasons})");
+                errors.Add($"Calendar mismatch: {monthsPerYear} months × {daysPerMonth} days = {calculatedYearLength} days, but year is {totalDaysInYear} days");
             }
 
-            // Validate sun names are unique
-            HashSet<string> sunNames = new HashSet<string>();
+            // Validate month names
+            if (monthNames == null || monthNames.Length != monthsPerYear)
+                errors.Add($"Month names array must have {monthsPerYear} entries");
+
+            // Validate seasonal data
+            if (createSeasonalData)
+            {
+                if (numberOfSeasons < 2 || numberOfSeasons > 12)
+                    errors.Add("Number of seasons must be between 2 and 12");
+
+                if (seasonNames == null || seasonNames.Length != numberOfSeasons)
+                    errors.Add($"Season names array must have {numberOfSeasons} entries");
+
+                if (seasonNames != null)
+                {
+                    for (int i = 0; i < seasonNames.Length; i++)
+                    {
+                        if (string.IsNullOrWhiteSpace(seasonNames[i]))
+                            errors.Add($"Season {i + 1} has no name");
+                    }
+                }
+            }
+
+            // Validate celestial bodies
+            if (suns.Count == 0)
+                errors.Add("At least one sun is required");
+
+            // Check for duplicate celestial body names
+            HashSet<string> celestialNames = new HashSet<string>();
             foreach (var sun in suns)
             {
-                if (string.IsNullOrEmpty(sun.name))
+                if (string.IsNullOrWhiteSpace(sun.name))
                 {
-                    errors.Add("One or more suns have empty names");
+                    errors.Add("A sun has no name");
+                    continue;
                 }
-                else if (!sunNames.Add(sun.name))
-                {
-                    errors.Add($"Duplicate sun name: {sun.name}");
-                }
+                if (!celestialNames.Add(sun.name))
+                    errors.Add($"Duplicate celestial body name: {sun.name}");
             }
-
-            // Validate moon names are unique
-            HashSet<string> moonNames = new HashSet<string>();
             foreach (var moon in moons)
             {
-                if (string.IsNullOrEmpty(moon.name))
+                if (string.IsNullOrWhiteSpace(moon.name))
                 {
-                    errors.Add("One or more moons have empty names");
+                    errors.Add("A moon has no name");
+                    continue;
                 }
-                else if (!moonNames.Add(moon.name))
-                {
-                    errors.Add($"Duplicate moon name: {moon.name}");
-                }
-
-                // Validate moon's sun reference exists
-                if (moon.reflectSunLight && !sunNames.Contains(moon.sunToReflect))
-                {
-                    errors.Add($"Moon '{moon.name}' references non-existent sun '{moon.sunToReflect}'");
-                }
+                if (!celestialNames.Add(moon.name))
+                    errors.Add($"Duplicate celestial body name: {moon.name}");
             }
 
+            // Validate paths
+            if (string.IsNullOrWhiteSpace(dataFolderPath))
+                errors.Add("Data folder path cannot be empty");
+
+            if (string.IsNullOrWhiteSpace(prefabFolderPath))
+                errors.Add("Prefab folder path cannot be empty");
+
             return errors;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Simplified celestial body identity - just defines that a body exists.
+    /// Seasonal behavior is defined in SeasonalData assets.
+    /// </summary>
+    [System.Serializable]
+    public class CelestialBodyIdentity
+    {
+        [Tooltip("Name of this celestial body (must be unique, used to match across seasons)")]
+        public string name = "Celestial Body";
+        
+        [Tooltip("Should this body have a directional light component?")]
+        public bool createDirectionalLight = true;
+    }
+
+    /// <summary>
+    /// Preset calendar configurations for quick setup
+    /// </summary>
+    public static class CalendarPresets
+    {
+        public static void ApplyEarthPreset(SetupConfig config)
+        {
+            config.timeScale = 60f;
+            config.hoursPerDay = 24;
+            config.minutesPerHour = 60;
+            config.secondsPerMinute = 60;
+            
+            config.totalDaysInYear = 360;
+            config.monthsPerYear = 12;
+            config.daysPerMonth = 30;
+            
+            config.numberOfSeasons = 4;
+            config.seasonNames = new string[] { "Spring", "Summer", "Autumn", "Winter" };
+            config.seasonTransitionDays = 10;
+            
+            config.monthNames = new string[]
+            {
+                "January", "February", "March", "April",
+                "May", "June", "July", "August",
+                "September", "October", "November", "December"
+            };
+
+            // Reset celestial bodies to Earth defaults
+            config.suns.Clear();
+            config.suns.Add(new CelestialBodyIdentity { name = "Sun", createDirectionalLight = true });
+            
+            config.moons.Clear();
+            config.moons.Add(new CelestialBodyIdentity { name = "Moon", createDirectionalLight = true });
+        }
+        
+        public static void ApplySolPreset(SetupConfig config)
+        {
+            config.timeScale = 10f;
+            config.hoursPerDay = 20;
+            config.minutesPerHour = 60;
+            config.secondsPerMinute = 60;
+            
+            config.totalDaysInYear = 832;
+            config.monthsPerYear = 8;
+            config.daysPerMonth = 104;
+            
+            config.numberOfSeasons = 4;
+            config.seasonNames = new string[] { "Lansomr", "Svik", "Evinotr", "Gro" };
+            config.seasonTransitionDays = 20;
+            
+            config.monthNames = new string[]
+            {
+                "Glavyr", "Tharven", "Solmyr", "Aethon",
+                "Lumis", "Verdis", "Harvyx", "Frosten"
+            };
+
+            // Reset celestial bodies to Sol defaults
+            config.suns.Clear();
+            config.suns.Add(new CelestialBodyIdentity { name = "Sol", createDirectionalLight = true });
+            
+            config.moons.Clear();
+            config.moons.Add(new CelestialBodyIdentity { name = "Luna", createDirectionalLight = true });
+        }
+        
+        public static void ApplyMarsPreset(SetupConfig config)
+        {
+            config.timeScale = 59f;
+            config.hoursPerDay = 24;
+            config.minutesPerHour = 60;
+            config.secondsPerMinute = 60;
+            
+            config.totalDaysInYear = 672; // Adjusted to divide evenly
+            config.monthsPerYear = 24;
+            config.daysPerMonth = 28;
+            
+            config.numberOfSeasons = 4;
+            config.seasonNames = new string[] { "Spring", "Summer", "Autumn", "Winter" };
+            config.seasonTransitionDays = 15;
+
+            // Reset to single sun, two moons (Phobos and Deimos)
+            config.suns.Clear();
+            config.suns.Add(new CelestialBodyIdentity { name = "Sun", createDirectionalLight = true });
+            
+            config.moons.Clear();
+            config.moons.Add(new CelestialBodyIdentity { name = "Phobos", createDirectionalLight = true });
+            config.moons.Add(new CelestialBodyIdentity { name = "Deimos", createDirectionalLight = false });
+        }
+        
+        public static void ApplyAlienPreset(SetupConfig config)
+        {
+            config.timeScale = 100f;
+            config.hoursPerDay = 10;
+            config.minutesPerHour = 100;
+            config.secondsPerMinute = 100;
+            
+            config.totalDaysInYear = 500;
+            config.monthsPerYear = 10;
+            config.daysPerMonth = 50;
+            
+            config.numberOfSeasons = 5;
+            config.seasonNames = new string[] 
+            { 
+                "First Bloom", "High Sun", "Golden Harvest",
+                "Frost Descent", "Deep Cold"
+            };
+            config.seasonTransitionDays = 10;
+
+            // Binary star system with three moons
+            config.suns.Clear();
+            config.suns.Add(new CelestialBodyIdentity { name = "Primary Star", createDirectionalLight = true });
+            config.suns.Add(new CelestialBodyIdentity { name = "Secondary Star", createDirectionalLight = true });
+            
+            config.moons.Clear();
+            config.moons.Add(new CelestialBodyIdentity { name = "Moon Alpha", createDirectionalLight = true });
+            config.moons.Add(new CelestialBodyIdentity { name = "Moon Beta", createDirectionalLight = true });
+            config.moons.Add(new CelestialBodyIdentity { name = "Moon Gamma", createDirectionalLight = false });
         }
     }
 }

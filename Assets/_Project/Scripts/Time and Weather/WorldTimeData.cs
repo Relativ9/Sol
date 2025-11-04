@@ -12,14 +12,7 @@ namespace Sol
     [CreateAssetMenu(fileName = "WorldTimeData", menuName = "Sol/World Time Data")]
     public class WorldTimeData : ScriptableObject
     {
-        [Header("Planet Time Settings")]
-        [Tooltip("Length of one game day in real-time seconds (e.g., 1200 = 20 minutes real time)")]
-        public float dayLengthInSeconds = 7200;
-        
-        [Tooltip("Total number of days in one complete planetary year")]
-        public int totalDaysInYear = 832;
-
-        [Header("Day Time Display")]
+        [Header("Display Time Structure")]
         [Tooltip("Number of hours displayed per day for time formatting (typically 24)")]
         public int hoursPerDay = 20;
         
@@ -28,6 +21,14 @@ namespace Sol
         
         [Tooltip("Number of seconds displayed per minute for time formatting (typically 60)")]
         public int secondsPerMinute = 60;
+
+        [Header("Real-Time Progression")]
+        [Tooltip("Time multiplier: How many game-seconds pass per real-second (e.g., 60 = 1 real second equals 1 game minute)")]
+        public float timeScale = 10f;
+
+        [Header("Year Structure")]
+        [Tooltip("Total number of days in one complete planetary year")]
+        public int totalDaysInYear = 832;
 
         [Header("Season Configuration")]
         [Tooltip("All seasons in chronological order. System will cycle through these based on day count.")]
@@ -139,10 +140,38 @@ namespace Sol
         private Month[] _monthCache;
         private SeasonRange[] _seasonRangeCache;
 
-        // Calculated properties for time conversion
-        public float SecondsPerGameHour => dayLengthInSeconds / hoursPerDay;
-        public float SecondsPerGameMinute => SecondsPerGameHour / minutesPerHour;
-        public float SecondsPerGameSecond => SecondsPerGameMinute / secondsPerMinute;
+        #region Calculated Time Properties
+
+        /// <summary>
+        /// Total game-seconds in one day (e.g., 24h × 60m × 60s = 86,400 for Earth)
+        /// This is how time is DISPLAYED, not how fast it progresses
+        /// </summary>
+        public int TotalGameSecondsPerDay => hoursPerDay * minutesPerHour * secondsPerMinute;
+
+        /// <summary>
+        /// Real-time duration of one complete day in seconds
+        /// Calculated from display structure and time scale
+        /// </summary>
+        public float DayLengthInSeconds => TotalGameSecondsPerDay / timeScale;
+
+        /// <summary>
+        /// Real-time duration of one game hour in seconds
+        /// </summary>
+        public float SecondsPerGameHour => (minutesPerHour * secondsPerMinute) / timeScale;
+
+        /// <summary>
+        /// Real-time duration of one game minute in seconds
+        /// </summary>
+        public float SecondsPerGameMinute => secondsPerMinute / timeScale;
+
+        /// <summary>
+        /// Real-time duration of one game second in seconds
+        /// </summary>
+        public float SecondsPerGameSecond => 1f / timeScale;
+
+        #endregion
+
+        #region Calendar Properties
         
         /// <summary>
         /// Gets calculated season ranges (cached for performance)
@@ -157,7 +186,6 @@ namespace Sol
             }
         }
 
-        // Calendar properties
         /// <summary>
         /// Gets all months in the calendar
         /// </summary>
@@ -176,6 +204,10 @@ namespace Sol
         /// </summary>
         public int MonthsPerYear => months.Count;
 
+        #endregion
+
+        #region Season Methods
+
         /// <summary>
         /// Gets the total number of seasons
         /// </summary>
@@ -184,7 +216,6 @@ namespace Sol
             return seasons?.Count ?? 0;
         }
 
-        
         /// <summary>
         /// Gets the SeasonalData asset for the specified season index
         /// </summary>
@@ -197,7 +228,6 @@ namespace Sol
         
             return seasons[seasonIndex].seasonalData;
         }
-        
 
         /// <summary>
         /// Gets the season configuration for a given index
@@ -246,7 +276,6 @@ namespace Sol
             
             return 0; // Fallback
         }
-
 
         /// <summary>
         /// Gets the day within the current season
@@ -299,10 +328,13 @@ namespace Sol
             
             return ranges.Length > 0 ? ranges[0] : new SeasonRange();
         }
-        
+
+        #endregion
+
+        #region Calendar Methods
 
         /// <summary>
-        /// Gets a month by its index (0-7)
+        /// Gets a month by its index (0-based)
         /// </summary>
         public Month GetMonth(int monthIndex)
         {
@@ -334,7 +366,7 @@ namespace Sol
         }
         
         /// <summary>
-        /// Gets the day of month (1-104) for a given day of year
+        /// Gets the day of month (1-based) for a given day of year
         /// </summary>
         /// <param name="dayOfYear">Day of year (1-based to match existing system)</param>
         /// <returns>Day of month (1-based)</returns>
@@ -375,6 +407,10 @@ namespace Sol
             string seasonName = GetSeasonName(seasonIndex);
             return $"{dateStr} ({seasonName})";
         }
+
+        #endregion
+
+        #region Time Display Methods
 
         /// <summary>
         /// Updates a GameTime object with calculated values based on celestial time and current day.
@@ -417,7 +453,7 @@ namespace Sol
         }
 
         /// <summary>
-        /// Converts celestial time to 24-hour display format.
+        /// Converts celestial time to display format.
         /// Provides consistent time formatting across the application.
         /// </summary>
         /// <param name="celestialTime">Celestial time value (0-1)</param>
@@ -452,6 +488,10 @@ namespace Sol
             return $"{displayHour:D2}:{minutes:D2}:{secs:D2} {ampm}";
         }
 
+        #endregion
+
+        #region Initialization and Caching
+
         /// <summary>
         /// Initialize the month cache from serialized data
         /// </summary>
@@ -467,34 +507,8 @@ namespace Sol
     
             for (int i = 0; i < months.Count; i++)
             {
-                // Updated constructor call - remove Season parameter
                 _monthCache[i] = new Month(months[i].name, months[i].index);
             }
-        }
-
-        #region Unity Lifecycle and Validation
-
-        /// <summary>
-        /// Unity callback for inspector value changes. Validates configuration integrity.
-        /// </summary>
-        private void OnValidate()
-        {
-            ValidateSeasonConfiguration();
-            ValidateTimeSettings();
-            ValidateCalendarSettings();
-            
-            // Reset caches when data changes
-            _monthCache = null;
-            _seasonRangeCache = null;
-        }
-
-        /// <summary>
-        /// Unity Awake callback. Ensures season ranges are calculated on load.
-        /// </summary>
-        private void Awake()
-        {
-            InitializeMonthCache();
-            CalculateSeasonRanges();
         }
 
         /// <summary>
@@ -522,10 +536,36 @@ namespace Sol
                     startDay = currentDay,
                     endDay = currentDay + season.lengthInDays - 1,
                     duration = season.lengthInDays
-                    // Remove solSeasonType assignment
                 };
                 currentDay += season.lengthInDays;
             }
+        }
+
+        #endregion
+
+        #region Unity Lifecycle and Validation
+
+        /// <summary>
+        /// Unity callback for inspector value changes. Validates configuration integrity.
+        /// </summary>
+        private void OnValidate()
+        {
+            ValidateSeasonConfiguration();
+            ValidateTimeSettings();
+            ValidateCalendarSettings();
+            
+            // Reset caches when data changes
+            _monthCache = null;
+            _seasonRangeCache = null;
+        }
+
+        /// <summary>
+        /// Unity Awake callback. Ensures season ranges are calculated on load.
+        /// </summary>
+        private void Awake()
+        {
+            InitializeMonthCache();
+            CalculateSeasonRanges();
         }
 
         /// <summary>
@@ -571,9 +611,9 @@ namespace Sol
         /// </summary>
         private void ValidateTimeSettings()
         {
-            if (dayLengthInSeconds <= 0)
+            if (timeScale <= 0f)
             {
-                Debug.LogWarning("[WorldTimeData] Day length must be greater than 0!");
+                Debug.LogWarning("[WorldTimeData] Time scale must be greater than 0!");
             }
             if (hoursPerDay <= 0 || minutesPerHour <= 0 || secondsPerMinute <= 0)
             {
@@ -609,6 +649,7 @@ namespace Sol
                 }
             }
         }
+
         #endregion
     }
 }

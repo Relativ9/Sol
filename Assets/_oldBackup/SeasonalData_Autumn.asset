@@ -19,7 +19,7 @@ MonoBehaviour:
     yAxisEnabled: 1
     yAxisSpeed: 1
     yAxisOverrideSpeed: 1
-    orbitalAngle: 22.25
+    orbitalAngle: 23.5
     baseElevation: 180
     orbitalPeriod: 1
     phaseOffset: 0
@@ -28,11 +28,11 @@ MonoBehaviour:
     active: 1
     overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisSpeed: 1
+    yAxisSpeed: 11.28
     yAxisOverrideSpeed: 1
-    orbitalAngle: 22.25
-    baseElevation: 180
+    orbitalAngle: 14.3
+    baseElevation: 280
     orbitalPeriod: 29.5
-    phaseOffset: 180
+    phaseOffset: 96
   useCommonOrbitalAngle: 1
   commonOrbitalAngle: 23.5

@@ -73,7 +73,7 @@ namespace Sol
         /// Create the orbital path using axis-angle quaternion composition.
         /// This avoids gimbal lock by applying rotations in the correct order around proper axes.
         /// </summary>
-        private Quaternion CreateOrbitalPathAxisAngle(SeasonalData seasonalData, CelestialBody celestialBody, float azimuth)
+        private Quaternion CreateOrbitalPathAxisAngle(SeasonalData seasonalData, SeasonalData.CelestialBodySeasonalConfig celestialBody, float azimuth)
         {
             // Get the effective orbital angle based on current season
             float effectiveOrbitalAngle = seasonalData.GetEffectiveOrbitalAngle(celestialBody);
@@ -102,7 +102,7 @@ namespace Sol
 
         #region Azimuth Calculation
 
-        private float CalculateAzimuth(CelestialBody celestialBody, float celestialTime, bool isMoon)
+        private float CalculateAzimuth(SeasonalData.CelestialBodySeasonalConfig celestialBody, float celestialTime, bool isMoon)
         {
             float effectiveSpeed = GetEffectiveYAxisSpeed(celestialBody);
             float baseAzimuth = effectiveSpeed * celestialTime * 360f;
@@ -118,11 +118,11 @@ namespace Sol
             return Mathf.Repeat(finalAzimuth, 360f);
         }
 
-        private float GetEffectiveYAxisSpeed(CelestialBody celestialBody)
+        private float GetEffectiveYAxisSpeed(SeasonalData.CelestialBodySeasonalConfig celestialBody)
         {
             if (celestialBody.yAxisOverrideSpeed && _timeManager?.WorldTimeData != null)
             {
-                float dayLengthInSeconds = _timeManager.WorldTimeData.dayLengthInSeconds;
+                float dayLengthInSeconds = _timeManager.WorldTimeData.TotalGameSecondsPerDay;
                 if (dayLengthInSeconds > 0)
                 {
                     if (enableDebugLogging && Time.frameCount % 600 == 0)
@@ -136,7 +136,7 @@ namespace Sol
             return celestialBody.yAxisSpeed;
         }
 
-        private float CalculateOrbitalDrift(CelestialBody celestialBody)
+        private float CalculateOrbitalDrift(SeasonalData.CelestialBodySeasonalConfig celestialBody)
         {
             if (_timeManager == null) return 0f;
             

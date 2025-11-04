@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
+  m_Name: AutumnData
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.SeasonalData
+  seasonName: Autumn
+  stars:
+  - name: Primary Star
+    active: 1
+    overrideOrbitalAngle: 0
+    yAxisEnabled: 1
+    yAxisSpeed: 1
+    yAxisOverrideSpeed: 0
+    orbitalAngle: 23.499998
+    baseElevation: 180
+    orbitalPeriod: 1
+    phaseOffset: 0
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
+  - name: Secondary Star
+    active: 1
+    overrideOrbitalAngle: 0
+    yAxisEnabled: 1
+    yAxisSpeed: 1
+    yAxisOverrideSpeed: 0
+    orbitalAngle: 23.499998
+    baseElevation: 180
+    orbitalPeriod: 1
+    phaseOffset: 0
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
+  moons:
+  - name: Moon
+    active: 1
+    overrideOrbitalAngle: 0
+    yAxisEnabled: 1
+    yAxisSpeed: 1
+    yAxisOverrideSpeed: 0
+    orbitalAngle: 23.499998
+    baseElevation: 180
+    orbitalPeriod: 29.5
+    phaseOffset: 180
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 4000
+    lightColor: {r: 0.8, g: 0.8, b: 1, a: 1}
+    lightIntensity: 500
+    castShadows: 0
+    angularDiameter: 0.52
+    surfaceColor: {r: 0.7, g: 0.7, b: 0.75, a: 1}
+    flareSize: 0.5
+    flareFalloff: 5
+    flareBrightness: 0.5
+    surfaceTexture: {fileID: 0}
+  useCommonOrbitalAngle: 1
+  commonOrbitalAngle: 23.5
+  dayAmbientColor: {r: 0.6, g: 0.55, b: 0.5, a: 1}
+  nightAmbientColor: {r: 0.05, g: 0.05, b: 0.15, a: 1}
+  skyExposure: 1.2
+  fogDensity: 0.015
+  fogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

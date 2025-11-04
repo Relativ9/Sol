@@ -139,7 +139,7 @@ namespace Sol
 
         private void UpdateCelestialTime()
         {
-            float dayLengthInSeconds = _worldTimeData.dayLengthInSeconds;
+            float dayLengthInSeconds = _worldTimeData.TotalGameSecondsPerDay;
             if (dayLengthInSeconds <= 0)
             {
                 Debug.LogError("[TimeManager] Day length must be greater than 0");
@@ -211,7 +211,7 @@ namespace Sol
             }
 
             float transitionDaysElapsed = _seasonTransitionProgress * _worldTimeData.seasonTransitionDays;
-            float dayIncrement = Time.deltaTime * _timeScale / _worldTimeData.dayLengthInSeconds;
+            float dayIncrement = Time.deltaTime * _timeScale / _worldTimeData.TotalGameSecondsPerDay;
             transitionDaysElapsed += dayIncrement;
             _seasonTransitionProgress = transitionDaysElapsed / _worldTimeData.seasonTransitionDays;
 
@@ -312,7 +312,7 @@ namespace Sol
                 return;
             }
 
-            if (_worldTimeData.dayLengthInSeconds <= 0)
+            if (_worldTimeData.TotalGameSecondsPerDay <= 0)
             {
                 Debug.LogError("[TimeManager] Day length must be greater than 0!");
             }

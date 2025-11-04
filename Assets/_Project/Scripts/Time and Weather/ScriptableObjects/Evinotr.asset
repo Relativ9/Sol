@@ -15,12 +15,12 @@ MonoBehaviour:
   stars:
   - name: Sol
     active: 1
-    overrideOrbitalAngle: 0
+    overrideOrbitalAngle: 1
     yAxisEnabled: 1
     yAxisSpeed: 0.25
     yAxisOverrideSpeed: 1
-    orbitalAngle: 30
-    baseElevation: 180
+    orbitalAngle: 12.9
+    baseElevation: 104
     orbitalPeriod: 1
     phaseOffset: 0
   - name: Notr

@@ -12,76 +12,76 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bdd632e0a40379459148d4013ed9619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sol.WorldTimeData
-  dayLengthInSeconds: 1440
-  totalDaysInYear: 360
   hoursPerDay: 24
   minutesPerHour: 60
   secondsPerMinute: 60
+  timeScale: 60
+  totalDaysInYear: 360
   seasons:
   - seasonName: Spring
     lengthInDays: 90
-    seasonalData: {fileID: 11400000, guid: 2bbdf630601521806839ea0ab47f1014, type: 2}
+    seasonalData: {fileID: 11400000, guid: ae68af3f8b452ef27bea0dd4c212a989, type: 2}
     overrideAmbientColors: 0
-    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
-    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
-    seasonColor: {r: 0.4, g: 1, b: 0.4, a: 1}
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 0.9, g: 0.35999995, b: 0.35999995, a: 1}
   - seasonName: Summer
     lengthInDays: 90
-    seasonalData: {fileID: 11400000, guid: a4e1e48d274faeb80950f20293ac055b, type: 2}
+    seasonalData: {fileID: 11400000, guid: b81a283168995153bb5bb9f7bdeaed98, type: 2}
     overrideAmbientColors: 0
-    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
-    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
-    seasonColor: {r: 1, g: 1, b: 0.4, a: 1}
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 0.63, g: 0.9, b: 0.35999995, a: 1}
   - seasonName: Autumn
     lengthInDays: 90
-    seasonalData: {fileID: 11400000, guid: 7f343e6e43fac0cde8045a211d8a5fd5, type: 2}
+    seasonalData: {fileID: 11400000, guid: 3ff932a8cc113b2509e5622ea43d587d, type: 2}
     overrideAmbientColors: 0
-    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
-    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
-    seasonColor: {r: 1, g: 0.6, b: 0.2, a: 1}
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 0.35999995, g: 0.9, b: 0.9, a: 1}
   - seasonName: Winter
     lengthInDays: 90
-    seasonalData: {fileID: 11400000, guid: 82e696361cd2f022caee5a86ef6e78eb, type: 2}
+    seasonalData: {fileID: 11400000, guid: caaec34d89b487eb1baa31a6e1477c12, type: 2}
     overrideAmbientColors: 0
-    seasonDayAmbient: {r: 1, g: 1, b: 1, a: 1}
-    seasonNightAmbient: {r: 0.1, g: 0.1, b: 0.2, a: 1}
-    seasonColor: {r: 0.7, g: 0.9, b: 1, a: 1}
+    seasonDayAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonNightAmbient: {r: 0, g: 0, b: 0, a: 0}
+    seasonColor: {r: 0.63, g: 0.35999995, b: 0.9, a: 1}
   seasonTransitionDays: 10
   daysPerMonth: 30
   months:
-  - name: Glavyr
+  - name: Month 1
     index: 0
-    monthColor: {r: 0.95, g: 0.57, b: 0.57, a: 1}
-  - name: Tharven
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 2
     index: 1
-    monthColor: {r: 0.95, g: 0.722, b: 0.57, a: 1}
-  - name: Solmyr
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 3
     index: 2
-    monthColor: {r: 0.95, g: 0.874, b: 0.57, a: 1}
-  - name: Aethon
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 4
     index: 3
-    monthColor: {r: 0.87399995, g: 0.95, b: 0.57, a: 1}
-  - name: Lumis
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 5
     index: 4
-    monthColor: {r: 0.72199994, g: 0.95, b: 0.57, a: 1}
-  - name: Verdis
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 6
     index: 5
-    monthColor: {r: 0.57, g: 0.95, b: 0.57, a: 1}
-  - name: Harvyx
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 7
     index: 6
-    monthColor: {r: 0.57, g: 0.95, b: 0.722, a: 1}
-  - name: Frosten
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 8
     index: 7
-    monthColor: {r: 0.57, g: 0.95, b: 0.87399995, a: 1}
-  - name: Stormyr
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 9
     index: 8
-    monthColor: {r: 0.57, g: 0.8739999, b: 0.95, a: 1}
-  - name: Wintern
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 10
     index: 9
-    monthColor: {r: 0.57, g: 0.72199994, b: 0.95, a: 1}
-  - name: Icelyn
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 11
     index: 10
-    monthColor: {r: 0.57, g: 0.57, b: 0.95, a: 1}
-  - name: Newyr
+    monthColor: {r: 1, g: 1, b: 1, a: 1}
+  - name: Month 12
     index: 11
-    monthColor: {r: 0.722, g: 0.57, b: 0.95, a: 1}
+    monthColor: {r: 1, g: 1, b: 1, a: 1}

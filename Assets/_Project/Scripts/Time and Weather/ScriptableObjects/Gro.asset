@@ -20,7 +20,7 @@ MonoBehaviour:
     yAxisSpeed: 0.25
     yAxisOverrideSpeed: 1
     orbitalAngle: 22.6
-    baseElevation: 180
+    baseElevation: 190
     orbitalPeriod: 1
     phaseOffset: 0
   - name: Notr
@@ -65,4 +65,4 @@ MonoBehaviour:
     orbitalPeriod: 356
     phaseOffset: 180
   useCommonOrbitalAngle: 1
-  commonOrbitalAngle: 90
+  commonOrbitalAngle: 23
