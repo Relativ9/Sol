@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEditor;
-using System.IO;
 using System.Collections.Generic;
+
+#if UNITY_HDRP
+using UnityEngine.Rendering.HighDefinition;
+#endif
 
 namespace Sol.Editor
 {
@@ -76,6 +79,14 @@ namespace Sol.Editor
                 AssetDatabase.CreateFolder(parentFolder, folderName);
                 Debug.Log($"[SolSetup] Created folder: {path}");
             }
+
+            // Save WorldTimeData with linked seasonal data
+            EditorUtility.SetDirty(worldTimeData);
+            AssetDatabase.SaveAssets();
+
+            Debug.Log($"[Sol Setup] Created and linked {seasonalDataAssets.Count} SeasonalData assets");
+
+            return seasonalDataAssets.ToArray();
         }
 
         #endregion
@@ -149,7 +160,19 @@ namespace Sol.Editor
             }
         }
 
-        #endregion
+            if (onSeasonChangedProp != null)
+            {
+                GameEvent seasonEvent = FindGameEventByName("OnSeasonChanged");
+                if (seasonEvent != null)
+                {
+                    onSeasonChangedProp.objectReferenceValue = seasonEvent;
+                    Debug.Log($"[Sol Setup] Assigned OnSeasonChanged event: {AssetDatabase.GetAssetPath(seasonEvent)}");
+                }
+                else
+                {
+                    Debug.LogWarning("[Sol Setup] Could not find 'OnSeasonChanged' GameEvent asset. Assign manually.");
+                }
+            }
 
         #region SeasonalData Generation
 
@@ -384,8 +407,24 @@ namespace Sol.Editor
             float hue = (float)seasonIndex / totalSeasons;
             return Color.HSVToRGB(hue, 0.6f, 0.9f);
         }
+        
+        /// <summary>
+        /// Creates a directional light for a celestial body with HDRP configuration.
+        /// </summary>
+        private static Light CreateCelestialLight(CelestialBodyConfig config, bool enableShadows, bool isMoon, Transform parent)
+        {
+            GameObject lightObj = new GameObject($"{config.name}");
+            lightObj.transform.SetParent(parent);
+            lightObj.transform.localPosition = Vector3.zero;
+            lightObj.transform.localRotation = Quaternion.identity;
 
-        #endregion
+            Light light = lightObj.AddComponent<Light>();
+            light.type = LightType.Directional;
+            
+            // Use white color - HDRP will handle temperature via HDAdditionalLightData
+            light.color = Color.white;
+            light.intensity = config.lightIntensity;
+            light.shadows = enableShadows ? LightShadows.Soft : LightShadows.None;
 
         #region Scene Setup
         
@@ -533,6 +572,13 @@ namespace Sol.Editor
 
             Debug.Log($"[SolSetup] ✓ Created TimeManager with {sunCount} suns and {moonCount} moons");
         }
+        
+        /// <summary>
+        /// Adds HDRP Volume component and assigns the SolDefaultSkyProfile.
+        /// </summary>
+        private static bool TryAddAndConfigureVolumeComponent(GameObject volumeObject)
+        {
+            Debug.Log("[Sol Setup] Configuring Volume component...");
 
 
         private static GameObject CreateCelestialBodyObject(string name, Transform parent, bool isSun, bool createLight)

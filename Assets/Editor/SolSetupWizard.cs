@@ -1217,7 +1217,7 @@ namespace Sol.Editor
 
                 Debug.Log("[SolSetupWizard] ✓ Generation complete!");
             }
-            catch (System.Exception e)
+            catch (System.NullReferenceException ex)
             {
                 Debug.LogError($"[SolSetupWizard] Generation failed: {e.Message}\n{e.StackTrace}");
                 
@@ -1229,6 +1229,24 @@ namespace Sol.Editor
             }
         }
 
+
+        /// <summary>
+        /// Resets configuration to defaults.
+        /// </summary>
+        private void ResetToDefaults()
+        {
+            if (EditorUtility.DisplayDialog(
+                "Reset Configuration", 
+                "Are you sure you want to reset all settings to defaults?", 
+                "Yes", "Cancel"))
+            {
+                _config = new SetupConfig();
+                _setupStatus = "";
+                _isSetupInProgress = false;
+                Repaint();
+                Debug.Log("[Sol Wizard] Configuration reset to defaults");
+            }
+        }
 
         #endregion
     }
