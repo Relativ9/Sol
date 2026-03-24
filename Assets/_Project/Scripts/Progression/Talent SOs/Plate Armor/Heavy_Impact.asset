@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Heavy_Impact
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Sacred_Plate
+  displayName: Sacred Plate
+  icon: {fileID: 21300000, guid: 6101f97e5cb2c942098ee236944207c6, type: 3}
+  maxPoints: 1
+  description: 'Falling from great hights no longer hurst you, instead the violent
+    impact sends debris flying damaing all enemies caught in the blast range for
+    the fall damage instead. Be warned, lethal drops are still leathal, for you and
+    everyone around. '
+  isHybrid: 0
+  tier: 6
+  offset: -1
+  parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: a013cc3aebc46d0c2add9b2e2c881b1a, type: 2}

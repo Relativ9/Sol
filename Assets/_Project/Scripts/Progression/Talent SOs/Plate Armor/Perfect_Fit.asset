@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Perfect_Fit
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Perfect_Fit
+  displayName: Perfect Fit
+  icon: {fileID: 21300000, guid: 660d16810cbda517eb73416418f8cb9d, type: 3}
+  maxPoints: 3
+  description: Increases armor value by 20/30/45%.
+  isHybrid: 0
+  tier: 12
+  offset: 0
+  parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: 90fafe75ad21dae3696479ed8e9ff32f, type: 2}
+  - {fileID: 11400000, guid: eba79848fd3554c32bc16bca31e7b317, type: 2}

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Intimitating_Clank
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Intimidating_Clank
+  displayName: Intimidating Clank
+  icon: {fileID: 21300000, guid: 31a3a75e05a1281daa6fdcb088ca2413, type: 3}
+  maxPoints: 1
+  description: Anytime a foe's glow glances effortlessly off your armor, there is
+    a 10% they will give up and run for 8 seconds.
+  isHybrid: 0
+  tier: 8
+  offset: -1
+  parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: f42d58989c96d0395b0b9f2774d75331, type: 2}

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Feather_Plate
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Feather_Plate
+  displayName: Feather Plate
+  icon: {fileID: 21300000, guid: 6101f97e5cb2c942098ee236944207c6, type: 3}
+  maxPoints: 3
+  description: 'Reduces the weight of worn armor by 30/45/60%. '
+  isHybrid: 0
+  tier: 7
+  offset: 1
+  parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: f42d58989c96d0395b0b9f2774d75331, type: 2}

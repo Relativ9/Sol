@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000004, guid: b2a4a7b19d22d401c9b3b954f2bc4928, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 6e2a886f4d2102c41a6de6bc8b15ddd6, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -5189,7 +5189,7 @@ MonoBehaviour:
   lowestSubdivLevelOverride: 0
   highestSubdivLevelOverride: 3
   overridesSubdivLevels: 0
-  mightNeedRebaking: 1
+  mightNeedRebaking: 0
   cachedTransform:
     e00: 1
     e01: 0
@@ -5253,8 +5253,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a83d2f7ae04ab6f4f99b0d85377be998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolumePerSceneData
-  serializedBakingSet: {fileID: 0}
-  sceneGUID: 8124e5870f4fd4c779e7a5f994e84ad1
+  serializedBakingSet: {fileID: 11400000, guid: 5b62d86fcc10fbd76887c3b49b04cd8a, type: 2}
+  sceneGUID: f2c207269ee447a23a2d2c62eef4948c
   obsoleteAsset: {fileID: 0}
   obsoleteCellSharedDataAsset: {fileID: 0}
   obsoleteCellSupportDataAsset: {fileID: 0}
