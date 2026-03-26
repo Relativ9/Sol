@@ -24,3 +24,4 @@ MonoBehaviour:
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
   - {fileID: 11400000, guid: b9e8efe0f9000d90282a4fff0ebbaa60, type: 2}
+  - {fileID: 11400000, guid: a4c7031548e9ee4cdbf99f22f6c5f0c1, type: 2}

@@ -10,16 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
-  m_Name: HybridNodeTest
+  m_Name: Collosal_Heft
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
-  nodeId: hb1
-  displayName: hb1
-  icon: {fileID: 21300000, guid: 45d905ab4c966dee59f57f5c3b8606b0, type: 3}
-  maxPoints: 0
-  description: sdasd
+  nodeId: Collosal_Heft
+  displayName: Collosal Heft
+  icon: {fileID: 21300000, guid: 4b6944b0542e52f52bb22292e612a79e, type: 3}
+  maxPoints: 3
+  description: Attacks with Two Handed Blunt Weapons cause enemies to loose an extra
+    10/15/20% energy on hit.
+  isActiveSkill: 0
   isHybrid: 0
-  tier: 3
-  offset: 3
-  parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
-  prerequisites:
-  - {fileID: 11400000, guid: 971c8917b900ff709b51d31142098f12, type: 2}
+  tier: 1
+  offset: -1
+  parentTree: {fileID: 11400000, guid: 4f19e7bcaec1e5d72923a9d4d207ef04, type: 2}
+  prerequisites: []

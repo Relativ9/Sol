@@ -19,8 +19,8 @@ MonoBehaviour:
   description: 'All melee attacks deal extra damage based on 10/20/40% total armor
     value. '
   isHybrid: 0
-  tier: 1
+  tier: 9
   offset: -1
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
-  - {fileID: 11400000, guid: 971c8917b900ff709b51d31142098f12, type: 2}
+  - {fileID: 11400000, guid: f137238faa35ca3ee8f86ab7d20e0af5, type: 2}

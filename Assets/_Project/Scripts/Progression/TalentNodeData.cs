@@ -12,6 +12,8 @@ namespace Sol
         public int maxPoints;           // Usually 1-3 for most nodes.
         [TextArea(3, 10)]
         public string description;      // Tooltip text
+
+        public bool isActiveSkill;
     
         // Gameplay effects
         private float armorBonus;
@@ -20,8 +22,8 @@ namespace Sol
     
         [Header("Visual Placement")]
         public bool isHybrid;           // True if this is a synergy node
-        public int tier;                // 0-12
-        public int offset;              // -2 to 2
+        public float tier;                // 0-12
+        public float offset;              // -2 to 2
         public TreeLayout parentTree;   // Which tree owns this node
     
         [Header("Connections")]

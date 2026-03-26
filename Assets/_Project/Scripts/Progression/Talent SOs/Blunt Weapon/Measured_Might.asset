@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
-  m_Name: HybridNodeTest 1
+  m_Name: Measured_Might
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
-  nodeId: hb2
-  displayName: hb2
-  icon: {fileID: 21300000, guid: 45d905ab4c966dee59f57f5c3b8606b0, type: 3}
-  maxPoints: 0
-  description: 
-  isHybrid: 1
-  tier: 6
+  nodeId: Measured_Might
+  displayName: Measured Might
+  icon: {fileID: 21300000, guid: c16612a3f844df4f59393879c2e1ef42, type: 3}
+  maxPoints: 3
+  description: Attacking with blunt weapons cost 15/25/40% less energy.
+  isActiveSkill: 0
+  isHybrid: 0
+  tier: 0
   offset: 0
-  parentTree: {fileID: 0}
-  prerequisites:
-  - {fileID: 11400000, guid: a013cc3aebc46d0c2add9b2e2c881b1a, type: 2}
+  parentTree: {fileID: 11400000, guid: 4f19e7bcaec1e5d72923a9d4d207ef04, type: 2}
+  prerequisites: []

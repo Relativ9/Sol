@@ -18,9 +18,10 @@ MonoBehaviour:
   maxPoints: 1
   description: 'If brought down to less than 30% while wearing full Plate Armor,
     your energy increases by 25% and you deal 10% more physical damage for 10 seconds. '
+  isActiveSkill: 0
   isHybrid: 0
-  tier: 8
-  offset: -1
+  tier: 5
+  offset: 2
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
   - {fileID: 11400000, guid: d5c51d5558c9e1a30a333fb2c5d23906, type: 2}

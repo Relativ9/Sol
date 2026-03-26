@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
   nodeId: Feather_Plate
   displayName: Feather Plate
-  icon: {fileID: 21300000, guid: 6101f97e5cb2c942098ee236944207c6, type: 3}
+  icon: {fileID: 21300000, guid: b770812cf7b210be9a9fbcfb74eb6643, type: 3}
   maxPoints: 3
   description: 'Reduces the weight of worn armor by 30/45/60%. '
   isHybrid: 0

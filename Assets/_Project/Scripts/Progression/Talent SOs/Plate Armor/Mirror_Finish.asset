@@ -20,7 +20,7 @@ MonoBehaviour:
     the caster instead. '
   isHybrid: 0
   tier: 10
-  offset: -2
+  offset: -1
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
   - {fileID: 11400000, guid: b6f906f57eeb8c79a8f0bdba732ad2c1, type: 2}

@@ -20,8 +20,8 @@ MonoBehaviour:
     and enemies you dash into are knocked down or staggered taking your armor rating
     as physical damage.
   isHybrid: 0
-  tier: 7
-  offset: 2
+  tier: 10
+  offset: 1
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
-  - {fileID: 11400000, guid: 375dc33c70c3990ceb47cd5753d40026, type: 2}
+  - {fileID: 11400000, guid: 87d32f85dc9a3dcf291fec503627099f, type: 2}

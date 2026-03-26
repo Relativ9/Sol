@@ -10,17 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
-  m_Name: Heavy_Set
+  m_Name: Hybrid_Sundering_Strike 1
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
-  nodeId: Heavy_Set
-  displayName: Heavy Set
-  icon: {fileID: 21300000, guid: 99afa6b57b98bf77caae11c22f3747e9, type: 3}
+  nodeId: Hybrid_Sundering_Strike
+  displayName: Sundering Stryke
+  icon: {fileID: 21300000, guid: b750c8e4c3b4eea1387f299a50387a92, type: 3}
   maxPoints: 1
-  description: You are big and others are small, when being hit by physical attacks
-    your stamina is no longer lowered.
-  isHybrid: 0
-  tier: 5
-  offset: 1
+  description: 'Active Skill: Swing your mace with all your strength sundering the
+    enemies armor by 20% for 20 seconds. This effect stacks.'
+  isActiveSkill: 1
+  isHybrid: 1
+  tier: 9.5
+  offset: 3
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
   - {fileID: 11400000, guid: 375dc33c70c3990ceb47cd5753d40026, type: 2}
+  - {fileID: 11400000, guid: ab4ce2d772468d9af8dffa06395bc33b, type: 2}

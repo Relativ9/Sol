@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
   nodeId: Momentum
   displayName: Momentum
-  icon: {fileID: 21300000, guid: 99afa6b57b98bf77caae11c22f3747e9, type: 3}
+  icon: {fileID: 21300000, guid: 9ffa8279a690e2c1dbfd1373d035a2a1, type: 3}
   maxPoints: 1
   description: After sprinting for more than 3 seconds while wearing plate armor
-    you knock down the next enemy caugt in your path.
+    you knock down the next enemy caught in your path.
+  isActiveSkill: 0
   isHybrid: 0
   tier: 3
   offset: 2

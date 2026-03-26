@@ -19,8 +19,8 @@ MonoBehaviour:
   description: Wielding 2 Handed Weapons while wearing full Plate Armor increases
     the stagger effect when hitting an enemy by 20/30/40%.
   isHybrid: 0
-  tier: 10
-  offset: 1
+  tier: 9
+  offset: 2
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
   - {fileID: 11400000, guid: 87d32f85dc9a3dcf291fec503627099f, type: 2}

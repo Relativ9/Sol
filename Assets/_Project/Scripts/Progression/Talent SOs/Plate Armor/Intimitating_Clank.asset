@@ -19,8 +19,8 @@ MonoBehaviour:
   description: Anytime a foe's glow glances effortlessly off your armor, there is
     a 10% they will give up and run for 8 seconds.
   isHybrid: 0
-  tier: 8
-  offset: -1
+  tier: 4
+  offset: 1
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites:
-  - {fileID: 11400000, guid: f42d58989c96d0395b0b9f2774d75331, type: 2}
+  - {fileID: 11400000, guid: d3c252498e74627fb915266f5dc9494a, type: 2}

@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Tempting Target
   icon: {fileID: 21300000, guid: 99afa6b57b98bf77caae11c22f3747e9, type: 3}
   maxPoints: 3
-  description: All engaged enemies focus their attacks on you.
+  description: All engaged enemies focus their attacks on you. Ignoring all allies.
+  isActiveSkill: 0
   isHybrid: 0
   tier: 8
   offset: -1
