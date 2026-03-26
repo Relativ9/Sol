@@ -6893,11 +6893,13 @@ MonoBehaviour:
   uiDocument: {fileID: 1128780044}
   nodeTemplate: {fileID: 9197481963319205126, guid: 2b39f5ba8afc51833b5cd891c4d4d9e3, type: 3}
   treeCollection: {fileID: 11400000, guid: fc1a0795214e979ae9fdee0522e9e733, type: 2}
-  centerRadius: 560
-  tierSpacing: 70
-  offsetAngle: 4
-  globalScale: 1
-  autoFitToScreen: 0
+  outerRadius: 1400
+  innerRadius: 600
+  treeAngularWidth: 25.5
+  maxOffset: 3
+  rotationSteps: 0
+  nodeScale: 1
+  liveTuningMode: 1
   inactiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   activeColor: {r: 0.4980392, g: 1, b: 0.8313726, a: 1}
 --- !u!4 &556237703
