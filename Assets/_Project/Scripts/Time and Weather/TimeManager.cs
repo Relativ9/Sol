@@ -2,13 +2,6 @@ using UnityEngine;
 
 namespace Sol
 {
-    /// <summary>
-    /// Manages planetary time, seasons, and calendar progression.
-    /// Updates celestial time each frame (respects time scale).
-    /// Can optionally throttle calculation updates using UpdateFrequencyOptimizer.
-    /// Raises GameEvents when day/season/year changes occur.
-    /// Provides full year tracking with configurable starting year for maximum flexibility.
-    /// </summary>
     public class TimeManager : MonoBehaviour, ITimeManager
     {
         [Header("Configuration")]
@@ -26,7 +19,11 @@ namespace Sol
 
         [Header("Time Control")]
         [Tooltip("Time scale multiplier (1 = normal, 2 = double speed, 0.5 = half speed)")]
-        [SerializeField] private float _timeScale = 1f;
+        [SerializeField] private float _celestialTimeScale = 1f;
+
+        private float _normalTimeScale = 1f;
+        private float _cachedTimeScale;
+        private float _cachedCelestialTimeScale;
         
         [Tooltip("Pause time progression")]
         [SerializeField] private bool _isPaused = false;
@@ -67,7 +64,7 @@ namespace Sol
         public float CelestialTime => _celestialTime;
         public int CurrentDay => _currentDay;
         public int CurrentYear => _currentYear;
-        public float TimeScale => _timeScale;
+        public float CelestialTimeScale => _celestialTimeScale;
         public bool IsPaused => _isPaused;
         public int CurrentSeasonIndex => _currentSeasonIndex;
         public string CurrentSeasonName => _worldTimeData?.GetSeasonName(_currentSeasonIndex) ?? "Unknown";
@@ -118,9 +115,16 @@ namespace Sol
 
         private void Awake()
         {
+            ServiceLocator.RegisterService<ITimeManager>(this); //Registers itself with the service locator.
+            
+            var calculator = new CelestialCalculator(this);
+            ServiceLocator.RegisterService<ICelestialCalculator>(calculator);
+        }
+
+        private void Start()
+        {
             ValidateConfiguration();
             InitializeTime();
-            
         }
 
         private void Update()
@@ -147,7 +151,7 @@ namespace Sol
             }
 
             // Calculate time increment (scaled by time scale)
-            float timeIncrement = (Time.deltaTime * _timeScale) / dayLengthInSeconds;
+            float timeIncrement = (Time.deltaTime * _celestialTimeScale) / dayLengthInSeconds;
             _celestialTime += timeIncrement;
 
             // Handle day transition
@@ -211,7 +215,7 @@ namespace Sol
             }
 
             float transitionDaysElapsed = _seasonTransitionProgress * _worldTimeData.seasonTransitionDays;
-            float dayIncrement = Time.deltaTime * _timeScale / _worldTimeData.TotalGameSecondsPerDay;
+            float dayIncrement = Time.deltaTime * _celestialTimeScale / _worldTimeData.TotalGameSecondsPerDay;
             transitionDaysElapsed += dayIncrement;
             _seasonTransitionProgress = transitionDaysElapsed / _worldTimeData.seasonTransitionDays;
 
@@ -337,20 +341,26 @@ namespace Sol
 
         #region Time Control Methods
 
-        public void SetTimeScale(float newTimeScale)
+        public void SetCelestialTimeScale(float newTimeScale)
         {
-            _timeScale = Mathf.Max(0f, newTimeScale);
+            _celestialTimeScale = Mathf.Max(0f, newTimeScale);
             
             if (_enableDebugLogging)
             {
-                Debug.Log($"[TimeManager] Time scale set to {_timeScale}x");
+                Debug.Log($"[TimeManager] Time scale set to {_celestialTimeScale}x");
             }
         }
 
         public void PauseTime()
         {
+            if (_isPaused) return;
             _isPaused = true;
             
+            _cachedTimeScale = Time.timeScale;
+            _cachedCelestialTimeScale = _celestialTimeScale;
+            
+            Time.timeScale = 0f;
+            SetCelestialTimeScale(0f);
             if (_enableDebugLogging)
             {
                 Debug.Log("[TimeManager] Time paused");
@@ -360,6 +370,8 @@ namespace Sol
         public void ResumeTime()
         {
             _isPaused = false;
+            Time.timeScale = _cachedTimeScale;
+            SetCelestialTimeScale(_cachedCelestialTimeScale);
             
             if (_enableDebugLogging)
             {
@@ -369,7 +381,10 @@ namespace Sol
 
         public void TogglePause()
         {
-            _isPaused = !_isPaused;
+            if (_isPaused)
+                ResumeTime();
+            else
+                PauseTime();
             
             if (_enableDebugLogging)
             {

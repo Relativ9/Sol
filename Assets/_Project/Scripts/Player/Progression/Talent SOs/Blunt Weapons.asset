@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b7b1ca21390c65749f4bb455baa537c, type: 3}
+  m_Name: Blunt Weapons
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
+  treeName: Blunt Weapon
+  treeColor: {r: 0.14538093, g: 0.31132078, b: 0.19404201, a: 0}
+  nodes:
+  - {fileID: 11400000, guid: ab4ce2d772468d9af8dffa06395bc33b, type: 2}
+  - {fileID: 11400000, guid: a85191e9f267f336db4ccc9ecd563fad, type: 2}
+  - {fileID: 11400000, guid: f4180161a3ec1825f987fcac220eb2b6, type: 2}
+  - {fileID: 11400000, guid: 5710676dbd432655094756598df5456a, type: 2}
+  - {fileID: 11400000, guid: e27e8e3ac183cf2f4a38d5248d18872d, type: 2}
+  - {fileID: 11400000, guid: 092a967ab7a27ed16ae18899d4b682d9, type: 2}
+  - {fileID: 11400000, guid: 5d329ffd1b833c6b197478338410db66, type: 2}
+  - {fileID: 11400000, guid: 491e949d813354f65b9903d03c14c0fe, type: 2}
+  - {fileID: 11400000, guid: 96cbe16a6838f80e18bfebbee848ebe6, type: 2}
+  - {fileID: 11400000, guid: 9fdb1e2101dcbfe708f1148942635431, type: 2}
+  - {fileID: 11400000, guid: f811ac074cc769985a560882d5216c1c, type: 2}
+  - {fileID: 11400000, guid: 6dff636337642a75792c8ed1060170e2, type: 2}
+  - {fileID: 11400000, guid: 22890b593badb28ed8810ad68dca6c4c, type: 2}
+  - {fileID: 11400000, guid: af6c9af5653a76ff8820d120a958beb9, type: 2}
+  - {fileID: 11400000, guid: ef939c093acc240ca88c5099d3952088, type: 2}

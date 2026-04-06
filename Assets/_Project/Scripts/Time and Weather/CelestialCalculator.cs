@@ -14,8 +14,8 @@ namespace Sol
         private ITimeManager _timeManager;
 
         #region Constructor
-
-        public CelestialCalculator(ITimeManager timeManager)
+        
+        public CelestialCalculator(TimeManager timeManager)
         {
             _timeManager = timeManager;
         }

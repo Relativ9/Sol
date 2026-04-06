@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Hammerang
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Hammerang
+  displayName: Hammerang
+  icon: {fileID: 21300000, guid: 9883671c94912c7bcb1e6b7a3c4e88d8, type: 3}
+  maxPoints: 1
+  description: 'Active: Throw your one-handed blunt weapon at the enemies head, dealing
+    attack damage and stunning them for 2 seconds before bouncing off their skull
+    returning to your hands.
+
+
+    Range: 10 meters.'
+  isActiveSkill: 1
+  isHybrid: 0
+  tier: 2
+  offset: 2
+  parentTree: {fileID: 11400000, guid: 4f19e7bcaec1e5d72923a9d4d207ef04, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: 96cbe16a6838f80e18bfebbee848ebe6, type: 2}

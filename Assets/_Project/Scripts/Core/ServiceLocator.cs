@@ -8,17 +8,11 @@ namespace Sol
     /// Centralized service registry for Sol system.
     /// Manages lifecycle and provides decoupled access to core services.
     /// </summary>
+    [DefaultExecutionOrder(-100)]
     public class ServiceLocator : MonoBehaviour
     {
         private static ServiceLocator _instance;
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
-
-        [Header("Core Services")]
-        [SerializeField] private TimeManager _timeManager;
-
-        [Header("Calculator Configuration")]
-        [Tooltip("Enable debug logging for celestial calculations")]
-        [SerializeField] private bool _enableCalculatorDebugLogging = false;
 
         private void Awake()
         {
@@ -31,30 +25,6 @@ namespace Sol
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            InitializeServices();
-        }
-
-        private void InitializeServices()
-        {
-            // Register TimeManager first (other services depend on it)
-            if (_timeManager != null)
-            {
-                RegisterService<ITimeManager>(_timeManager);
-                Debug.Log("[ServiceLocator] ITimeManager registered");
-            }
-            else
-            {
-                Debug.LogError("[ServiceLocator] TimeManager reference missing!");
-                return; // Can't initialize calculator without TimeManager
-            }
-
-            // Register CelestialCalculator (depends on ITimeManager)
-            var celestialCalculator = new CelestialCalculator(_timeManager);
-            celestialCalculator.enableDebugLogging = _enableCalculatorDebugLogging;
-            RegisterService<ICelestialCalculator>(celestialCalculator);
-            Debug.Log("[ServiceLocator] ICelestialCalculator registered");
-
-            // Future services go here...
         }
 
         public static void RegisterService<T>(object service) where T : class

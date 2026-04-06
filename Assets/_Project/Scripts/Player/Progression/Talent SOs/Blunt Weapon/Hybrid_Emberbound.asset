@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Hybrid_Emberbound
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Hybrid_Emberbound
+  displayName: Emberbound
+  icon: {fileID: 21300000, guid: 2645f70841ef3739896161c567877dc9, type: 3}
+  maxPoints: 1
+  description: 'Imbune your Hammerang weapon with fire before throwing it, removing
+    the stun effect but doubling the damage and applying a burn effect on all targets
+    hit. '
+  isActiveSkill: 0
+  isHybrid: 1
+  tier: 3.5
+  offset: 3
+  parentTree: {fileID: 11400000, guid: 4f19e7bcaec1e5d72923a9d4d207ef04, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: e27e8e3ac183cf2f4a38d5248d18872d, type: 2}

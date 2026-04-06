@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Time _Dilation
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Time_Dilation
+  displayName: Time DIlation
+  icon: {fileID: 21300000, guid: 9db47d9916288cd929e28d457da1d6a7, type: 3}
+  maxPoints: 3
+  description: 'Active On Self: See time through a different dimension, slowing time
+    by 40/60/80%.'
+  isActiveSkill: 1
+  isHybrid: 0
+  tier: 6
+  offset: 2
+  parentTree: {fileID: 11400000, guid: 0485021b290675a80a1ca6fe9afccb28, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: 9db11c526bf27b9f58700bb772de3d1f, type: 2}

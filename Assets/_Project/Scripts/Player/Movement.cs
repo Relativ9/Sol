@@ -4,7 +4,7 @@ namespace Sol
 {
     public class Movement : MonoBehaviour, IPlayerComponent, IBaseMovement
     {
-                [Header("Movement Settings")]
+        [Header("Movement Settings")]
         [SerializeField] private float _defaultSpeed = 3f;
         [SerializeField] private float _defaultDeceleration = 20f;
         [SerializeField] private bool _debugMovement = true;

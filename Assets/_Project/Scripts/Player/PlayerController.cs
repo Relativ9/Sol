@@ -13,6 +13,7 @@ namespace Sol
         private CapsuleCollider _playerCollider;
         private PlayerInput _playerInput;
         private Camera _mainCamera;
+        private ITimeManager _timeManager;
 
         [HideInInspector] public bool _moveInputDetected = false;
         [HideInInspector] public bool _runInputDetected = false;
@@ -29,13 +30,13 @@ namespace Sol
         private IBaseMovement _currentMovementState;
         private IJumping _jumpingComponent;
         private IGravityController _gravityController;
-
+        
         [SerializeField] private Vector3 _debugVelDisplay;
         [SerializeField] private Vector2 _debugLookDisplay;
 
         void Awake()
         {
-            if(_playerRb == null) _playerRb = GetComponent<Rigidbody>();
+            if(_playerRb == null) _playerRb = GetComponent<Rigidbody>(); 
             
             // Register locomotion interfaces
             RegisterService<IStatsService>(GetComponent<IStatsService>());
@@ -66,12 +67,17 @@ namespace Sol
             }
             
         }
-        
+
         void Update()
         {
 
             DetermineActiveMovementState();
             _debugVelDisplay = _playerRb.linearVelocity;
+        }
+
+        void Start()
+        {
+            _timeManager = ServiceLocator.Get<ITimeManager>();
         }
 
         private void DetermineActiveMovementState()
@@ -106,25 +112,6 @@ namespace Sol
                 Debug.Log($"Deactivated movement: {_currentMovementState.GetType().Name}");
                 _currentMovementState = null;
             }
-            // Also check if jumping component should be activated/deactivated
-            // if (_jumpingComponent != null)
-            // {
-            //     // For jumping, we don't need to activate/deactivate here
-            //     // It will be triggered by input events in OnJump
-            //
-            //     // However, if your jumping component needs to be active to process updates,
-            //     // you could add logic here to activate it based on conditions
-            //
-            //     // For example:
-            //     // bool canJumpBeActivated = /* your condition */;
-            //     // if (canJumpBeActivated)
-            //     // {
-            //     //     if (_jumpingComponent is MonoBehaviour jumpBehavior)
-            //     //     {
-            //     //         Debug.Log($"Ensuring jump component is active: {jumpBehavior.GetType().Name}");
-            //     //     }
-            //     // }
-            // }
         }
 
         // Update is called once per frame
@@ -274,6 +261,7 @@ namespace Sol
 
         public void OnAttack(InputAction.CallbackContext context)
         {
+            if (_timeManager.IsPaused) return;
             if (context.started)
             {
                 _attackInputDetected = true;
@@ -294,6 +282,20 @@ namespace Sol
                 _attackInputDetected = false;
             }
         }
+        
+        // if (context.started)
+        // {
+        //     ICombatController combatController = GetService<ICombatController>();
+        //     if (combatController != null)
+        //     {
+        //         combatController.ToggleWeaponState();
+        //         Debug.Log("Toggle weapon input received");
+        //     }
+        //     else
+        //     {
+        //         Debug.LogWarning("Toggle weapon input received but no combat controller found!");
+        //     }
+        // }
         
         private IEnumerator ClearJumpPriority(float delay)
         {

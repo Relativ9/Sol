@@ -22,7 +22,7 @@ namespace Sol
         float CelestialTime { get; }
         int CurrentDay { get; }
         int CurrentYear { get; }
-        float TimeScale { get; }
+        float CelestialTimeScale { get; }
         bool IsPaused { get; }
         
         #endregion
@@ -71,7 +71,7 @@ namespace Sol
 
         #region Time Control Methods
         
-        void SetTimeScale(float newTimeScale);
+        void SetCelestialTimeScale(float newTimeScale);
         void PauseTime();
         void ResumeTime();
         void TogglePause();

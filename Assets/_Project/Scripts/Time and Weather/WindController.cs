@@ -43,7 +43,7 @@ namespace Sol
         {
             if (windZone == null || timeManager == null) return;
 
-            float currentTimeScale = timeManager.TimeScale;
+            float currentTimeScale = timeManager.CelestialTimeScale;
             
             // Only update if time scale changed (optimization)
             if (Mathf.Abs(currentTimeScale - lastTimeScale) > 0.01f)

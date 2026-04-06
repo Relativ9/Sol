@@ -11,5 +11,12 @@ namespace Sol
         void RemoveModifiersFromSource(string statName, string sourceId);
         void RemoveAllModifiersOfType(string statName, ModifierCatagory modifierCatagory);
         float GetSpeedMultiplier();
+        
+        // Progression
+        int GetLevel();
+        int GetAvailableTalentPoints();
+        int GetTotalTalentPoints();
+        bool SpendTalentPoint();
+        void RefundTalentPoint();
     }
 }

@@ -33,7 +33,7 @@ namespace Sol
             // Find the Cinemachine camera if not assigned
             if (_cinemachineCamera == null)
             {
-                _cinemachineCamera = FindObjectOfType<CinemachineCamera>();
+                _cinemachineCamera = Object.FindFirstObjectByType<CinemachineCamera>();
                 if (_cinemachineCamera == null)
                 {
                     Debug.LogError("No CinemachineCamera found! Camera control won't work.");

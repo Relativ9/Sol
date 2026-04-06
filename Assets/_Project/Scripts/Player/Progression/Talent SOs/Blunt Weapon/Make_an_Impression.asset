@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Make_an_Impression
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Make_an_Impression
+  displayName: Make an Impression
+  icon: {fileID: 21300000, guid: 12fbc10621d392d839d22fa42b87dc3f, type: 3}
+  maxPoints: 1
+  description: Staggered enemies remain staggered for an extra 2 seconds.
+  isActiveSkill: 0
+  isOwned: 0
+  isHybrid: 0
+  tier: 6
+  offset: 2
+  parentTree: {fileID: 11400000, guid: 4f19e7bcaec1e5d72923a9d4d207ef04, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: af6c9af5653a76ff8820d120a958beb9, type: 2}

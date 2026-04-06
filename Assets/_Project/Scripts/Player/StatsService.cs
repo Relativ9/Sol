@@ -12,9 +12,15 @@ namespace Sol
         
         private Dictionary<string, Dictionary<ModifierCatagory, List<StatModifier>>> _modifiersByCategory = new Dictionary<string, Dictionary<ModifierCatagory, List<StatModifier>>>();
         
+        private int _level;
+        private int _totalTalentPoints;
+        private int _spentTalentPoints;
+        
         void Awake()
         {
+            ServiceLocator.RegisterService<IStatsService>(this);
             IntializeStats();
+            
         }
 
         private void IntializeStats()
@@ -40,6 +46,12 @@ namespace Sol
             _baseValues["TerminalVelocity"] = _playerStats.baseTerminalVelocity;
             // statsRegistry.RegisterStat("gravityMultiplier", 2.5f); // Default fall multiplier
             // statsRegistry.RegisterStat("terminalVelocity", -20f); // Maximum fall speed
+            
+            
+            // Progression - level is a plain counter, not in the modifier pipeline
+            _level = _playerStats.level;
+            _totalTalentPoints = _level + _playerStats.talentPointBonus;
+            _spentTalentPoints = 0;
 
             foreach (string statName in _baseValues.Keys)
             {
@@ -51,6 +63,28 @@ namespace Sol
                 }
 
             }
+        }
+        
+        // --- Progression Methods ---
+        public int GetLevel() => _level;
+        public int GetTotalTalentPoints() => _totalTalentPoints;
+        public int GetAvailableTalentPoints() => _totalTalentPoints - _spentTalentPoints;
+        public bool SpendTalentPoint()
+        {
+            if (_spentTalentPoints >= _totalTalentPoints)
+            {
+                Debug.Log("[StatsService] No talent points available");
+                return false;
+            }
+            _spentTalentPoints++;
+            Debug.Log($"[StatsService] Point spent. Remaining: {GetAvailableTalentPoints()}/{_totalTalentPoints}");
+            return true;
+        }
+        public void RefundTalentPoint()
+        {
+            if (_spentTalentPoints <= 0) return;
+            _spentTalentPoints--;
+            Debug.Log($"[StatsService] Point refunded. Remaining: {GetAvailableTalentPoints()}/{_totalTalentPoints}");
         }
 
         private void Update()
@@ -221,5 +255,6 @@ namespace Sol
             
             return currentSpeed / baseSpeed;
         }
+
     }
 }

@@ -1,0 +1,66 @@
+/* Base node styles */
+.talent-node {
+    border-width: 1px;
+    border-radius: 180px;
+    border-color: rgb(255, 185, 105);
+    opacity: 1;
+}
+
+.talent-node #icon-slot {
+    opacity: 1;
+}
+
+.talent-node #point-counter {
+    display: flex;
+}
+
+/* Locked - prerequisites not met */
+.talent-node.locked {
+    -unity-background-image-tint-color: rgb(128, 128, 129);
+    border-color: rgb(80, 80, 80);
+    opacity: 1;
+}
+
+.talent-node.locked #icon-slot {
+    opacity: 1;
+    -unity-background-image-tint-color: rgb(80, 80, 80);
+}
+
+/* Available - ready to allocate */
+.talent-node.available {
+    border-color: rgb(255, 185, 105);
+    opacity: 1;
+}
+
+.talent-node.available:hover {
+    border-color: rgb(255, 220, 180);
+    scale: 1.05;
+}
+
+/* Active - points allocated */
+.talent-node.active {
+    border-color: rgb(255, 255, 255);
+    border-width: 3px;
+    opacity: 1;
+}
+
+.talent-node.active #icon-slot {
+    opacity: 1;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+/* Point counter - only visible on multi-point nodes */
+.talent-node.multi-point #point-counter {
+    display: flex;
+    color: rgb(200, 200, 200);
+}
+
+.talent-node.active.multi-point #point-counter {
+    color: rgb(255, 255, 255);
+}
+
+.talent-node.locked.multi-point #point-counter {
+    color: rgb(80, 80, 80);
+}
+
+

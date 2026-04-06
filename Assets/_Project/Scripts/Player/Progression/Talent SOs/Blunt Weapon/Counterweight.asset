@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Counterweight
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Counterweight
+  displayName: Counterweight
+  icon: {fileID: 21300000, guid: 42f34aaea3f7131529efde86cdaf7241, type: 3}
+  maxPoints: 3
+  description: Blocking with blunt weapons costs 20/35/50% less energy.
+  isActiveSkill: 0
+  isHybrid: 0
+  tier: 7
+  offset: -2
+  parentTree: {fileID: 11400000, guid: 4f19e7bcaec1e5d72923a9d4d207ef04, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: a85191e9f267f336db4ccc9ecd563fad, type: 2}

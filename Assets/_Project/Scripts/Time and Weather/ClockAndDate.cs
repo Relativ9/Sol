@@ -159,7 +159,7 @@ namespace Sol
         {
             if (timeManager == null) return;
 
-            Color targetColor = timeManager.TimeScale > 0f ? normalColor : pausedColor;
+            Color targetColor = timeManager.CelestialTimeScale > 0f ? normalColor : pausedColor;
             if (textComponent.color != targetColor)
             {
                 textComponent.color = targetColor;
@@ -194,7 +194,7 @@ namespace Sol
         public void SetTextColor(Color color)
         {
             normalColor = color;
-            if (textComponent != null && timeManager != null && timeManager.TimeScale > 0f)
+            if (textComponent != null && timeManager != null && timeManager.CelestialTimeScale > 0f)
             {
                 textComponent.color = color;
             }

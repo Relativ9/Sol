@@ -26,8 +26,13 @@ namespace Sol
         public float baseStamina = 100f;
         public float baseFocus = 100f;
         
+        [Header("Progression")]
+        public int level = 1;
+        public int talentPointBonus = 3;
+        public int prestigePoints = 0;
+
         // [Header("Camera")]
         // public float baseFOV = 60f;
-        
+
     }
 }

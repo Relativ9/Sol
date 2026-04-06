@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Hybrid_Abyssal_Plate
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Hybrid_Abyssal_Plate
+  displayName: Abyssal Plate
+  icon: {fileID: 21300000, guid: bb13a83a1a47ae5bcaebc8878e92e898, type: 3}
+  maxPoints: 1
+  description: 'Getting hit by magic damge while wearing plate armor has a 10% of
+    resetting all your cooldowns (exluding global cooldowns).  '
+  isActiveSkill: 0
+  isHybrid: 1
+  tier: 3.5
+  offset: 3
+  parentTree: {fileID: 11400000, guid: 0485021b290675a80a1ca6fe9afccb28, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: b88a7ade89b10146ea6bfc82ed865dbf, type: 2}
+  - {fileID: 11400000, guid: de4fbf0edc606939394c1d10572e57f9, type: 2}

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 587ea7690e98997d7907aec2de01be9e, type: 3}
+  m_Name: Sustained_Conjunction
+  m_EditorClassIdentifier: Assembly-CSharp::Sol.TalentNodeData
+  nodeId: Sustained_Conjunction
+  displayName: Sustained Conjunction
+  icon: {fileID: 21300000, guid: 00f0da42e2eab2838911db04f2bf7e44, type: 3}
+  maxPoints: 3
+  description: Void summons and conjurations last 20/30/50% longer.
+  isActiveSkill: 0
+  isHybrid: 0
+  tier: 2
+  offset: 1
+  parentTree: {fileID: 11400000, guid: 0485021b290675a80a1ca6fe9afccb28, type: 2}
+  prerequisites:
+  - {fileID: 11400000, guid: 0c9a6b166e2647f5999b609b83f4402b, type: 2}
