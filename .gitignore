@@ -75,3 +75,15 @@ push_log.txt
 
 # Unity Lighting Data - regenerated locally
 **/LightingData.asset
+
+# Unity Auto-Generated - regenerated locally
+**/LightingData.asset
+**/*.lighting
+**/Lightmap-*
+**/ReflectionProbe-*
+**/LightingData/
+Library/
+Temp/
+Logs/
+obj/
+*.suo
