@@ -283,20 +283,6 @@ namespace Sol
             }
         }
         
-        // if (context.started)
-        // {
-        //     ICombatController combatController = GetService<ICombatController>();
-        //     if (combatController != null)
-        //     {
-        //         combatController.ToggleWeaponState();
-        //         Debug.Log("Toggle weapon input received");
-        //     }
-        //     else
-        //     {
-        //         Debug.LogWarning("Toggle weapon input received but no combat controller found!");
-        //     }
-        // }
-        
         private IEnumerator ClearJumpPriority(float delay)
         {
             yield return new WaitForSeconds(delay);

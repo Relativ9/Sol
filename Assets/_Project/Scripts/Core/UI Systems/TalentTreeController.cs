@@ -12,27 +12,31 @@ namespace Sol
         private IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> _nodes;
         
         private Label _talentPointsLabel;
-        
-        private void Awake()
-        {
-            // var tooltipRoot = root.Q<VisualElement>("tooltip-root");
-            // _tooltipSystem = new TooltipSystem(tooltipRoot);
 
-        }
 
         void Start()
         {
             ServiceLocator.RegisterService<ITooltipSystem>(_tooltipSystem);
         }
         
-        public void Initialize(IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> nodes, VisualElement root)
+        public void Initialize(IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> nodes, VisualElement root, VisualTreeAsset tooltipTemplate)
         {   
             _statsService = ServiceLocator.Get<IStatsService>();
             _talentPointsLabel = root.Q<Label>("talent-points-label");
             _nodes = nodes; // CRITICAL: Store the reference
+            
+            var tooltipRoot = root.Q<VisualElement>("tooltip-root");
+            tooltipTemplate.CloneTree(tooltipRoot);
+            _tooltipSystem = new TooltipSystem(tooltipRoot);
 
             CheckSpentPoints();
             UpdatePointsDisplay();
+            
+            root.RegisterCallback<PointerMoveEvent>(evt => 
+            {
+                if (_tooltipSystem != null)
+                    _tooltipSystem.UpdatePosition(evt.position);
+            });
             
             foreach (var kvp in nodes)
             {
@@ -45,11 +49,12 @@ namespace Sol
                 if (data.maxPoints > 1) element.AddToClassList("multi-point");
                 
                 element.AddToClassList("talent-node");
-                element.RegisterCallback<ClickEvent>(evt => OnNodeClicked(evt, capturedNodeId));
+                element.RegisterCallback<PointerDownEvent>(evt => OnNodeClicked(evt, capturedNodeId));
+   
                 
                 // Optional: Tooltip handlers
-                element.RegisterCallback<MouseEnterEvent>(evt => ShowTooltip(data));
-                element.RegisterCallback<MouseLeaveEvent>(evt => HideTooltip());
+                element.RegisterCallback<PointerEnterEvent>(evt => ShowTooltip(data, evt.position));
+                element.RegisterCallback<PointerLeaveEvent>(evt => HideTooltip());
                 
                 UpdateNodeVisual(element, data);
             }
@@ -64,20 +69,20 @@ namespace Sol
                 _statsService.SpendTalentPoint();
         }
         
-        void OnNodeClicked(ClickEvent evt, string nodeId)
+        void OnNodeClicked(PointerDownEvent evt, string nodeId)
         {
-            evt.StopPropagation();
-            
             if (!_nodes.TryGetValue(nodeId, out var nodeInstance)) return;
             var data = nodeInstance.Data;
             var element = nodeInstance.Element;
             
             if (evt.button == 0) // Left click
             {
+                evt.StopPropagation();
                 TryAllocate(nodeId, data, element);
             }
-            else if (evt.button == 1) // Right click
+            else if (evt.button == 2) // Right click
             {
+                evt.StopPropagation();
                 TryRemove(nodeId, data, element);
             }
         }
@@ -211,10 +216,10 @@ namespace Sol
             }
         }
         
-        void ShowTooltip(TalentNodeDataSO data)
+        void ShowTooltip(TalentNodeDataSO data, Vector2 position)
         {
             // Stub - implement with your adapter
-            //_tooltipSystem.Show(new TalentNodeTooltipAdapter(data));
+            _tooltipSystem.Show(new TalentNodeTooltipAdapter(data), position);
         }
         
         void HideTooltip()

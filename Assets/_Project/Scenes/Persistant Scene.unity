@@ -6617,6 +6617,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 578510089}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &435630121
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 435630122}
+  - component: {fileID: 435630123}
+  m_Layer: 0
+  m_Name: VirtualCursorController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &435630122
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435630121}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1826156584}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &435630123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435630121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01751c472d74f2d5d8eee12523273327, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::VIrtualCursorController
+  _inputAsset: {fileID: -944628639613478452, guid: 1816fe33611e1194ca2ed5da4b003b17, type: 3}
+  _actionMapName: UI
+  _cursorSpeed: 800
+  _cursorTexture: {fileID: 2800000, guid: b750c8e4c3b4eea1387f299a50387a92, type: 3}
 --- !u!1 &446571575
 GameObject:
   m_ObjectHideFlags: 0
@@ -14825,8 +14873,6 @@ GameObject:
   - component: {fileID: 1676536041}
   - component: {fileID: 1676536040}
   - component: {fileID: 1676536039}
-  - component: {fileID: 1676536043}
-  - component: {fileID: 1676536042}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -14895,30 +14941,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1676536042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1676536038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a79c4e23d4d4b64bfa5fa9e6671a460, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UIElements.PanelRaycaster
---- !u!114 &1676536043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1676536038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a410b213209442fb15a69799f0240a5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UIElements.PanelEventHandler
 --- !u!4 &1685367198 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5472622940992281205, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -15283,6 +15305,7 @@ Transform:
   m_Children:
   - {fileID: 782325666}
   - {fileID: 1561581043}
+  - {fileID: 435630122}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1826156585
@@ -15302,6 +15325,7 @@ MonoBehaviour:
   _talentTreeSettings: {fileID: 11400000, guid: 3418f1081cad51d228ed8d36d73f1244, type: 2}
   _nodeTemplate: {fileID: 9197481963319205126, guid: 2b39f5ba8afc51833b5cd891c4d4d9e3, type: 3}
   _treeCollection: {fileID: 11400000, guid: fc1a0795214e979ae9fdee0522e9e733, type: 2}
+  _tooltipTemplate: {fileID: 9197481963319205126, guid: aa0e1ebaaba47e3bb98810e5a4fa13bc, type: 3}
 --- !u!114 &1826156586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15394,7 +15418,7 @@ MonoBehaviour:
     m_ActionName: 'UI/Right Click[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 4692c7df-3c79-4964-bd37-23349d0439ed
+  m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 1823688466}
 --- !u!114 &1826156588
@@ -16653,6 +16677,18 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: ce028a84-d2f5-4769-a2fe-a6a3b35b587f
     m_ActionName: 'Shared/New action[/Keyboard/k]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 43c6be22-d904-48fd-bbfc-2cd34bea9050
+    m_ActionName: 'UI/Point[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 7e973a24-76f3-4308-8e6e-9b097c6f9d93
+    m_ActionName: 'UI/Left Click[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4098a8a0-c407-40e2-9918-e677e1f16ca0
+    m_ActionName: 'UI/Right Click[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Main

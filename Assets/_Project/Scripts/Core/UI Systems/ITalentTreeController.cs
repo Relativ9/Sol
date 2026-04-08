@@ -3,7 +3,11 @@ using Sol;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-public interface ITalentTreeController
+namespace Sol
 {
-    void Initialize(IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> nodes, VisualElement root);
+    public interface ITalentTreeController
+    {
+        void Initialize(IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> nodes, VisualElement root, VisualTreeAsset tooltipTemplate);
+    }
 }
+

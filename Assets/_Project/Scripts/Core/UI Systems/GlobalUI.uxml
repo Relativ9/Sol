@@ -1,31 +1,3 @@
-<!--<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">-->
-<!--    <ui:VisualElement name="ui-root" -->
-<!--                      style="width: 100%; height: 100%; position: absolute;">-->
-<!--        -->
-<!--        &lt;!&ndash; HUD goes here later &ndash;&gt;-->
-<!--        <ui:VisualElement name="hud-root" -->
-<!--                          style="width: 100%; height: 100%; position: absolute;" />-->
-
-<!--        &lt;!&ndash; Talent wheel panel, initially hidden &ndash;&gt;-->
-<!--        <ui:VisualElement name="talent-wheel-root" -->
-<!--                          style="visibility: visible; width: 100%; height: 100%; position: absolute; display: none;">-->
-<!--            -->
-<!--            &lt;!&ndash; Your existing wheel content goes here &ndash;&gt;-->
-<!--            <ui:VisualElement name="wheel-container" -->
-<!--                              style="flex-grow: 0; width: 90%; height: 90%; -->
-<!--                position: relative; justify-content: center; -->
-<!--                align-self: center; align-items: center;-->
-<!--                flex-direction: row; flex-shrink: 0;" />-->
-<!--                -->
-<!--        </ui:VisualElement>-->
-
-<!--        &lt;!&ndash; Tooltip always last so it renders on top of everything &ndash;&gt;-->
-<!--        <ui:VisualElement name="tooltip-root" -->
-<!--                          style="position: absolute; display: none;" />-->
-
-<!--    </ui:VisualElement>-->
-<!--</ui:UXML>-->
-
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="ui-root" style="width: 100%; height: 100%; position: absolute;">
         

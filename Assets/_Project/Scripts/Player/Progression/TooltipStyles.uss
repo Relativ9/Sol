@@ -2,6 +2,7 @@
     transition-duration: 0.15s;
     opacity: 0.8;
     transition-timing-function: ease;
+    pointer-events: none;
 }
 
 #tooltip-title {

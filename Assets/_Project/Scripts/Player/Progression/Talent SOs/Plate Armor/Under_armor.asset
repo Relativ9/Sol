@@ -15,9 +15,11 @@ MonoBehaviour:
   nodeId: Under_Armor
   displayName: Under Armor
   icon: {fileID: 21300000, guid: 8c5eff95c3b1564c793aa111c52dd611, type: 3}
-  maxPoints: 3
-  description: Soft protection your plate protect you from small knives, decreasing
-    bleed chance by 20/30/40%.
+  maxPoints: 2
+  description: Soft protection under your plate protect you from small knives, decreasing
+    bleed chance by 20/40%.
+  isActiveSkill: 0
+  allocatedPoints: 0
   isHybrid: 0
   tier: 7
   offset: 2

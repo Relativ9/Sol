@@ -15,9 +15,11 @@ MonoBehaviour:
   nodeId: Big_Swing
   displayName: Big Swing
   icon: {fileID: 21300000, guid: 45d905ab4c966dee59f57f5c3b8606b0, type: 3}
-  maxPoints: 1
+  maxPoints: 2
   description: Wielding 2 Handed Weapons while wearing full Plate Armor increases
-    the stagger effect when hitting an enemy by 20/30/40%.
+    the stagger effect when hitting an enemy by 20/30%
+  isActiveSkill: 0
+  allocatedPoints: 0
   isHybrid: 0
   tier: 9
   offset: 2

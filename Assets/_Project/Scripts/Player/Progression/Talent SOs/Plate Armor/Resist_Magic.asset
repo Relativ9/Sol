@@ -15,8 +15,10 @@ MonoBehaviour:
   nodeId: Resist_Magic
   displayName: Resist Magic
   icon: {fileID: 21300000, guid: 458691302223ef6ba8d4bf17f5ccdf32, type: 3}
-  maxPoints: 3
-  description: 'Increases resistance to all but Sonic magic by 15/25/40%. '
+  maxPoints: 2
+  description: 'Increases resistance to all but Sonic magic by 15/30%. '
+  isActiveSkill: 0
+  allocatedPoints: 0
   isHybrid: 0
   tier: 9
   offset: -2

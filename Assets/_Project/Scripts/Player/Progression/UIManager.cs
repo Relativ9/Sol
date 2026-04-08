@@ -19,8 +19,10 @@ namespace Sol
         [SerializeField] private VisualTreeAsset _nodeTemplate;
         [SerializeField] private TreeLayoutCollectionSO _treeCollection;
         
+        [SerializeField] private VisualTreeAsset _tooltipTemplate;
         private ITalentTreeGenerator _talentTreeGenerator;
         private TooltipSystem _tooltipSystem;
+        private IVirtualCursor _virtualCursor;
         
         void Awake()
         {
@@ -32,10 +34,15 @@ namespace Sol
         private void Start()
         {
             if (_document == null) _document = GetComponentInChildren<UIDocument>();
-            
+            _virtualCursor = ServiceLocator.Get<IVirtualCursor>();
             _uiStateService = ServiceLocator.Get<IUIStateService>();
+    
+            // Register the document BEFORE any panels open
+            _virtualCursor?.RegisterDocument(_document);
             
-            var element = _document.rootVisualElement.Q("talent-wheel-root"); // Q() not Query()
+            Debug.LogError($"[UIManager] Got cursor instance: {_virtualCursor.GetHashCode()}");
+    
+            var element = _document.rootVisualElement.Q("talent-wheel-root");
             _panels["talent-wheel-root"] = element;
         }
 
@@ -58,6 +65,8 @@ namespace Sol
 
         public void OpenPanel(string panelName)
         {
+            _virtualCursor?.SetActiveDocument(_document);
+            Debug.LogError($"[UIManager] OpenPanel - virtualCursor null={_virtualCursor == null}, document null={_document == null}");
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
                 panel.style.display = DisplayStyle.Flex;
@@ -66,7 +75,7 @@ namespace Sol
                 {
                     _talentTreeGenerator.Generate();
                     var controller = gameObject.AddComponent<TalentTreeController>(); // Or use existing one
-                    controller.Initialize(_talentTreeGenerator.GetNodeRegistry(), _document.rootVisualElement);
+                    controller.Initialize(_talentTreeGenerator.GetNodeRegistry(), _document.rootVisualElement, _tooltipTemplate);
                 });
                 
             }

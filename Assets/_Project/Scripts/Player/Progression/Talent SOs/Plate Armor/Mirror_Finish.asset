@@ -15,9 +15,11 @@ MonoBehaviour:
   nodeId: Mirror_Finish
   displayName: Mirror Finish
   icon: {fileID: 21300000, guid: e79a34999bcdbb17b8ec30b9fc302942, type: 3}
-  maxPoints: 3
-  description: 'Resisted magic has a 10/15/20% chance of being reflected back at
-    the caster instead. '
+  maxPoints: 1
+  description: 'Resisted magic has a 15% chance of being reflected back at the caster
+    instead. '
+  isActiveSkill: 0
+  allocatedPoints: 0
   isHybrid: 0
   tier: 10
   offset: -1

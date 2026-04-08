@@ -16,8 +16,10 @@ MonoBehaviour:
   displayName: Thorns
   icon: {fileID: 21300000, guid: ea5c53b91a83c30cab3538ebabec8fce, type: 3}
   maxPoints: 1
-  description: 'All Melee attacks against you hurts the attacker for 20% of your
+  description: 'All Melee attacks against you hurts the attacker for 15% of your
     armor rating. '
+  isActiveSkill: 0
+  allocatedPoints: 0
   isHybrid: 0
   tier: 8
   offset: 1
