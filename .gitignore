@@ -72,3 +72,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 push_log.txt
+
+# Unity Lighting Data - regenerated locally
+**/LightingData.asset
