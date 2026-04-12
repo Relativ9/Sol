@@ -630,10 +630,10 @@ MonoBehaviour:
   moonPhase: 0.2
   moonPhaseRotation: 0
   earthshine: 1
-  flareSize: 4.5
+  flareSize: 2.5
   flareTint: {r: 0.5058824, g: 0.95294124, b: 1, a: 1}
   flareFalloff: 4
-  flareMultiplier: 1
+  flareMultiplier: 0.2
   surfaceTexture: {fileID: 0}
   surfaceTint: {r: 0.504717, g: 0.95311946, b: 1, a: 1}
   m_Distance: 1
@@ -669,8 +669,8 @@ MonoBehaviour:
   m_MaxDepthBias: 0.001
   m_ShadowResolution:
     m_Override: 512
-    m_UseOverride: 1
-    m_Level: 0
+    m_UseOverride: 0
+    m_Level: 2
   m_ShadowDimmer: 1
   m_VolumetricShadowDimmer: 0.221
   m_ShadowFadeDistance: 10000
@@ -1503,6 +1503,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 309453129}
+  - component: {fileID: 309453130}
   m_Layer: 0
   m_Name: CameraFollow
   m_TagString: Untagged
@@ -1518,13 +1519,32 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 309453128}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.019, y: 0.067, z: 0.041}
+  m_LocalRotation: {x: 0.000000029802322, y: -0.00000010896474, z: 0.000000029682269, w: 1}
+  m_LocalPosition: {x: -0.018999984, y: 0.066999935, z: 0.04100004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 955429714}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &309453130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 309453128}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d581465821a61f67e9e73f61d088d68e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::CameraFollowObject
+  _headBone: {fileID: 955429714}
+  _verticalSmoothTime: 0.4
+  _maxVerticalOffset: 1
+  _onlyDampenUpward: 1
+  _smoothedY: 0
+  _yVelocity: 0
+  _initialised: 0
 --- !u!1 &315526942
 GameObject:
   m_ObjectHideFlags: 0
@@ -9109,7 +9129,7 @@ MonoBehaviour:
     Enabled: 0
     m_Value: 0
   OutputChannel: 1
-  StandbyUpdate: 2
+  StandbyUpdate: 1
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
@@ -9147,12 +9167,12 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b617507da6d07e749b7efdb34e1173e1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
   TrackerSettings:
     BindingMode: 4
     PositionDamping: {x: 0, y: 0, z: 0}
-    AngularDampingMode: 1
-    RotationDamping: {x: 1, y: 1, z: 1}
+    AngularDampingMode: 0
+    RotationDamping: {x: 0, y: 0, z: 0}
     QuaternionDamping: 1
   FollowOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1428497753
@@ -9322,10 +9342,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _worldTimeData: {fileID: 11400000, guid: 7f3a3ebdbd5da5f45adddde98d687f39, type: 2}
-  _startingTimeOfDay: 0.35
+  _startingTimeOfDay: 0.4
   _startingDay: 320
   _startingYear: 1
-  _celestialTimeScale: 500
+  _celestialTimeScale: 20
   _isPaused: 0
   _onDayChanged: {fileID: 11400000, guid: 727d73a369cc46e17ab6b3a4dde14c90, type: 2}
   _onSeasonChanged: {fileID: 11400000, guid: 28100ae44fcb65decb9537b51cf5c7bb, type: 2}
@@ -16780,8 +16800,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _checkPoint: {fileID: 0}
-  _checkRadius: 0.2
-  _checkDistance: 0.3
+  _checkRadius: 0.3
+  _checkDistance: 0.4
   _groundLayer:
     serializedVersion: 2
     m_Bits: 55
@@ -16877,7 +16897,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4383e27ef4e694a4694c8b8a45d4b27c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sensitivity: 10
+  _sensitivity: 2
   _invertY: 0
   _lockCursorOnStart: 1
   _cinemachineCamera: {fileID: 1427533668}
