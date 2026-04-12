@@ -23,6 +23,16 @@ namespace Sol
         [Header("Air Movement")]
         [SerializeField] private float _airDeceleration = 0.5f; // Much lower deceleration in air
         
+        [Header("Slope Settings")]
+        [SerializeField] private float _slopeAlignmentStrength = 1f;   // 0 = flat, 1 = fully slope-aligned
+        [SerializeField] private float _maxWalkableSlopeAngle = 45f;   // Steeper than this = slide, not walk
+        
+        [Header("Ground Stickiness")]
+        [SerializeField] private float _groundStickyForce = 15f;        // Downward force while grounded
+        [SerializeField] private float _groundStickyMaxUpVelocity = 0.5f; // Only suppress upward vel below this
+        [SerializeField] private float _ungroundedDelay = 0.08f;        // Seconds before stickiness turns off
+        private float _timeSinceGrounded = 0f;
+        
         // Dependencies
         private IPlayerContext _context;
         private IStatsService _statsService;
@@ -186,105 +196,131 @@ namespace Sol
         }
         
         public void ProcessMovement()
+    {
+        if (_rigidbody == null) return;
+
+        bool jumpHasPriority = _context.GetStateValue<bool>("JumpPriority", false);
+        if (jumpHasPriority) return;
+
+        bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded :
+                          _context.GetStateValue<bool>("IsGrounded", false);
+        bool isGroundedStrict = _groundChecker != null ? _groundChecker.IsGroundedStrict : isGrounded;
+
+        Vector3 currentVelocity = _rigidbody.linearVelocity;
+        Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
+
+        // --- Track time since we were strictly grounded (for stickiness) ---
+        if (isGroundedStrict)
+            _timeSinceGrounded = 0f;
+        else
+            _timeSinceGrounded += Time.fixedDeltaTime;
+
+        bool withinStickyWindow = _timeSinceGrounded <= _ungroundedDelay;
+
+        if (isGrounded && _isActive)
         {
-            if (_rigidbody == null) return;
-            
-            // Check if jump has priority
-            bool jumpHasPriority = _context.GetStateValue<bool>("JumpPriority", false);
-            if (jumpHasPriority) return; // Don't modify velocity during jump priority period
-            
-            // Check if grounded
-            bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded :
-                            _context.GetStateValue<bool>("IsGrounded", false);
-            
-            // Get current velocity
-            Vector3 currentVelocity = _rigidbody.linearVelocity;
-            Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
-            
-            // Only process movement input if grounded and active
-            if (isGrounded && _isActive)
+            float targetSpeed = _statsService != null ? _statsService.GetStat("moveSpeed") : _defaultSpeed;
+            float deceleration = _statsService != null ? _statsService.GetStat("deceleration") : _defaultDeceleration;
+            _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
+
+            // Get the blended ground normal (current + look-ahead)
+            Vector3 groundNormal = _groundChecker != null
+                ? _groundChecker.GetSmoothedGroundNormal()
+                : Vector3.up;
+
+            float slopeAngle = Vector3.Angle(Vector3.up, groundNormal);
+            bool isWalkableSlope = slopeAngle <= _maxWalkableSlopeAngle;
+
+            if (_hasMoveInput && isWalkableSlope)
             {
-                // Get target speed from stats service
-                float targetSpeed = _statsService != null
-                    ? _statsService.GetStat("moveSpeed")
-                    : _defaultSpeed;
-                
-                float deceleration = _statsService != null
-                    ? _statsService.GetStat("deceleration")
-                    : _defaultDeceleration;
-                
-                // Smoothly transition to the target speed
-                _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
-                
-                if (_hasMoveInput)
+                float speedMultiplier = _isMovingBackward ? _backwardSpeedMultiplier : 1.0f;
+
+                // Flat movement direction
+                Vector3 flatDirection = _moveDirection;
+
+                // Project onto slope plane — this is the key fix
+                // The velocity now naturally follows the terrain contour
+                Vector3 slopeDirection = Vector3.ProjectOnPlane(flatDirection, groundNormal).normalized;
+
+                // Blend between flat and slope-aligned based on strength setting
+                Vector3 finalDirection = Vector3.Slerp(flatDirection, slopeDirection, _slopeAlignmentStrength);
+
+                Vector3 targetVelocity = finalDirection * (_currentSpeed * speedMultiplier);
+
+                // *** Only preserve Y velocity if it's downward or we are on a slope going down ***
+                // This prevents the upward launch at slope crests
+                float newY = currentVelocity.y;
+                if (newY > _groundStickyMaxUpVelocity && isGroundedStrict)
                 {
-                    // Apply backward movement multiplier if moving backward
-                    float speedMultiplier = _isMovingBackward ? _backwardSpeedMultiplier : 1.0f;
-                    
-                    // Calculate target velocity based on input direction and interpolated speed
-                    Vector3 targetVelocity = _moveDirection * (_currentSpeed * speedMultiplier);
-                    
-                    // Apply the new velocity directly to the rigidbody
+                    // Clamp upward velocity while grounded — kills the "hop"
+                    newY = Mathf.Lerp(newY, 0f, Time.fixedDeltaTime * 20f);
+                }
+
+                _rigidbody.linearVelocity = new Vector3(
+                    targetVelocity.x,
+                    targetVelocity.y != 0 ? targetVelocity.y : newY, // Use slope Y if projected, else clamped
+                    targetVelocity.z
+                );
+            }
+            else if (!_hasMoveInput && horizontalVelocity.magnitude > 0.1f)
+            {
+                // Deceleration — unchanged from your original
+                float reductionAmount = deceleration * Time.fixedDeltaTime;
+                float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - reductionAmount);
+
+                if (newMagnitude > 0.1f)
+                {
+                    Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
                     _rigidbody.linearVelocity = new Vector3(
-                        targetVelocity.x,
+                        deceleratedVelocity.x,
                         currentVelocity.y,
-                        targetVelocity.z
+                        deceleratedVelocity.z
                     );
                 }
-                else if (horizontalVelocity.magnitude > 0.1f)
+                else
                 {
-                    // Calculate how much to reduce velocity this frame
-                    float reductionAmount = deceleration * Time.fixedDeltaTime;
-                    float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - reductionAmount);
-                    
-                    if (newMagnitude > 0.1f)
-                    {
-                        // Apply reduced velocity in the same direction
-                        Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
-                        
-                        _rigidbody.linearVelocity = new Vector3(
-                            deceleratedVelocity.x,
-                            currentVelocity.y,
-                            deceleratedVelocity.z
-                        );
-                    }
-                    else
-                    {
-                        // Below threshold, stop horizontal movement completely
-                        _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
-                    }
+                    _rigidbody.linearVelocity = new Vector3(0, currentVelocity.y, 0);
                 }
             }
-            else if (!isGrounded)
+
+            // --- Stickiness force: pushes player into the ground while grounded ---
+            // Counters accumulated upward physics from slope collision responses
+            if (withinStickyWindow)
             {
-                // In air - apply very minimal deceleration to preserve momentum
-                // but still have some air resistance
-                if (horizontalVelocity.magnitude > 0.1f)
-                {
-                    float airReductionAmount = _airDeceleration * Time.fixedDeltaTime;
-                    float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - airReductionAmount);
-                    
-                    if (newMagnitude > 0.1f)
-                    {
-                        // Apply very slight deceleration in air
-                        Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
-                        
-                        _rigidbody.linearVelocity = new Vector3(
-                            deceleratedVelocity.x,
-                            currentVelocity.y,
-                            deceleratedVelocity.z
-                        );
-                    }
-                }
-                
-                // Update the context with our current state
-                _context.SetStateValue("IsInAir", true);
+                _rigidbody.AddForce(Vector3.down * _groundStickyForce, ForceMode.Acceleration);
             }
-            
-            // Update the context with our current state
-            _context.SetStateValue("IsInAir", !isGrounded);
+
+            // Tell the look-ahead which way we're heading
+            if (_groundChecker != null && _hasMoveInput)
+            {
+                _groundChecker.SetLookAheadDirection(_moveDirection);
+            }
         }
-        
+        else if (!isGrounded)
+        {
+            // Air movement — your existing code unchanged
+            if (horizontalVelocity.magnitude > 0.1f)
+            {
+                float airReductionAmount = _airDeceleration * Time.fixedDeltaTime;
+                float newMagnitude = Mathf.Max(0, horizontalVelocity.magnitude - airReductionAmount);
+
+                if (newMagnitude > 0.1f)
+                {
+                    Vector3 deceleratedVelocity = horizontalVelocity.normalized * newMagnitude;
+                    _rigidbody.linearVelocity = new Vector3(
+                        deceleratedVelocity.x,
+                        currentVelocity.y,
+                        deceleratedVelocity.z
+                    );
+                }
+            }
+
+            _context.SetStateValue("IsInAir", true);
+        }
+
+        _context.SetStateValue("IsInAir", !isGrounded);
+    }
+
         private Vector3 CalculateStrafingDirection(Vector2 input)
         {
             // If we have a camera controller, use it

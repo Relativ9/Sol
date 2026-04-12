@@ -85,10 +85,15 @@ public class VirtualCursor : IVirtualCursor
     
         if (document == null)
         {
-            _activeDocument = null;
-            HideCursor();
+            _cursorElement?.RemoveFromHierarchy();
+            UnityEngine.Cursor.visible = false;
+            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             return;
         }
+        // Hide OS cursor - virtual cursor takes over
+        UnityEngine.Cursor.visible = false;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        
         _activeDocument = document;
         Debug.Log($"[VirtualCursor] _activeDocument set to: {_activeDocument.name}");
     
@@ -134,18 +139,6 @@ public class VirtualCursor : IVirtualCursor
             Debug.Log($"[VirtualCursor] Skipping - enabled={_isEnabled} doc={_activeDocument?.name}");
             return;
         }
-        // // Auto-detect physical mouse usage
-        // if (_input.IsMouseBeingUsed())
-        // {
-        //     HandleMouseTakeover();
-        //     return;
-        // }
-        //
-        // // We have gamepad input - ensure cursor is active
-        // if (_input.GetMovementDelta().magnitude > MOUSE_DETECTION_THRESHOLD)
-        // {
-        //     ShowCursor();
-        // }
 
         ShowCursor();
         // Update position based on analog input
@@ -191,26 +184,18 @@ public class VirtualCursor : IVirtualCursor
         }
     }
 
-    /// <summary>
-    /// Moves the cursor based on analog stick input.
-    /// Operates in screen space, then converts to panel space for rendering.
-    /// </summary>
     private void UpdatePosition(float deltaTime)
     {
         Vector2 input = _input.GetMovementDelta();
-        
-        // Scale input by speed and frame time for consistent movement
+    
         Vector2 delta = input * _speed * deltaTime;
-        _currentPosition += delta;
-
-        // Clamp to screen bounds
+    
+        _currentPosition.x += delta.x;
+        _currentPosition.y -= delta.y; // Flip Y: mouse delta is bottom-up, screen position tracks top-down
+    
         _currentPosition.x = Mathf.Clamp(_currentPosition.x, 0, Screen.width);
         _currentPosition.y = Mathf.Clamp(_currentPosition.y, 0, Screen.height);
-
-        // Convert screen position to panel space for UI Toolkit
         Vector2 panelPosition = GetPanelPosition();
-
-        // Update visual element position (centered on the point)
         _cursorElement.style.left = panelPosition.x - CURSOR_OFFSET;
         _cursorElement.style.top = panelPosition.y - CURSOR_OFFSET;
     }
@@ -222,14 +207,17 @@ public class VirtualCursor : IVirtualCursor
     /// <returns>Position in panel space (0,0 at top-left of document)</returns>
     private Vector2 GetPanelPosition()
     {
-        if (_activeDocument?.panelSettings == null)
+        if (_activeDocument?.rootVisualElement?.panel == null)
             return _currentPosition;
-        float scale = _activeDocument.panelSettings.scale;
-    
-        // Flip Y: Screen space is bottom-up, UI Toolkit panel space is top-down
-        float flippedY = Screen.height - _currentPosition.y;
-    
-        return new Vector2(_currentPosition.x / scale, flippedY / scale);
+        // RuntimePanelUtils handles all coordinate space conversions:
+        // - Screen resolution vs panel resolution
+        // - PanelSettings scale modes
+        // - Panel offset and padding
+        return RuntimePanelUtils.ScreenToPanel(
+            _activeDocument.rootVisualElement.panel,
+            _currentPosition
+        );
+
     }
 
     /// <summary>
@@ -245,26 +233,14 @@ public class VirtualCursor : IVirtualCursor
     {
         Vector2 panelPos = GetPanelPosition();
         VisualElement hoveredElement = PickElement(_activeDocument.rootVisualElement, panelPos);
-
-        // Handle enter/leave transitions
         if (hoveredElement != _lastHoveredElement)
         {
-            // Leave previous element
-            if (_lastHoveredElement != null)
-            {
-                SendPointerLeave(_lastHoveredElement, panelPos);
-            }
-
-            // Enter new element
-            if (hoveredElement != null)
-            {
-                SendPointerEnter(hoveredElement, panelPos);
-            }
-
+            // DO NOT send PointerEnterEvent or PointerLeaveEvent - they crash
+            // due to PreDispatch accessing panel.cursorManager with unset pointerId
+            // USS :hover handles visual feedback automatically
             _lastHoveredElement = hoveredElement;
         }
-
-        // Continuous move events for tracking (used by tooltips for position updates)
+        // Move events are safe - only send those
         if (hoveredElement != null)
         {
             SendPointerMove(hoveredElement, panelPos);

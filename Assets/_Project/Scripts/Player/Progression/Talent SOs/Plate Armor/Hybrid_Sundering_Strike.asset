@@ -16,10 +16,10 @@ MonoBehaviour:
   displayName: Sundering Stryke
   icon: {fileID: 21300000, guid: b750c8e4c3b4eea1387f299a50387a92, type: 3}
   maxPoints: 1
-  description: 'Active Skill: Swing your mace with all your strength sundering the
-    enemies armor by 20% for 20 seconds. This effect stacks.'
+  description: Swing your mace with all your strength sundering the enemies armor
+    by 20% for 20 seconds. This effect stacks.
   isActiveSkill: 1
-  allocatedPoints: 1
+  allocatedPoints: 0
   isHybrid: 1
   tier: 3.5
   offset: 3

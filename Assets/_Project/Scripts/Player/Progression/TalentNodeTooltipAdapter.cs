@@ -17,7 +17,7 @@ namespace Sol
 
         public string Title => _data.displayName;
         public string Description => _data.description;
-        public string SubText => _data.isActiveSkill ? $"Active Skill | Max Points : {_data.maxPoints}" : $"Max Points: {_data.maxPoints}";
+        public string SubText => _data.isActiveSkill ? $"Active | Max Points : {_data.maxPoints}" : $"Passive | Max Points: {_data.maxPoints}";
         public Sprite Icon => _data.icon;
         public Color IconColor => _data.parentTree != null ? _data.parentTree.treeColor : Color.white;
     }

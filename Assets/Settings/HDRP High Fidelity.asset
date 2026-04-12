@@ -210,7 +210,7 @@ MonoBehaviour:
   m_PrefilterUseLegacyLightmaps: 0
   m_PrefilterUseLightmapBicubicSampling: 0
   m_RenderPipelineSettings:
-    supportShadowMask: 0
+    supportShadowMask: 1
     supportSSR: 0
     supportSSRTransparent: 0
     supportSSAO: 1
@@ -331,7 +331,7 @@ MonoBehaviour:
         useDynamicViewportRescale: 0
       cachedPunctualLightShadowAtlas: 4096
       cachedAreaLightShadowAtlas: 4096
-      allowDirectionalMixedCachedShadows: 0
+      allowDirectionalMixedCachedShadows: 1
       shadowResolutionDirectional:
         m_Values: 00020000000400000008000000100000
         m_SchemaId:
@@ -347,7 +347,7 @@ MonoBehaviour:
       maxDirectionalShadowMapResolution: 4096
       maxPunctualShadowMapResolution: 4096
       maxAreaShadowMapResolution: 4096
-      supportScreenSpaceShadows: 0
+      supportScreenSpaceShadows: 1
       maxScreenSpaceShadowSlots: 4
       screenSpaceShadowBufferFormat: 48
     decalSettings:

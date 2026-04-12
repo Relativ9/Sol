@@ -44,7 +44,7 @@ public class CursorInputActionMap : ICursorInput, IDisposable
 
         if (_moveAction == null || _primaryAction == null || _secondaryAction == null)
         {
-            Debug.LogError($"Missing required actions. Need: {MOVE_ACTION_NAME}, {PRIMARY_ACTION_NAME}, {SECONDARY_ACTION_NAME}");
+            Debug.Log($"Missing required actions. Need: {MOVE_ACTION_NAME}, {PRIMARY_ACTION_NAME}, {SECONDARY_ACTION_NAME}");
         }
 
         Enable();

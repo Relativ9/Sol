@@ -38,7 +38,7 @@ namespace Sol
             _input = new CursorInputActionMap(_inputAsset);
             _cursor = new VirtualCursor(_input, _cursorStyleSheet, _cursorSpeed);
     
-            Debug.LogError($"[VirtualCursorController] Registering cursor instance: {_cursor.GetHashCode()}");
+            Debug.Log($"[VirtualCursorController] Registering cursor instance: {_cursor.GetHashCode()}");
             ServiceLocator.RegisterService<IVirtualCursor>(_cursor);
         }
 

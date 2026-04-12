@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bdd632e0a40379459148d4013ed9619, type: 3}
   m_Name: Jor World Time Data
   m_EditorClassIdentifier: 
-  dayLengthInSeconds: 72000
-  totalDaysInYear: 832
   hoursPerDay: 20
   minutesPerHour: 60
   secondsPerMinute: 60
+  timeScale: 10
+  totalDaysInYear: 832
   seasons:
   - seasonName: Gro
     lengthInDays: 156
     seasonalData: {fileID: 11400000, guid: 29e7a8a457f9e0947af0e330c35bf3ff, type: 2}
-    overrideAmbientColors: 1
+    overrideAmbientColors: 0
     seasonDayAmbient: {r: 0.23057711, g: 1, b: 0.16509432, a: 0}
     seasonNightAmbient: {r: 0.6511626, g: 0, b: 1, a: 0}
     seasonColor: {r: 0.31062692, g: 0.7830189, b: 0.28439835, a: 1}

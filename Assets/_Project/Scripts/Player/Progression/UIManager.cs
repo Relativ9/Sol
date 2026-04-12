@@ -36,11 +36,11 @@ namespace Sol
             if (_document == null) _document = GetComponentInChildren<UIDocument>();
             _virtualCursor = ServiceLocator.Get<IVirtualCursor>();
             _uiStateService = ServiceLocator.Get<IUIStateService>();
-    
-            // Register the document BEFORE any panels open
-            _virtualCursor?.RegisterDocument(_document);
             
-            Debug.LogError($"[UIManager] Got cursor instance: {_virtualCursor.GetHashCode()}");
+            //Ensure virtual cursor is disabled on start
+            _virtualCursor?.UnregisterDocument(_document);
+            
+            Debug.Log($"[UIManager] Got cursor instance: {_virtualCursor.GetHashCode()}");
     
             var element = _document.rootVisualElement.Q("talent-wheel-root");
             _panels["talent-wheel-root"] = element;
@@ -51,14 +51,10 @@ namespace Sol
             if (IsPanelOpen(panelName))
             {
                 ClosePanel(panelName);
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
             }
             else
             {
                 OpenPanel(panelName);
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
             }
             ServiceLocator.Get<ITimeManager>().TogglePause();
         }
@@ -66,7 +62,7 @@ namespace Sol
         public void OpenPanel(string panelName)
         {
             _virtualCursor?.SetActiveDocument(_document);
-            Debug.LogError($"[UIManager] OpenPanel - virtualCursor null={_virtualCursor == null}, document null={_document == null}");
+            Debug.Log($"[UIManager] OpenPanel - virtualCursor null={_virtualCursor == null}, document null={_document == null}");
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
                 panel.style.display = DisplayStyle.Flex;
@@ -83,6 +79,7 @@ namespace Sol
 
         public void ClosePanel(string panelName)
         {
+            _virtualCursor?.UnregisterDocument(_document);
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
                 panel.style.display = DisplayStyle.None;

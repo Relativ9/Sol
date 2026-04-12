@@ -1,51 +1,40 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
-using System.Collections;
 
 namespace Sol
 {
+    /// <summary>
+    /// Validates and owns the Sky and Fog Volume.
+    /// Exposes ApplyRotation so CelestialRotator can drive the space skybox
+    /// rotation using the same calculated Quaternion as the sun transform.
+    /// </summary>
     public class SkyAndFogController : MonoBehaviour
     {
-        public Volume skyAndFogVolume; // Reference to the Sky and Fog Volume
-        public float rotationSpeed = 10f; // Speed of rotation along the Y-axis (degrees per second)
-        private PhysicallyBasedSky physicallyBasedSky;
-        void Start()
+        [SerializeField] private Volume skyAndFogVolume;
+
+        private PhysicallyBasedSky _physicallyBasedSky;
+
+        private void Start()
         {
-            // Ensure the Volume and the Physically Based Sky are correctly set up
-            if (skyAndFogVolume != null && skyAndFogVolume.profile != null)
+            if (skyAndFogVolume == null || skyAndFogVolume.profile == null)
             {
-                if (skyAndFogVolume.profile.TryGet(out physicallyBasedSky))
-                {
-                    // Successfully obtained the Physically Based Sky component
-                    Debug.Log("Physically Based Sky found in the Sky and Fog Volume.");
-                }
-                else
-                {
-                    Debug.LogError("No Physically Based Sky found in the Sky and Fog Volume profile. Please assign a Physically Based Sky in the Volume.");
-                }
+                Debug.LogError("[SkyAndFogController] Sky and Fog Volume or its profile is not assigned.");
+                return;
             }
-            else
+
+            if (!skyAndFogVolume.profile.TryGet(out _physicallyBasedSky))
             {
-                Debug.LogError("Sky and Fog Volume or its profile is not assigned.");
+                Debug.LogError("[SkyAndFogController] No PhysicallyBasedSky found in the Volume profile.");
             }
         }
-        void Update()
+
+        public void ApplyRotation(Quaternion rotation)
         {
-            if (physicallyBasedSky != null)
-            {
-                // Get the current space rotation
-                Vector3 currentRotation = physicallyBasedSky.spaceRotation.value;
-                // Increment the Y (yaw) rotation value over time
-                currentRotation.y += rotationSpeed * Time.deltaTime;
-                // Optional: Wrap the value between 0 and 360 degrees
-                if (currentRotation.y >= 360f)
-                    currentRotation.y -= 360f;
-                else if (currentRotation.y < 0f)
-                    currentRotation.y += 360f;
-                // Apply the updated rotation back to the Physically Based Sky
-                physicallyBasedSky.spaceRotation.value = currentRotation;
-            }
+            if (_physicallyBasedSky == null)
+                return;
+
+            _physicallyBasedSky.spaceRotation.value = rotation.eulerAngles;
         }
     }
 }

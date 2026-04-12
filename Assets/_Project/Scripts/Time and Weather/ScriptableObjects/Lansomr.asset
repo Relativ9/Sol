@@ -12,27 +12,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b5ddc91ae69d0d49bae5d2b3a467d92, type: 3}
   m_Name: Lansomr
   m_EditorClassIdentifier: 
+  seasonName: New Season
   stars:
   - name: Sol
     active: 1
-    overrideOrbitalAngle: 0
+    overrideOrbitalAngle: 1
     yAxisEnabled: 1
     yAxisSpeed: 0.25
     yAxisOverrideSpeed: 1
     orbitalAngle: 45
-    baseElevation: 228
+    baseElevation: 145
     orbitalPeriod: 1
     phaseOffset: 0
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
   - name: Notr
     active: 1
-    overrideOrbitalAngle: 0
+    overrideOrbitalAngle: 1
     yAxisEnabled: 1
     yAxisSpeed: 0.25
     yAxisOverrideSpeed: 1
-    orbitalAngle: 60
-    baseElevation: 210
+    orbitalAngle: 45
+    baseElevation: 215
     orbitalPeriod: 1
     phaseOffset: 0
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
   moons:
   - name: Iskarn
     active: 1
@@ -44,25 +69,71 @@ MonoBehaviour:
     baseElevation: 197.6
     orbitalPeriod: 104
     phaseOffset: 200
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
   - name: Rynth
     active: 1
     overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisSpeed: 0.15
+    yAxisSpeed: 1
     yAxisOverrideSpeed: 0
     orbitalAngle: 45
     baseElevation: 185.7
     orbitalPeriod: 178
     phaseOffset: 120
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
   - name: Veldris
     active: 1
     overrideOrbitalAngle: 0
     yAxisEnabled: 1
-    yAxisSpeed: 0.15
+    yAxisSpeed: 2
     yAxisOverrideSpeed: 0
     orbitalAngle: 45
     baseElevation: 135.3
     orbitalPeriod: 356
     phaseOffset: 180
+    hasDirectionalLight: 1
+    useColorTemperature: 1
+    lightTemperature: 6500
+    lightColor: {r: 1, g: 1, b: 1, a: 1}
+    lightIntensity: 100000
+    castShadows: 1
+    angularDiameter: 0.53
+    surfaceColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    flareSize: 1
+    flareFalloff: 10
+    flareBrightness: 2
+    surfaceTexture: {fileID: 0}
   useCommonOrbitalAngle: 1
   commonOrbitalAngle: 23.5
+  dayAmbientColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  nightAmbientColor: {r: 0.1, g: 0.1, b: 0.2, a: 1}
+  skyExposure: 1
+  fogDensity: 0.01
+  fogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  cloudDensityMin: -0.5
+  cloudDensityMax: 0.6
+  cloudDensityLerpSpeed: 0.05
+  prevailingWindDirection: 299
+  baseWindSpeed: 0.131

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,7 +12,6 @@ namespace Sol
         
         private Label _talentPointsLabel;
 
-
         void Start()
         {
             ServiceLocator.RegisterService<ITooltipSystem>(_tooltipSystem);
@@ -23,19 +21,19 @@ namespace Sol
         {   
             _statsService = ServiceLocator.Get<IStatsService>();
             _talentPointsLabel = root.Q<Label>("talent-points-label");
-            _nodes = nodes; // CRITICAL: Store the reference
+            _nodes = nodes;
             
             var tooltipRoot = root.Q<VisualElement>("tooltip-root");
             tooltipTemplate.CloneTree(tooltipRoot);
             _tooltipSystem = new TooltipSystem(tooltipRoot);
 
-            CheckSpentPoints();
+            // No CheckSpentPoints() - it was spending points on initialization
             UpdatePointsDisplay();
             
-            root.RegisterCallback<PointerMoveEvent>(evt => 
+            root.RegisterCallback<MouseMoveEvent>(evt => 
             {
                 if (_tooltipSystem != null)
-                    _tooltipSystem.UpdatePosition(evt.position);
+                    _tooltipSystem.UpdatePosition(evt.mousePosition);
             });
             
             foreach (var kvp in nodes)
@@ -44,43 +42,35 @@ namespace Sol
                 var element = nodeInstance.Element;
                 var data = nodeInstance.Data;
                 
-                string capturedNodeId = data.nodeId; // Capture for lambda
+                string capturedNodeId = data.nodeId;
                 
                 if (data.maxPoints > 1) element.AddToClassList("multi-point");
                 
                 element.AddToClassList("talent-node");
-                element.RegisterCallback<PointerDownEvent>(evt => OnNodeClicked(evt, capturedNodeId));
-   
+
+                // MouseDownEvent matches what VirtualCursor synthesizes
+                element.RegisterCallback<MouseDownEvent>(evt => OnNodeClicked(evt, capturedNodeId));
                 
-                // Optional: Tooltip handlers
-                element.RegisterCallback<PointerEnterEvent>(evt => ShowTooltip(data, evt.position));
-                element.RegisterCallback<PointerLeaveEvent>(evt => HideTooltip());
+                // PointerEnter/Leave crash when synthesized - use MouseEnter/Leave
+                element.RegisterCallback<MouseEnterEvent>(evt => ShowTooltip(data, evt.mousePosition));
+                element.RegisterCallback<MouseLeaveEvent>(evt => HideTooltip());
                 
                 UpdateNodeVisual(element, data);
             }
         }
 
-        void CheckSpentPoints()
-        {
-            int alreadySpent = 0;
-            foreach (var kvp in _nodes)
-                alreadySpent += kvp.Value.Data.allocatedPoints;
-            for (int i = 0; i < alreadySpent; i++)
-                _statsService.SpendTalentPoint();
-        }
-        
-        void OnNodeClicked(PointerDownEvent evt, string nodeId)
+        void OnNodeClicked(MouseDownEvent evt, string nodeId)
         {
             if (!_nodes.TryGetValue(nodeId, out var nodeInstance)) return;
             var data = nodeInstance.Data;
             var element = nodeInstance.Element;
             
-            if (evt.button == 0) // Left click
+            if (evt.button == 0)
             {
                 evt.StopPropagation();
                 TryAllocate(nodeId, data, element);
             }
-            else if (evt.button == 2) // Right click
+            else if (evt.button == 1) // button 1 = right click in MouseEvent
             {
                 evt.StopPropagation();
                 TryRemove(nodeId, data, element);
@@ -91,7 +81,6 @@ namespace Sol
         {
             if (data.allocatedPoints >= data.maxPoints) return;
             if (!_statsService.SpendTalentPoint()) return;
-            // Check prerequisites
             bool canAllocate = CalculateCanAllocate(data);
             if (!canAllocate) return;
             
@@ -130,10 +119,8 @@ namespace Sol
             foreach (var prereq in data.prerequisites)
             {
                 if (_nodes.TryGetValue(prereq.nodeId, out var prereqInstance))
-                {
                     if (prereqInstance.Data.allocatedPoints > 0)
-                        return true; // ANY prerequisite met (change to All for hybrids)
-                }
+                        return true;
             }
             return false;
         }
@@ -143,15 +130,11 @@ namespace Sol
             foreach (var kvp in _nodes)
             {
                 var dependentData = kvp.Value.Data;
-                
                 if (dependentData.allocatedPoints <= 0) continue;
                 if (dependentData.prerequisites == null) continue;
                 
                 foreach (var prereq in dependentData.prerequisites)
-                {
-                    if (prereq.nodeId == parentNodeId)
-                        return true;
-                }
+                    if (prereq.nodeId == parentNodeId) return true;
             }
             return false;
         }
@@ -160,27 +143,19 @@ namespace Sol
         {
             foreach (var kvp in _nodes)
             {
-                if (kvp.Key == changedNodeId) continue; // Skip self
-                
+                if (kvp.Key == changedNodeId) continue;
                 var dependentInstance = kvp.Value;
                 var dependentData = dependentInstance.Data;
-                
-                // Check if this node has the changed node as prerequisite
                 if (HasPrerequisite(dependentData, changedNodeId))
-                {
                     UpdateNodeVisual(dependentInstance.Element, dependentData);
-                }
             }
         }
         
         bool HasPrerequisite(TalentNodeDataSO data, string prerequisiteId)
         {
             if (data.prerequisites == null) return false;
-            
             foreach (var prereq in data.prerequisites)
-            {
                 if (prereq.nodeId == prerequisiteId) return true;
-            }
             return false;
         }
         
@@ -218,14 +193,10 @@ namespace Sol
         
         void ShowTooltip(TalentNodeDataSO data, Vector2 position)
         {
-            // Stub - implement with your adapter
             _tooltipSystem.Show(new TalentNodeTooltipAdapter(data), position);
         }
         
-        void HideTooltip()
-        {
-            _tooltipSystem?.Hide();
-        }
+        void HideTooltip() => _tooltipSystem?.Hide();
         
         void UpdatePointsDisplay()
         {
@@ -234,8 +205,8 @@ namespace Sol
             int total = _statsService.GetTotalTalentPoints();
             _talentPointsLabel.text = $"Points: {available}/{total}";
             _talentPointsLabel.style.color = available > 0
-                ? new StyleColor(new Color(1f, 0.73f, 0.41f))   // Orange
-                : new StyleColor(new Color(0.8f, 0.2f, 0.2f));  // Red
+                ? new StyleColor(new Color(1f, 0.73f, 0.41f))
+                : new StyleColor(new Color(0.8f, 0.2f, 0.2f));
         }
         
         [ContextMenu("Reset All Talents")]
@@ -247,9 +218,7 @@ namespace Sol
                 return;
             }
 
-            // Count how many points we're refunding
             int refundCount = 0;
-
             foreach (var kvp in _nodes)
             {
                 var data = kvp.Value.Data;
@@ -257,18 +226,14 @@ namespace Sol
                 data.allocatedPoints = 0;
             }
 
-            // Refund all points at once
             for (int i = 0; i < refundCount; i++)
                 _statsService.RefundTalentPoint();
 
-            // Refresh all visuals
             foreach (var kvp in _nodes)
                 UpdateNodeVisual(kvp.Value.Element, kvp.Value.Data);
 
             UpdatePointsDisplay();
-
             Debug.Log($"[TalentTree] Reset complete. Refunded {refundCount} points.");
         }
     }
 }
-

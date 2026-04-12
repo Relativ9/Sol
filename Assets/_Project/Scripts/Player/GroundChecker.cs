@@ -17,6 +17,13 @@ namespace Sol
         [SerializeField] private float _groundedBufferTime = 0.1f;
         [SerializeField] private float _coyoteTime = 0.15f;
         
+        [Header("Slope Look-Ahead")]
+        [SerializeField] private float _lookAheadDistance = 0.4f;   // How far ahead to probe
+        [SerializeField] private float _lookAheadRayOffset = 0.3f;  // Forward offset of probe ray
+        private RaycastHit _lookAheadHit;
+        private bool _hasLookAheadHit;
+        private Vector3 _lookAheadDirection = Vector3.forward; // Updated externally
+        
         private IPlayerContext _context;
         [SerializeField] private bool _isGrounded;
         private bool _wasGrounded;
@@ -153,7 +160,43 @@ namespace Sol
             {
                 _isGrounded = false;
             }
+            
+            _hasLookAheadHit = false;
+            if (_isGrounded && _lookAheadDirection.sqrMagnitude > 0.01f)
+            {
+                Vector3 probeOrigin = _checkPoint.position 
+                                      + _lookAheadDirection.normalized * _lookAheadRayOffset;
+                _hasLookAheadHit = Physics.Raycast(
+                    probeOrigin,
+                    Vector3.down,
+                    out _lookAheadHit,
+                    _checkDistance + 0.3f,  // Slightly longer range to catch upcoming drops too
+                    _groundLayer
+                );
+            }
         }
+        
+        public void SetLookAheadDirection(Vector3 worldDirection)
+        {
+            _lookAheadDirection = worldDirection;
+        }
+        
+        public Vector3 GetSmoothedGroundNormal()
+        {
+            if (!_isGrounded) return Vector3.up;
+    
+            Vector3 currentNormal = _groundHit.normal;
+    
+            if (_hasLookAheadHit)
+            {
+                // Blend toward the upcoming surface normal
+                return Vector3.Slerp(currentNormal, _lookAheadHit.normal, 0.5f).normalized;
+            }
+    
+            return currentNormal;
+        }
+        
+        public bool IsGroundedStrict => _isGrounded;
         
         private void OnDrawGizmos()
         {

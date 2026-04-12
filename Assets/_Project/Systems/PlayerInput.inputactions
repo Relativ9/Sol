@@ -188,13 +188,13 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Point",
-                    "type": "PassThrough",
+                    "name": "CursorMove",
+                    "type": "Value",
                     "id": "43c6be22-d904-48fd-bbfc-2cd34bea9050",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Left Click",
@@ -234,7 +234,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Point",
+                    "action": "CursorMove",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

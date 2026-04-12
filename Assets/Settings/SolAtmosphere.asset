@@ -60,7 +60,7 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 1
   renderingMode:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   material:
     m_OverrideState: 0
@@ -327,7 +327,7 @@ MonoBehaviour:
     m_Value: 0
   cloudSimpleMode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   m_CloudPreset:
     m_OverrideState: 1
     m_Value: 4
@@ -466,7 +466,7 @@ MonoBehaviour:
       m_RotationOrder: 4
   scatteringTint:
     m_OverrideState: 1
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_Value: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
   powderEffectIntensity:
     m_OverrideState: 0
     m_Value: 0.25
@@ -475,7 +475,7 @@ MonoBehaviour:
     m_Value: 0.5
   densityMultiplier:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.039
   shapeFactor:
     m_OverrideState: 1
     m_Value: 0.796
@@ -508,7 +508,7 @@ MonoBehaviour:
     m_Value: 1
   sunLightDimmer:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.5
   erosionOcclusion:
     m_OverrideState: 0
     m_Value: 0.1
@@ -518,7 +518,7 @@ MonoBehaviour:
       mode: 3
       customValue: 100
       additiveValue: 0
-      multiplyValue: 10
+      multiplyValue: 1
   orientation:
     m_OverrideState: 1
     m_Value:
@@ -555,7 +555,7 @@ MonoBehaviour:
     m_Value: 1
   shadows:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   shadowResolution:
     m_OverrideState: 1
     m_Value: 256
@@ -605,7 +605,7 @@ MonoBehaviour:
     m_Value: {x: 0, y: -6378.1, z: 0}
   windOrientation:
     m_OverrideState: 1
-    m_Value: 40
+    m_Value: 63
   windSpeed:
     m_OverrideState: 1
     m_Value: 10

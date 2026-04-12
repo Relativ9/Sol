@@ -53,6 +53,23 @@ namespace Sol
 
         [Tooltip("Fog color tint")]
         public Color fogColor = Color.gray;
+        
+        [Header("Cloud Settings")]
+        [Tooltip("Minimum cloud density target for this season (can be negative — values below 0 clamp to clear sky)")]
+        [Range(-0.5f, 1f)]
+        public float cloudDensityMin = -0.3f;
+        [Tooltip("Maximum cloud density target for this season")]
+        [Range(-0.5f, 1f)]
+        public float cloudDensityMax = 0.6f;
+        [Tooltip("How quickly cloud density transitions toward its daily target (higher = snappier)")]
+        [Range(0.01f, 1f)]
+        public float cloudDensityLerpSpeed = 0.05f;
+        [Tooltip("Prevailing wind direction for this season in degrees [0, 360]")]
+        [Range(0f, 360f)]
+        public float prevailingWindDirection = 0f;
+        [Tooltip("Base wind speed for this season")]
+        [Range(0f, 1f)]
+        public float baseWindSpeed = 0.1f;
 
         #region Properties
 

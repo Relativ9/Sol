@@ -276,13 +276,13 @@ namespace Sol
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Point"",
-                    ""type"": ""PassThrough"",
+                    ""name"": ""CursorMove"",
+                    ""type"": ""Value"",
                     ""id"": ""43c6be22-d904-48fd-bbfc-2cd34bea9050"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Left Click"",
@@ -322,7 +322,7 @@ namespace Sol
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Point"",
+                    ""action"": ""CursorMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -381,7 +381,7 @@ namespace Sol
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_OpenTalentPanel = m_UI.FindAction("OpenTalentPanel", throwIfNotFound: true);
-            m_UI_Point = m_UI.FindAction("Point", throwIfNotFound: true);
+            m_UI_CursorMove = m_UI.FindAction("CursorMove", throwIfNotFound: true);
             m_UI_LeftClick = m_UI.FindAction("Left Click", throwIfNotFound: true);
             m_UI_RightClick = m_UI.FindAction("Right Click", throwIfNotFound: true);
         }
@@ -617,7 +617,7 @@ namespace Sol
         private readonly InputActionMap m_UI;
         private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
         private readonly InputAction m_UI_OpenTalentPanel;
-        private readonly InputAction m_UI_Point;
+        private readonly InputAction m_UI_CursorMove;
         private readonly InputAction m_UI_LeftClick;
         private readonly InputAction m_UI_RightClick;
         /// <summary>
@@ -636,9 +636,9 @@ namespace Sol
             /// </summary>
             public InputAction @OpenTalentPanel => m_Wrapper.m_UI_OpenTalentPanel;
             /// <summary>
-            /// Provides access to the underlying input action "UI/Point".
+            /// Provides access to the underlying input action "UI/CursorMove".
             /// </summary>
-            public InputAction @Point => m_Wrapper.m_UI_Point;
+            public InputAction @CursorMove => m_Wrapper.m_UI_CursorMove;
             /// <summary>
             /// Provides access to the underlying input action "UI/LeftClick".
             /// </summary>
@@ -676,9 +676,9 @@ namespace Sol
                 @OpenTalentPanel.started += instance.OnOpenTalentPanel;
                 @OpenTalentPanel.performed += instance.OnOpenTalentPanel;
                 @OpenTalentPanel.canceled += instance.OnOpenTalentPanel;
-                @Point.started += instance.OnPoint;
-                @Point.performed += instance.OnPoint;
-                @Point.canceled += instance.OnPoint;
+                @CursorMove.started += instance.OnCursorMove;
+                @CursorMove.performed += instance.OnCursorMove;
+                @CursorMove.canceled += instance.OnCursorMove;
                 @LeftClick.started += instance.OnLeftClick;
                 @LeftClick.performed += instance.OnLeftClick;
                 @LeftClick.canceled += instance.OnLeftClick;
@@ -699,9 +699,9 @@ namespace Sol
                 @OpenTalentPanel.started -= instance.OnOpenTalentPanel;
                 @OpenTalentPanel.performed -= instance.OnOpenTalentPanel;
                 @OpenTalentPanel.canceled -= instance.OnOpenTalentPanel;
-                @Point.started -= instance.OnPoint;
-                @Point.performed -= instance.OnPoint;
-                @Point.canceled -= instance.OnPoint;
+                @CursorMove.started -= instance.OnCursorMove;
+                @CursorMove.performed -= instance.OnCursorMove;
+                @CursorMove.canceled -= instance.OnCursorMove;
                 @LeftClick.started -= instance.OnLeftClick;
                 @LeftClick.performed -= instance.OnLeftClick;
                 @LeftClick.canceled -= instance.OnLeftClick;
@@ -819,12 +819,12 @@ namespace Sol
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnOpenTalentPanel(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "Point" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "CursorMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnPoint(InputAction.CallbackContext context);
+            void OnCursorMove(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Left Click" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
