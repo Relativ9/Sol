@@ -27,7 +27,7 @@ namespace Sol
         // Dependencies
         private IPlayerContext _context;
         private IAnimationController _animationController;
-        private IWeaponService _weaponService;
+        //private IWeaponService _weaponService;
         private AnimationEventDispatcher _eventDispatcher;
         
         // State
@@ -48,17 +48,17 @@ namespace Sol
             _context = context;
             
             _animationController = context.GetService<IAnimationController>();
-            _weaponService = context.GetService<IWeaponService>();
+            //_weaponService = context.GetService<IWeaponService>();
             
             if (_animationController == null)
             {
                 Debug.LogError("Animation Controller not found! Combat animations won't work.");
             }
             
-            if (_weaponService == null)
-            {
-                Debug.LogWarning("Weapon Service not found! Using default weapon settings.");
-            }
+            // if (_weaponService == null)
+            // {
+            //     Debug.LogWarning("Weapon Service not found! Using default weapon settings.");
+            // }
             
             // Find the animator component
             Animator animator = GetComponentInChildren<Animator>();
@@ -280,26 +280,26 @@ private void UnsheatheWeapon()
     SetCombatState(CombatState.Unsheathing);
     
     // Get weapon type from service or use default
-    WeaponType weaponType = _weaponService != null ? 
-        _weaponService.GetEquippedWeaponType() : WeaponType.OneHanded;
-    
-    // Set animation parameters
-    if (_animationController != null)
-    {
-        _animationController.SetTrigger("Unsheathe");
-        
-        // Set weapon type in animator
-        switch (weaponType)
-        {
-            case WeaponType.OneHanded:
-                _animationController.SetBool("OneHanded", true);
-                break;
-            case WeaponType.TwoHanded:
-                _animationController.SetBool("TwoHanded", true);
-                break;
-            // Add other weapon types as needed
-        }
-    }
+    // WeaponType weaponType = _weaponService != null ? 
+    //     _weaponService.GetEquippedWeaponType() : WeaponType.OneHanded;
+    //
+    // // Set animation parameters
+    // if (_animationController != null)
+    // {
+    //     _animationController.SetTrigger("Unsheathe");
+    //     
+    //     // Set weapon type in animator
+    //     switch (weaponType)
+    //     {
+    //         case WeaponType.OneHanded:
+    //             _animationController.SetBool("OneHanded", true);
+    //             break;
+    //         case WeaponType.TwoHanded:
+    //             _animationController.SetBool("TwoHanded", true);
+    //             break;
+    //         // Add other weapon types as needed
+    //     }
+    // }
     
     // Start coroutine to complete unsheathing after animation time
     if (_stateTransitionCoroutine != null)
@@ -312,10 +312,10 @@ private void UnsheatheWeapon()
     // Update context state
     _context.SetStateValue("IsWeaponDrawn", true);
     
-    if (_debugCombat)
-    {
-        Debug.Log($"Unsheathing weapon of type: {weaponType}");
-    }
+    // if (_debugCombat)
+    // {
+    //     Debug.Log($"Unsheathing weapon of type: {weaponType}");
+    // }
 }
 
 private IEnumerator CompleteUnsheathe()

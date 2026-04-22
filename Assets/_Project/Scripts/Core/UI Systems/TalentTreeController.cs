@@ -7,36 +7,57 @@ namespace Sol
     public class TalentTreeController : MonoBehaviour, ITalentTreeController
     {
         private IStatsService _statsService;
+        private IProgressionService _progressionService;
+        private ITalentStateService _talentState;
+        private ITalentTreeGenerator _treeGenerator;
         private ITooltipSystem _tooltipSystem;
-        private IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> _nodes;
         
+        private IReadOnlyDictionary<string, NodeInstance> _nodes;
         private Label _talentPointsLabel;
+        private VisualElement _root;
 
-        void Start()
-        {
-            ServiceLocator.RegisterService<ITooltipSystem>(_tooltipSystem);
-        }
-        
-        public void Initialize(IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> nodes, VisualElement root, VisualTreeAsset tooltipTemplate)
+        public void Initialize(
+            IReadOnlyDictionary<string, NodeInstance> nodes, 
+            VisualElement root, 
+            VisualTreeAsset tooltipTemplate)
         {   
             _statsService = ServiceLocator.Get<IStatsService>();
-            _talentPointsLabel = root.Q<Label>("talent-points-label");
+            _progressionService = ServiceLocator.Get<IProgressionService>();
+            _talentState = ServiceLocator.Get<ITalentStateService>();
+            _treeGenerator = ServiceLocator.Get<ITalentTreeGenerator>();
             _nodes = nodes;
+            _root = root;
             
+            _talentPointsLabel = root.Q<Label>("talent-points-label");
+            
+            // Setup tooltip locally. Do NOT register transient systems to ServiceLocator.
             var tooltipRoot = root.Q<VisualElement>("tooltip-root");
-            tooltipTemplate.CloneTree(tooltipRoot);
-            _tooltipSystem = new TooltipSystem(tooltipRoot);
+            if (tooltipRoot != null && tooltipTemplate != null)
+            {
+                tooltipTemplate.CloneTree(tooltipRoot);
+                _tooltipSystem = new TooltipSystem(tooltipRoot);
+            }
 
-            // No CheckSpentPoints() - it was spending points on initialization
-            UpdatePointsDisplay();
+            BindGlobalInput(root);
+            BindNodeInteractions();
             
+            UpdatePointsDisplay();
+            RefreshAllVisuals();
+        }
+
+        #region Input Binding
+        
+        void BindGlobalInput(VisualElement root)
+        {
             root.RegisterCallback<MouseMoveEvent>(evt => 
             {
-                if (_tooltipSystem != null)
-                    _tooltipSystem.UpdatePosition(evt.mousePosition);
+                _tooltipSystem?.UpdatePosition(evt.mousePosition);
             });
-            
-            foreach (var kvp in nodes)
+        }
+        
+        void BindNodeInteractions()
+        {
+            foreach (var kvp in _nodes)
             {
                 var nodeInstance = kvp.Value;
                 var element = nodeInstance.Element;
@@ -44,96 +65,101 @@ namespace Sol
                 
                 string capturedNodeId = data.nodeId;
                 
-                if (data.maxPoints > 1) element.AddToClassList("multi-point");
+                if (data.maxPoints > 1) 
+                    element.AddToClassList("multi-point");
                 
                 element.AddToClassList("talent-node");
 
-                // MouseDownEvent matches what VirtualCursor synthesizes
                 element.RegisterCallback<MouseDownEvent>(evt => OnNodeClicked(evt, capturedNodeId));
-                
-                // PointerEnter/Leave crash when synthesized - use MouseEnter/Leave
                 element.RegisterCallback<MouseEnterEvent>(evt => ShowTooltip(data, evt.mousePosition));
                 element.RegisterCallback<MouseLeaveEvent>(evt => HideTooltip());
-                
-                UpdateNodeVisual(element, data);
             }
+        }
+        
+        #endregion
+
+        public string[] GetAllocatedNodeIds()
+        {
+            return _talentState.GetAllocatedNodeIds();
         }
 
         void OnNodeClicked(MouseDownEvent evt, string nodeId)
         {
             if (!_nodes.TryGetValue(nodeId, out var nodeInstance)) return;
-            var data = nodeInstance.Data;
-            var element = nodeInstance.Element;
-            
+    
             if (evt.button == 0)
             {
                 evt.StopPropagation();
-                TryAllocate(nodeId, data, element);
+                TryAllocate(nodeId, nodeInstance);
             }
-            else if (evt.button == 1) // button 1 = right click in MouseEvent
+            else if (evt.button == 1)
             {
                 evt.StopPropagation();
-                TryRemove(nodeId, data, element);
+                TryRemove(nodeId, nodeInstance);
             }
         }
         
-        void TryAllocate(string nodeId, TalentNodeDataSO data, VisualElement element)
+        void TryAllocate(string nodeId, NodeInstance nodeInstance)
         {
-            if (data.allocatedPoints >= data.maxPoints) return;
-            if (!_statsService.SpendTalentPoint()) return;
-            bool canAllocate = CalculateCanAllocate(data);
-            if (!canAllocate) return;
+            var data = nodeInstance.Data;
+            int currentPoints = _talentState.GetAllocatedPoints(nodeId);
             
-            data.allocatedPoints++;
-            UpdateNodeVisual(element, data);
-            RefreshDependents(nodeId);
-            UpdatePointsDisplay();
+            if (currentPoints >= data.maxPoints) return;
+            if (!PrerequisitesMet(data)) return;
             
-            Debug.Log($"Allocated point to {data.displayName}: {data.allocatedPoints}/{data.maxPoints}");
-        }
-        
-        void TryRemove(string nodeId, TalentNodeDataSO data, VisualElement element)
-        {
-            if (data.allocatedPoints <= 0) return;
+            if (!_progressionService.SpendTalentPoint()) return;
             
-            if (HasAllocatedDependent(nodeId))
+            if (_talentState.TryAllocatePoint(nodeId))
             {
-                Debug.Log($"Cannot remove {data.displayName}: dependent nodes are allocated");
-                return;
+                // StateService raised GameEvent for persistent listeners (SaveManager, etc.)
+                // We refresh visuals immediately for responsiveness.
+                UpdateNodeVisual(nodeId, nodeInstance);
+                RefreshDependents(nodeId);
             }
-            
-            data.allocatedPoints--;
-            _statsService.RefundTalentPoint();
-            UpdateNodeVisual(element, data);
-            RefreshDependents(nodeId);
-            UpdatePointsDisplay();
-            
-            Debug.Log($"Removed point from {data.displayName}: {data.allocatedPoints}/{data.maxPoints}");
+            else
+            {
+                _progressionService.RefundTalentPoint();
+                UpdatePointsDisplay();
+            }
         }
         
-        bool CalculateCanAllocate(TalentNodeDataSO data)
+        void TryRemove(string nodeId, NodeInstance nodeInstance)
+        {
+            if (_talentState.GetAllocatedPoints(nodeId) <= 0) return;
+            if (HasAllocatedDependent(nodeId)) return;
+            
+            if (_talentState.TryRemovePoint(nodeId))
+            {
+                _progressionService.RefundTalentPoint();
+                UpdateNodeVisual(nodeId, nodeInstance);
+                RefreshDependents(nodeId);
+            }
+        }
+        
+        bool PrerequisitesMet(TalentNodeDataSO data)
         {
             if (data.prerequisites == null || data.prerequisites.Count == 0)
                 return true;
             
             foreach (var prereq in data.prerequisites)
             {
-                if (_nodes.TryGetValue(prereq.nodeId, out var prereqInstance))
-                    if (prereqInstance.Data.allocatedPoints > 0)
-                        return true;
+                if (_talentState.HasAllocatedPoints(prereq.nodeId))
+                    return true;
             }
             return false;
         }
         
         bool HasAllocatedDependent(string parentNodeId)
         {
-            foreach (var kvp in _nodes)
+            foreach (var nodeId in _talentState.GetAllocatedNodeIds())
             {
-                var dependentData = kvp.Value.Data;
-                if (dependentData.allocatedPoints <= 0) continue;
-                if (dependentData.prerequisites == null) continue;
+                if (nodeId == parentNodeId) continue;
+                if (_talentState.GetAllocatedPoints(nodeId) <= 0) continue;
                 
-                foreach (var prereq in dependentData.prerequisites)
+                var nodeData = _treeGenerator.GetNodeData(nodeId);
+                if (nodeData?.prerequisites == null) continue;
+                
+                foreach (var prereq in nodeData.prerequisites)
                     if (prereq.nodeId == parentNodeId) return true;
             }
             return false;
@@ -144,10 +170,10 @@ namespace Sol
             foreach (var kvp in _nodes)
             {
                 if (kvp.Key == changedNodeId) continue;
-                var dependentInstance = kvp.Value;
-                var dependentData = dependentInstance.Data;
+                
+                var dependentData = kvp.Value.Data;
                 if (HasPrerequisite(dependentData, changedNodeId))
-                    UpdateNodeVisual(dependentInstance.Element, dependentData);
+                    UpdateNodeVisual(kvp.Key, kvp.Value);
             }
         }
         
@@ -159,35 +185,45 @@ namespace Sol
             return false;
         }
         
-        void UpdateNodeVisual(VisualElement element, TalentNodeDataSO data)
+        void UpdateNodeVisual(string nodeId, NodeInstance nodeInstance)
         {
-            bool canAllocate = CalculateCanAllocate(data);
+            var data = nodeInstance.Data;
+            var element = nodeInstance.Element;
+            int allocated = _talentState.GetAllocatedPoints(nodeId);
+            
+            bool atMax = allocated >= data.maxPoints;
+            bool canAllocate = !atMax && PrerequisitesMet(data);
             
             element.RemoveFromClassList("locked");
             element.RemoveFromClassList("available");
             element.RemoveFromClassList("active");
 
-            if (data.allocatedPoints > 0)
+            if (allocated > 0)
             {
                 element.AddToClassList("active");
-                Debug.Log($"[Visual] {data.nodeId} -> active, classes: {string.Join(", ", element.GetClasses())}");
             }
             else if (!canAllocate)
             {
                 element.AddToClassList("locked");
-                Debug.Log($"[Visual] {data.nodeId} -> locked, classes: {string.Join(", ", element.GetClasses())}");
             }
             else
             {
                 element.AddToClassList("available");
-                Debug.Log($"[Visual] {data.nodeId} -> available, classes: {string.Join(", ", element.GetClasses())}");
             }
             
             if (data.maxPoints > 1)
             {
                 var counter = element.Q<Label>("point-counter");
                 if (counter != null)
-                    counter.text = $"{data.allocatedPoints}/{data.maxPoints}";
+                    counter.text = $"{allocated}/{data.maxPoints}";
+            }
+        }
+        
+        void RefreshAllVisuals()
+        {
+            foreach (var kvp in _nodes)
+            {
+                UpdateNodeVisual(kvp.Key, kvp.Value);
             }
         }
         
@@ -201,8 +237,8 @@ namespace Sol
         void UpdatePointsDisplay()
         {
             if (_talentPointsLabel == null) return;
-            int available = _statsService.GetAvailableTalentPoints();
-            int total = _statsService.GetTotalTalentPoints();
+            int available = _progressionService.GetAvailableTalentPoints();
+            int total = _progressionService.GetTotalTalentPoints();
             _talentPointsLabel.text = $"Points: {available}/{total}";
             _talentPointsLabel.style.color = available > 0
                 ? new StyleColor(new Color(1f, 0.73f, 0.41f))
@@ -212,27 +248,26 @@ namespace Sol
         [ContextMenu("Reset All Talents")]
         public void ResetAllTalents()
         {
-            if (_nodes == null)
+            if (_nodes == null || _talentState == null)
             {
                 Debug.LogWarning("[TalentTree] Cannot reset - not initialized yet");
                 return;
             }
 
             int refundCount = 0;
-            foreach (var kvp in _nodes)
+            foreach (var nodeId in _talentState.GetAllocatedNodeIds())
             {
-                var data = kvp.Value.Data;
-                refundCount += data.allocatedPoints;
-                data.allocatedPoints = 0;
+                refundCount += _talentState.GetAllocatedPoints(nodeId);
             }
 
+            _talentState.ResetAll();
+
             for (int i = 0; i < refundCount; i++)
-                _statsService.RefundTalentPoint();
+                _progressionService.RefundTalentPoint();
 
-            foreach (var kvp in _nodes)
-                UpdateNodeVisual(kvp.Value.Element, kvp.Value.Data);
-
+            RefreshAllVisuals();
             UpdatePointsDisplay();
+            
             Debug.Log($"[TalentTree] Reset complete. Refunded {refundCount} points.");
         }
     }

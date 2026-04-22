@@ -7,52 +7,71 @@ namespace Sol
 
     public class StatsService : MonoBehaviour, IStatsService
     {
-        [SerializeField] private PlayerStats _playerStats;
         private Dictionary<string, float> _baseValues = new Dictionary<string, float>();
         
         private Dictionary<string, Dictionary<ModifierCatagory, List<StatModifier>>> _modifiersByCategory = new Dictionary<string, Dictionary<ModifierCatagory, List<StatModifier>>>();
         
-        private int _level;
-        private int _totalTalentPoints;
-        private int _spentTalentPoints;
-        
         void Awake()
         {
             ServiceLocator.RegisterService<IStatsService>(this);
-            IntializeStats();
-            
         }
 
-        private void IntializeStats()
+        public void Initialize(PlayerStatSO statSO, PlayerSaveData saveData)
         {
             //Movement stats
-            _baseValues["moveSpeed"] = _playerStats != null ? _playerStats.baseMoveSpeed : 5f;
-            _baseValues["runMultiplier"] = _playerStats != null ? _playerStats.baseRunMultiplier : 1.6f;
-            _baseValues["deceleration"] = _playerStats != null ? _playerStats.baseDeceleration : 8f;
-            
-            //Combat stats
-            _baseValues["health"] = _playerStats.baseHealth;
-            _baseValues["stamina"] = _playerStats.baseStamina;
-            _baseValues["focus"] = _playerStats.baseFocus;
+            _baseValues["moveSpeed"] = statSO.baseMoveSpeed;
+            _baseValues["runMultiplier"]  = statSO.baseRunMultiplier;
+            _baseValues["deceleration"] = statSO.baseDeceleration;
+            _baseValues["crouchSpeed"] = statSO.baseCrouchSpeed;
             
             //Jump stats
-            _baseValues["JumpForce"] = _playerStats.baseJumpForce;
-            _baseValues["JumpCooldown"] = _playerStats.baseJumpCooldown;
-            _baseValues["JumpDirectionBoost"] = _playerStats.baseJumpDirectionBoost;
-            _baseValues["MaxDoubleJump"] = _playerStats.baseMaxDoubleJump;
+            _baseValues["jumpForce"] = statSO.baseJumpForce;
+            _baseValues["jumpCooldown"] = statSO.baseJumpCooldown;
+            _baseValues["jumpDirectionBoost"] = statSO.baseJumpDirectionBoost;
+            _baseValues["maxDoubleJump"] = statSO.baseMaxDoubleJump;
+            _baseValues["fallDamageMultiplier"] = statSO.baseFallDamageMultiplier;
             
             //Gravity Stats
-            _baseValues["GravityMultiplier"] = _playerStats.baseGravityMultiplier;
-            _baseValues["TerminalVelocity"] = _playerStats.baseTerminalVelocity;
-            // statsRegistry.RegisterStat("gravityMultiplier", 2.5f); // Default fall multiplier
-            // statsRegistry.RegisterStat("terminalVelocity", -20f); // Maximum fall speed
+            _baseValues["gravityMultiplier"] = statSO.baseGravityMultiplier;
+            _baseValues["terminalVelocity"] = statSO.baseTerminalVelocity;
             
+            //Core Attributes
+            _baseValues["brawn"] = statSO.brawn;
+            _baseValues["finesse"] = statSO.finesse;
+            _baseValues["insight"] = statSO.insight;
+            _baseValues["focus"] = statSO.focus;
+            _baseValues["vigor"] = statSO.vigor;
+            _baseValues["willpower"] = statSO.willpower;
             
-            // Progression - level is a plain counter, not in the modifier pipeline
-            _level = _playerStats.level;
-            _totalTalentPoints = _level + _playerStats.talentPointBonus;
-            _spentTalentPoints = 0;
-
+            //Stats
+            _baseValues["health"] = statSO.baseHealth;
+            _baseValues["energy"] = statSO.baseEnergy;
+            _baseValues["healthRegen"] =  statSO.baseHealthRegen;
+            _baseValues["energyRegen"] =  statSO.baseEnergyRegen;
+            _baseValues["meleeDamage"] = statSO.baseMeleeDamage;
+            _baseValues["projectileDamage"] =  statSO.baseProjectileDamage;
+            _baseValues["projectileRange"] =  statSO.baseProjectileRange;
+            _baseValues["spellPower"] =  statSO.baseSpellPower;
+            _baseValues["armorValue"] = statSO.baseArmorValue;
+            _baseValues["carryCapacity"] = statSO.baseCarryCapacity;
+            _baseValues["critChance"] = statSO.baseCritChance;
+            _baseValues["critMultiplier"] = statSO.baseCritMultiplier;
+            _baseValues["deflectionChance"] = statSO.baseDeflectionChance;
+            _baseValues["magicResistance"] = statSO.baseMagicResistance;
+            _baseValues["fireResistance"] = statSO.baseFireResistance;
+            _baseValues["iceResistance"] = statSO.baseIceResistance;
+            _baseValues["voidResistance"] = statSO.baseVoidResistance;
+            _baseValues["sonicResistance"] = statSO.baseSonicResistance;
+            _baseValues["soulResistance"] = statSO.baseSoulResistance;
+            _baseValues["reflectChance"] = statSO.baseReflectChance;
+            _baseValues["environmentalResistance"] = statSO.baseEnvironmentalResistance;
+            _baseValues["parryAndBlockTime"] = statSO.baseParryAndBlockTime;
+            _baseValues["clueRange"] = statSO.baseClueRange;
+            _baseValues["charmChance"] = statSO.baseCharmChance;
+            _baseValues["knowledgeChance"] = statSO.baseKnowledgeChance;
+            _baseValues["deceptionChance"] = statSO.baseDeceptionChance;
+            _baseValues["intimidationChance"] = statSO.baseIntimidationChance;
+            
             foreach (string statName in _baseValues.Keys)
             {
                 _modifiersByCategory[statName] = new Dictionary<ModifierCatagory, List<StatModifier>>();
@@ -63,28 +82,8 @@ namespace Sol
                 }
 
             }
-        }
-        
-        // --- Progression Methods ---
-        public int GetLevel() => _level;
-        public int GetTotalTalentPoints() => _totalTalentPoints;
-        public int GetAvailableTalentPoints() => _totalTalentPoints - _spentTalentPoints;
-        public bool SpendTalentPoint()
-        {
-            if (_spentTalentPoints >= _totalTalentPoints)
-            {
-                Debug.Log("[StatsService] No talent points available");
-                return false;
-            }
-            _spentTalentPoints++;
-            Debug.Log($"[StatsService] Point spent. Remaining: {GetAvailableTalentPoints()}/{_totalTalentPoints}");
-            return true;
-        }
-        public void RefundTalentPoint()
-        {
-            if (_spentTalentPoints <= 0) return;
-            _spentTalentPoints--;
-            Debug.Log($"[StatsService] Point refunded. Remaining: {GetAvailableTalentPoints()}/{_totalTalentPoints}");
+            
+            // saveData used by ProgressionService to push attribute modifiers after initialisation
         }
 
         private void Update()

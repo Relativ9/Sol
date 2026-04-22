@@ -25,7 +25,7 @@ namespace Sol
         public void Initialize(IPlayerContext context)
         {
             _context = context;
-            _statsService = context.GetService<IStatsService>();
+            _statsService = ServiceLocator.Get<IStatsService>();
             _groundChecker = context.GetService<IGroundChecker>();
             _rigidbody = GetComponent<Rigidbody>();
             
@@ -82,7 +82,7 @@ namespace Sol
             
             // Clamp to terminal velocity
             float currentTerminalVelocity = _statsService != null ? 
-                _statsService.GetStat("TerminalVelocity") : _terminalVelocity;
+                _statsService.GetStat("terminalVelocity") : _terminalVelocity;
                 
             // Only clamp vertical velocity
             if (_rigidbody.linearVelocity.y < currentTerminalVelocity)
@@ -107,10 +107,10 @@ namespace Sol
                 );
                 
                 _statsService.ApplyOrReplaceModifier(
-                    "GravityMultiplier", 
+                    "gravityMultiplier", 
                     scaleModifier, 
                     ModifierCatagory.Temporary, 
-                    "GravityController"
+                    "gravityController"
                 );
             }
         }
@@ -128,14 +128,14 @@ namespace Sol
             // Remove any gravity scale modifiers
             if (_statsService != null)
             {
-                _statsService.RemoveModifiersFromSource("GravityMultiplier", "GravityController");
+                _statsService.RemoveModifiersFromSource("gravityMultiplier", "gravityController");
             }
         }
         
         public float GetCurrentGravityScale()
         {
             return _statsService != null ? 
-                _statsService.GetStat("GravityMultiplier") : _defaultGravityMultiplier;
+                _statsService.GetStat("gravityMultiplier") : _defaultGravityMultiplier;
         }
         
         public Vector3 GetCurrentGravity()

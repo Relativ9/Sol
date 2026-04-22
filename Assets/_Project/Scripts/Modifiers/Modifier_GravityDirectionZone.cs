@@ -4,6 +4,8 @@ namespace Sol
 {
     public class Modifier_GravityDirectionZone : MonoBehaviour
     {
+        private IStatsService _statsService;
+        
         [Header("Gravity Settings")]
         [SerializeField] private bool _useTransformDirection = true;
         [SerializeField] private Vector3 _customGravityDirection = Vector3.down;
@@ -23,6 +25,7 @@ namespace Sol
         
         private void Start()
         {
+            _statsService = ServiceLocator.Get<IStatsService>();
             // Generate unique zone ID for debugging
             _zoneId = $"GravityZone_{gameObject.name}_{gameObject.GetInstanceID()}";
             

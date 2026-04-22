@@ -7,7 +7,12 @@ namespace Sol
 {
     public interface ITalentTreeController
     {
-        void Initialize(IReadOnlyDictionary<string, TalentTreeGenerator.NodeInstance> nodes, VisualElement root, VisualTreeAsset tooltipTemplate);
+        void Initialize(
+            IReadOnlyDictionary<string, NodeInstance> nodes, 
+            VisualElement root, 
+            VisualTreeAsset tooltipTemplate);
+    
+        string[] GetAllocatedNodeIds();
     }
 }
 

@@ -13,7 +13,6 @@ namespace Sol
         [TextArea(3, 10)]
         public string description;      // Tooltip text
         public bool isActiveSkill;
-        public int allocatedPoints;
     
         [Header("Visual Placement")]
         public bool isHybrid;           // True if this is a synergy node

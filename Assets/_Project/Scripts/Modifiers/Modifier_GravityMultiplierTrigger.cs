@@ -5,7 +5,9 @@ namespace Sol
 {
     public class Modifier_GravityMultiplierTrigger : MonoBehaviour
     {
-                [Header("Gravity Modifier Settings")]
+        private IStatsService _statsService;
+         
+        [Header("Gravity Modifier Settings")]
         [SerializeField] private float _gravityMultiplier = 0.5f;
         [SerializeField] private bool _persistWhileInTrigger = false;
         [SerializeField] private float _duration = 3.0f;
@@ -23,11 +25,11 @@ namespace Sol
 
         private float _lastEffectTime = -1f;
         private Transform _playerTransform;
-        private IStatsService _playerStatsService;
         private bool _playerInTrigger = false;
         
         private void Start()
         {
+            _statsService = ServiceLocator.Get<IStatsService>();
             // Generate a source ID if none is set manually
             if (string.IsNullOrEmpty(_sourceId) || _generateUniqueId)
             {
@@ -47,9 +49,6 @@ namespace Sol
                 IPlayerContext playerContext = other.GetComponent<IPlayerContext>();
                 if (playerContext == null) return;
                 
-                _playerStatsService = other.GetComponent<IStatsService>();
-                if (_playerStatsService == null) return;
-                
                 // Apply the gravity modifier
                 ApplyGravityModifier();
                 
@@ -65,7 +64,7 @@ namespace Sol
         
         private void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Player") && _playerStatsService != null)
+            if (other.CompareTag("Player") && _statsService != null)
             {
                 _playerInTrigger = false;
                 
@@ -76,14 +75,14 @@ namespace Sol
                 }
                 
                 // Clear references
-                _playerStatsService = null;
-                _playerTransform = null;
+                // _statsService = null;
+                // _playerTransform = null;
             }
         }
         
         private void ApplyGravityModifier()
         {
-            if (_playerStatsService == null) return;
+            if (_statsService == null) return;
             
             // Create the modifier with appropriate duration
             float modifierDuration = _persistWhileInTrigger ? -1f : _duration;
@@ -96,8 +95,8 @@ namespace Sol
             };
             
             // Apply the modifier
-            string modifierId = ((StatsService)_playerStatsService).ApplyOrReplaceModifier(
-                "GravityMultiplier", 
+            string modifierId = ((StatsService)_statsService).ApplyOrReplaceModifier(
+                "gravityMultiplier", 
                 gravityModifier, 
                 _modifierCatagory, 
                 _sourceId
@@ -109,9 +108,9 @@ namespace Sol
         
         private void RemoveGravityModifier()
         {
-            if (_playerStatsService == null) return;
+            if (_statsService == null) return;
             
-            _playerStatsService.RemoveModifiersFromSource("GravityMultiplier", _sourceId);
+            _statsService.RemoveModifiersFromSource("gravityMultiplier", _sourceId);
             Debug.Log($"Removed gravity modifier from {_sourceId}");
         }
 

@@ -124,6 +124,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -9146598635968803322, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &29638996
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 29638997}
+  - component: {fileID: 29638998}
+  m_Layer: 0
+  m_Name: TalentTreeGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &29638997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29638996}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1808101699}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &29638998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29638996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86281766f19b87c9e94482f640102635, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.TalentTreeGenerator
+  _treeCollectionSO: {fileID: 11400000, guid: fc1a0795214e979ae9fdee0522e9e733, type: 2}
+  _settingsSO: {fileID: 11400000, guid: 3418f1081cad51d228ed8d36d73f1244, type: 2}
+  _talentStateChangedEvent: {fileID: 11400000, guid: 96ac776596ad3df4887ae197ee6b1729, type: 2}
 --- !u!1 &36548949
 GameObject:
   m_ObjectHideFlags: 0
@@ -994,6 +1041,80 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2029201095384133314, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &206663305
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 206663306}
+  - component: {fileID: 206663308}
+  - component: {fileID: 206663307}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &206663306
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206663305}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1808101699}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &206663307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206663305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1affbe9c7e63d982bc2d2b007baa34a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.SaveManager
+  debounceInterval: 2
+--- !u!114 &206663308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206663305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df783e241952c02acaf897a02a4e6f0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.GameEventListener
+  _gameEvent: {fileID: 11400000, guid: 22b154ef827f07344abc3b9240c338af, type: 2}
+  _response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 206663307}
+        m_TargetAssemblyTypeName: Sol.SaveManager, Sol_Scripts
+        m_MethodName: OnGameStateChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &223305535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1538,13 +1659,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d581465821a61f67e9e73f61d088d68e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Sol_Scripts::CameraFollowObject
-  _headBone: {fileID: 955429714}
-  _verticalSmoothTime: 0.4
-  _maxVerticalOffset: 1
-  _onlyDampenUpward: 1
-  _smoothedY: 0
-  _yVelocity: 0
-  _initialised: 0
 --- !u!1 &315526942
 GameObject:
   m_ObjectHideFlags: 0
@@ -7619,6 +7733,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -1918406353201951979, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &707063838
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 707063839}
+  - component: {fileID: 707063840}
+  m_Layer: 0
+  m_Name: StatsService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &707063839
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707063838}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1808101699}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &707063840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707063838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e799e663e228b44a94eb4ef2fd23cdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.StatsService
 --- !u!4 &711337461 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -9166285093476956020, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -9343,9 +9501,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _worldTimeData: {fileID: 11400000, guid: 7f3a3ebdbd5da5f45adddde98d687f39, type: 2}
   _startingTimeOfDay: 0.4
-  _startingDay: 320
+  _startingDay: 1
   _startingYear: 1
-  _celestialTimeScale: 20
+  _celestialTimeScale: 400
   _isPaused: 0
   _onDayChanged: {fileID: 11400000, guid: 727d73a369cc46e17ab6b3a4dde14c90, type: 2}
   _onSeasonChanged: {fileID: 11400000, guid: 28100ae44fcb65decb9537b51cf5c7bb, type: 2}
@@ -15049,6 +15207,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1808101698
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1808101699}
+  m_Layer: 0
+  m_Name: Services/Managers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1808101699
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808101698}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -15.97692, y: 0.46335, z: -25.23324}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1960861018}
+  - {fileID: 707063839}
+  - {fileID: 2029814765}
+  - {fileID: 206663306}
+  - {fileID: 29638997}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1823617039 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3117890623932289515, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -15375,10 +15569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sol.UIManager
   _document: {fileID: 1561581042}
-  panelOpen: 0
-  _talentTreeSettings: {fileID: 11400000, guid: 3418f1081cad51d228ed8d36d73f1244, type: 2}
   _nodeTemplate: {fileID: 9197481963319205126, guid: 2b39f5ba8afc51833b5cd891c4d4d9e3, type: 3}
-  _treeCollection: {fileID: 11400000, guid: fc1a0795214e979ae9fdee0522e9e733, type: 2}
   _tooltipTemplate: {fileID: 9197481963319205126, guid: aa0e1ebaaba47e3bb98810e5a4fa13bc, type: 3}
 --- !u!114 &1826156586
 MonoBehaviour:
@@ -15787,6 +15978,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 416511142261111596, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
   m_PrefabInstance: {fileID: 117685358}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1960861016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1960861018}
+  - component: {fileID: 1960861019}
+  m_Layer: 0
+  m_Name: GameInitializer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1960861018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960861016}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1808101699}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1960861019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960861016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73b2737911dc7f98aae45e82adbe2285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.GameInitializer
+  playerStatSO: {fileID: 11400000, guid: 6b8b5e174e3a426469cb0623ee87618d, type: 2}
+  playerProgressionSO: {fileID: 11400000, guid: 12a3532e67962fc32a80cf3889e877dd, type: 2}
+  statsService: {fileID: 707063840}
 --- !u!4 &1962008662 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 281297371296666442, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -16032,11 +16270,11 @@ Transform:
   m_GameObject: {fileID: 2029814764}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -113.45485, y: 0, z: 89.29654}
+  m_LocalPosition: {x: -97.47793, y: -0.46335, z: 114.52978}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1808101699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2029814766
 MonoBehaviour:
@@ -16178,43 +16416,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 206e1b98c5a548042a4a1171ba46fa45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigBuilder: {fileID: 2036524099}
-  _drawnWeaponRig: {fileID: 637976896}
-  _sheathedWeaponRig: {fileID: 507270656}
-  _transitionDuration: 0.2
-  _quickTransitionDuration: 0.2
-  _transitionCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _drawWeaponEvent: OnDrawWeapon
-  _sheatheWeaponEvent: OnSheatheWeapon
-  _beginSheatheEvent: OnBeginSheathe
-  _beginUnsheatheEvent: OnBeginUnsheathe
-  _attackStartEvent: OnAttackStart
-  _attackEndEvent: OnAttackEnd
-  _attackTransitionDuration: 0.1
-  _debugRig: 0
 --- !u!95 &2036524103
 Animator:
   serializedVersion: 7
@@ -16516,7 +16717,6 @@ GameObject:
   - component: {fileID: 2100861475}
   - component: {fileID: 2100861479}
   - component: {fileID: 2100861476}
-  - component: {fileID: 2100861478}
   - component: {fileID: 2100861477}
   - component: {fileID: 2100861482}
   - component: {fileID: 2100861483}
@@ -16771,22 +16971,9 @@ MonoBehaviour:
   _airDeceleration: 0.5
   _slopeAlignmentStrength: 1
   _maxWalkableSlopeAngle: 45
-  _groundStickyForce: 15
+  _groundStickyForce: 1
   _groundStickyMaxUpVelocity: 0.5
-  _ungroundedDelay: 0.08
---- !u!114 &2100861478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2100861468}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e799e663e228b44a94eb4ef2fd23cdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerStats: {fileID: 11400000, guid: 6b8b5e174e3a426469cb0623ee87618d, type: 2}
+  _ungroundedDelay: 0.02
 --- !u!114 &2100861479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16950,14 +17137,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69d29597602ff014590cbedeb912b2c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rightHandMount: {fileID: 0}
-  _leftHandMount: {fileID: 0}
-  _backMount: {fileID: 0}
-  _oneHandedWeaponPrefab: {fileID: 5532835289429941658, guid: 387ce7cc6eee83b48a45d0aeeaff0d11, type: 3}
-  _twoHandedWeaponPrefab: {fileID: 0}
-  _drawWeaponEvent: OnDrawWeapon
-  _sheatheWeaponEvent: OnSheatheWeapon
-  _debugEvents: 0
 --- !u!114 &2100861488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16970,9 +17149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 733d8f646b9f551428f8e2e855d6634d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _availableWeapons:
-  - {fileID: 11400000, guid: 0006d50062ba3d341adf5e108097b275, type: 2}
-  _defaultWeaponId: BasicSword
 --- !u!114 &2100861489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17401,7 +17577,6 @@ Light:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 2029814765}
   - {fileID: 1634270511}
   - {fileID: 1562301784}
   - {fileID: 1761106423}
@@ -17410,3 +17585,4 @@ SceneRoots:
   - {fileID: 1676536041}
   - {fileID: 578510089}
   - {fileID: 1564531028}
+  - {fileID: 1808101699}

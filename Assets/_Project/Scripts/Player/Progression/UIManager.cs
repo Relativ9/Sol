@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,42 +7,54 @@ namespace Sol
 {
     public class UIManager : MonoBehaviour, IUIManager
     {
+        [Header("UI References")]
+        [SerializeField] private UIDocument _document;
+        [SerializeField] private VisualTreeAsset _nodeTemplate;
+        [SerializeField] private VisualTreeAsset _tooltipTemplate;
         
-        public UIDocument _document;
-
-        public bool panelOpen = false;
         private Dictionary<string, VisualElement> _panels = new();
         private IUIStateService _uiStateService;
-        
-        [SerializeField] private TalentTreeSettingsSO _talentTreeSettings;
-        [SerializeField] private VisualTreeAsset _nodeTemplate;
-        [SerializeField] private TreeLayoutCollectionSO _treeCollection;
-        
-        [SerializeField] private VisualTreeAsset _tooltipTemplate;
         private ITalentTreeGenerator _talentTreeGenerator;
-        private TooltipSystem _tooltipSystem;
+        private ITalentStateService _talentStateService;
         private IVirtualCursor _virtualCursor;
+        
+        private bool _isTalentPanelInitialized = false;
         
         void Awake()
         {
-            ServiceLocator.RegisterService<IUIManager>(this); //Registers itself with the service locator.
-            _talentTreeGenerator = new TalentTreeGenerator(_document, _nodeTemplate, _treeCollection, _talentTreeSettings);
-            ServiceLocator.RegisterService<ITalentTreeGenerator>(_talentTreeGenerator);
+            ServiceLocator.RegisterService<IUIManager>(this);
         }
 
         private void Start()
         {
-            if (_document == null) _document = GetComponentInChildren<UIDocument>();
+            if (_document == null) 
+                _document = GetComponentInChildren<UIDocument>();
+            
+            // Get services from locator
             _virtualCursor = ServiceLocator.Get<IVirtualCursor>();
             _uiStateService = ServiceLocator.Get<IUIStateService>();
+            _talentTreeGenerator = ServiceLocator.Get<ITalentTreeGenerator>();
+            _talentStateService = ServiceLocator.Get<ITalentStateService>();
             
-            //Ensure virtual cursor is disabled on start
+            // Ensure virtual cursor is disabled on start
             _virtualCursor?.UnregisterDocument(_document);
             
-            Debug.Log($"[UIManager] Got cursor instance: {_virtualCursor.GetHashCode()}");
+            Debug.Log($"[UIManager] Got cursor instance: {_virtualCursor?.GetHashCode()}");
     
-            var element = _document.rootVisualElement.Q("talent-wheel-root");
-            _panels["talent-wheel-root"] = element;
+            // Cache panel references
+            CachePanelReferences();
+        }
+        
+        void CachePanelReferences()
+        {
+            var root = _document?.rootVisualElement;
+            if (root == null) return;
+            
+            var talentWheelRoot = root.Q("talent-wheel-root");
+            if (talentWheelRoot != null)
+            {
+                _panels["talent-wheel-root"] = talentWheelRoot;
+            }
         }
 
         public void TogglePanel(string panelName)
@@ -56,46 +67,78 @@ namespace Sol
             {
                 OpenPanel(panelName);
             }
-            ServiceLocator.Get<ITimeManager>().TogglePause();
+            
+            ServiceLocator.Get<ITimeManager>()?.TogglePause();
         }
 
         public void OpenPanel(string panelName)
         {
             _virtualCursor?.SetActiveDocument(_document);
+            
             Debug.Log($"[UIManager] OpenPanel - virtualCursor null={_virtualCursor == null}, document null={_document == null}");
+            
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
                 panel.style.display = DisplayStyle.Flex;
                 
-                panel.RegisterCallbackOnce<GeometryChangedEvent>(e => 
+                // Talent panel specific initialization
+                if (panelName == "talent-wheel-root" && !_isTalentPanelInitialized)
                 {
-                    _talentTreeGenerator.Generate();
-                    var controller = gameObject.AddComponent<TalentTreeController>(); // Or use existing one
-                    controller.Initialize(_talentTreeGenerator.GetNodeRegistry(), _document.rootVisualElement, _tooltipTemplate);
-                });
-                
+                    InitializeTalentPanel(panel);
+                }
             }
+        }
+        
+        void InitializeTalentPanel(VisualElement panel)
+        {
+            // Register once for geometry change to ensure layout is ready
+            panel.RegisterCallbackOnce<GeometryChangedEvent>(e => 
+            {
+                // Generate visuals (creates VisualElements from cached NodeInstance data)
+                _talentTreeGenerator.Generate(_document.rootVisualElement, _nodeTemplate);
+                
+                // Create controller to handle input/visual updates
+                var controller = gameObject.AddComponent<TalentTreeController>();
+                controller.Initialize(
+                    _talentTreeGenerator.GetNodeRegistry(), 
+                    _document.rootVisualElement, 
+                    _tooltipTemplate);
+                
+                _isTalentPanelInitialized = true;
+            });
         }
 
         public void ClosePanel(string panelName)
         {
             _virtualCursor?.UnregisterDocument(_document);
+            
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
                 panel.style.display = DisplayStyle.None;
+                
+                // Optional: Clear UI elements to save memory, 
+                // or keep them cached for faster reopening
+                if (panelName == "talent-wheel-root")
+                {
+                    _talentTreeGenerator.ClearUI();
+                    // Note: We don't destroy the controller here - 
+                    // could pool it or destroy if memory is tight
+                    var controller = GetComponent<TalentTreeController>();
+                    if (controller != null)
+                    {
+                        Destroy(controller);
+                    }
+                    _isTalentPanelInitialized = false;
+                }
             }
         }
 
         public bool IsPanelOpen(string panelName)
         {
-            bool _panelOpen;
-
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
-                _panelOpen = panel.style.display.Equals(DisplayStyle.Flex) ? true : false;
-                return _panelOpen;
+                return panel.style.display == DisplayStyle.Flex;
             }
-
             return false;
         }
     }

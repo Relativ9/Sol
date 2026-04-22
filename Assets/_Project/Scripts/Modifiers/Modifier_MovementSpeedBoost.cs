@@ -4,6 +4,8 @@ namespace Sol
 {
     public class Modifier_MovementSpeedBoost : MonoBehaviour
     {
+        private IStatsService _statsService;
+        
         [Header("Boost Settings")] [SerializeField]
         private float _speedBoostAmount = 20f;
 
@@ -26,6 +28,7 @@ namespace Sol
 
         private void Start()
         {
+            _statsService = ServiceLocator.Get<IStatsService>();
             // Generate a source ID if needed
             if (string.IsNullOrEmpty(_sourceId) || _generateUniqueId)
             {
@@ -47,12 +50,8 @@ namespace Sol
                 IPlayerContext playerContext = other.GetComponent<IPlayerContext>();
                 if (playerContext == null) return;
 
-                // Get the stats service
-                IStatsService statsService = playerContext.GetService<IStatsService>();
-                if (statsService == null) return;
-
                 // Apply or replace the speed boost
-                ApplySpeedBoost(statsService);
+                ApplySpeedBoost(_statsService);
 
                 // Play effects if not in cooldown
                 if (canPlayEffects)
@@ -74,7 +73,7 @@ namespace Sol
             };
 
             // Apply or replace the modifier using our sourceId
-            string modifierId = ((StatsService)statsService).ApplyOrReplaceModifier(
+            string modifierId = statsService.ApplyOrReplaceModifier(
                 "moveSpeed", speedModifier, _modifierCategory, _sourceId);
 
             Debug.Log(

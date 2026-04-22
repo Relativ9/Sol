@@ -39,14 +39,13 @@ namespace Sol
             if(_playerRb == null) _playerRb = GetComponent<Rigidbody>(); 
             
             // Register locomotion interfaces
-            RegisterService<IStatsService>(GetComponent<IStatsService>());
             RegisterService<IGroundChecker>(GetComponent<GroundChecker>());
             RegisterService<IAnimationController>(GetComponent<PlayerAnimationController>());
             RegisterService<ICameraController>(GetComponent<CameraController>());
             
             // Register Combet interfaces
             RegisterService<ICombatController>(GetComponent<CombatStateController>());
-            RegisterService<IWeaponService>(GetComponent<WeaponService>());
+            //RegisterService<IWeaponService>(GetComponent<WeaponService>());
             
             AnimationEventDispatcher eventDispatcher = GetComponent<AnimationEventDispatcher>();
             if (eventDispatcher == null)
