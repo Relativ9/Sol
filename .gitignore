@@ -87,3 +87,7 @@ Temp/
 Logs/
 obj/
 *.suo
+# Unity APV/Probe Baking Data - auto-generated
+**/*Baking Set*
+**/*.CellSharedData.bytes
+**/*.CellSupportData.bytes
