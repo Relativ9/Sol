@@ -10,8 +10,8 @@ namespace Sol
         private float _speedBoostAmount = 20f;
 
         [SerializeField] private float _boostDuration = 3f;
-        [SerializeField] private ModifierType _modifierType = ModifierType.Additive;
-        [SerializeField] private ModifierCatagory _modifierCategory = ModifierCatagory.Temporary;
+        [SerializeField] private ModifierType _modifierType = ModifierType.FlatAdditive;
+        [SerializeField] private ModifierCategory _modifierCategory = ModifierCategory.Temporary;
 
         [Header("Source Identification")] [SerializeField]
         private string _sourceId = "";
@@ -65,16 +65,26 @@ namespace Sol
         private void ApplySpeedBoost(IStatsService statsService)
         {
             // Create the modifier
-            StatModifier speedModifier = new StatModifier
-            {
-                value = _speedBoostAmount,
-                type = _modifierType,
-                duration = _boostDuration
-            };
+            // StatModifier speedModifier = new StatModifier
+            // {
+            //     value = _speedBoostAmount,
+            //     type = _modifierType,
+            //     duration = _boostDuration
+            // };
+            
+            float runMultiplier = _statsService.GetStat(StatTypeEnum.RunMultiplier);
+            
+            StatModifier runMod = new StatModifier(
+                type: ModifierType.PercentAdditive,
+                category: ModifierCategory.Temporary,
+                statType: StatTypeEnum.MoveSpeed,
+                value: runMultiplier,
+                sourceId: _sourceId,
+                duration: _boostDuration
+            );
 
             // Apply or replace the modifier using our sourceId
-            string modifierId = statsService.ApplyOrReplaceModifier(
-                "moveSpeed", speedModifier, _modifierCategory, _sourceId);
+            string modifierId = statsService.ApplyOrReplaceModifier(runMod);
 
             Debug.Log(
                 $"Applied/refreshed speed boost from {_sourceId}: +{_speedBoostAmount} for {_boostDuration} seconds. ID: {modifierId}");

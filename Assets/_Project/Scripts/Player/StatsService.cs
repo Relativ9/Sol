@@ -4,85 +4,99 @@ using UnityEngine;
 
 namespace Sol
 {
-
     public class StatsService : MonoBehaviour, IStatsService
     {
-        private Dictionary<string, float> _baseValues = new Dictionary<string, float>();
-        
-        private Dictionary<string, Dictionary<ModifierCatagory, List<StatModifier>>> _modifiersByCategory = new Dictionary<string, Dictionary<ModifierCatagory, List<StatModifier>>>();
-        
+        private Dictionary<StatTypeEnum, float> _baseValues = new();
+        private Dictionary<StatTypeEnum, float> _derivedCache = new();
+
+        private Dictionary<StatTypeEnum, Dictionary<ModifierCategory, List<StatModifier>>> _modifiersByCategory = new();
+        private Dictionary<string, StatTypeEnum> _modifierToStatLookup = new();
+        private bool _statsDirty = false;
+
+        private IStatCalculator _calculator;
+
+        [SerializeField] private GameEvent _onStatsChangedEvent;
+
         void Awake()
         {
+            _calculator = new StandardStatCalculator();
             ServiceLocator.RegisterService<IStatsService>(this);
         }
 
         public void Initialize(PlayerStatSO statSO, PlayerSaveData saveData)
         {
-            //Movement stats
-            _baseValues["moveSpeed"] = statSO.baseMoveSpeed;
-            _baseValues["runMultiplier"]  = statSO.baseRunMultiplier;
-            _baseValues["deceleration"] = statSO.baseDeceleration;
-            _baseValues["crouchSpeed"] = statSO.baseCrouchSpeed;
-            
-            //Jump stats
-            _baseValues["jumpForce"] = statSO.baseJumpForce;
-            _baseValues["jumpCooldown"] = statSO.baseJumpCooldown;
-            _baseValues["jumpDirectionBoost"] = statSO.baseJumpDirectionBoost;
-            _baseValues["maxDoubleJump"] = statSO.baseMaxDoubleJump;
-            _baseValues["fallDamageMultiplier"] = statSO.baseFallDamageMultiplier;
-            
-            //Gravity Stats
-            _baseValues["gravityMultiplier"] = statSO.baseGravityMultiplier;
-            _baseValues["terminalVelocity"] = statSO.baseTerminalVelocity;
-            
             //Core Attributes
-            _baseValues["brawn"] = statSO.brawn;
-            _baseValues["finesse"] = statSO.finesse;
-            _baseValues["insight"] = statSO.insight;
-            _baseValues["focus"] = statSO.focus;
-            _baseValues["vigor"] = statSO.vigor;
-            _baseValues["willpower"] = statSO.willpower;
-            
-            //Stats
-            _baseValues["health"] = statSO.baseHealth;
-            _baseValues["energy"] = statSO.baseEnergy;
-            _baseValues["healthRegen"] =  statSO.baseHealthRegen;
-            _baseValues["energyRegen"] =  statSO.baseEnergyRegen;
-            _baseValues["meleeDamage"] = statSO.baseMeleeDamage;
-            _baseValues["projectileDamage"] =  statSO.baseProjectileDamage;
-            _baseValues["projectileRange"] =  statSO.baseProjectileRange;
-            _baseValues["spellPower"] =  statSO.baseSpellPower;
-            _baseValues["armorValue"] = statSO.baseArmorValue;
-            _baseValues["carryCapacity"] = statSO.baseCarryCapacity;
-            _baseValues["critChance"] = statSO.baseCritChance;
-            _baseValues["critMultiplier"] = statSO.baseCritMultiplier;
-            _baseValues["deflectionChance"] = statSO.baseDeflectionChance;
-            _baseValues["magicResistance"] = statSO.baseMagicResistance;
-            _baseValues["fireResistance"] = statSO.baseFireResistance;
-            _baseValues["iceResistance"] = statSO.baseIceResistance;
-            _baseValues["voidResistance"] = statSO.baseVoidResistance;
-            _baseValues["sonicResistance"] = statSO.baseSonicResistance;
-            _baseValues["soulResistance"] = statSO.baseSoulResistance;
-            _baseValues["reflectChance"] = statSO.baseReflectChance;
-            _baseValues["environmentalResistance"] = statSO.baseEnvironmentalResistance;
-            _baseValues["parryAndBlockTime"] = statSO.baseParryAndBlockTime;
-            _baseValues["clueRange"] = statSO.baseClueRange;
-            _baseValues["charmChance"] = statSO.baseCharmChance;
-            _baseValues["knowledgeChance"] = statSO.baseKnowledgeChance;
-            _baseValues["deceptionChance"] = statSO.baseDeceptionChance;
-            _baseValues["intimidationChance"] = statSO.baseIntimidationChance;
-            
-            foreach (string statName in _baseValues.Keys)
-            {
-                _modifiersByCategory[statName] = new Dictionary<ModifierCatagory, List<StatModifier>>();
+            _baseValues[StatTypeEnum.Brawn] = statSO.brawn;
+            _baseValues[StatTypeEnum.Finesse] = statSO.finesse;
+            _baseValues[StatTypeEnum.Insight] = statSO.insight;
+            _baseValues[StatTypeEnum.Focus] = statSO.focus;
+            _baseValues[StatTypeEnum.Vigor] = statSO.vigor;
+            _baseValues[StatTypeEnum.Willpower] = statSO.willpower;
 
-                foreach (ModifierCatagory catagory in System.Enum.GetValues(typeof(ModifierCatagory)))
+            //Movement
+            _baseValues[StatTypeEnum.MoveSpeed] = statSO.baseMoveSpeed;
+            _baseValues[StatTypeEnum.RunMultiplier] = statSO.baseRunMultiplier;
+            _baseValues[StatTypeEnum.Deceleration] = statSO.baseDeceleration;
+            _baseValues[StatTypeEnum.CrouchSpeed] = statSO.baseCrouchSpeed;
+            _baseValues[StatTypeEnum.JumpForce] = statSO.baseJumpForce;
+            _baseValues[StatTypeEnum.JumpCooldown] = statSO.baseJumpCooldown;
+            _baseValues[StatTypeEnum.JumpDirectionBoost] = statSO.baseJumpDirectionBoost;
+            _baseValues[StatTypeEnum.MaxDoubleJump] = statSO.baseMaxDoubleJump;
+            _baseValues[StatTypeEnum.FallDamageMultiplier] = statSO.baseFallDamageMultiplier;
+            _baseValues[StatTypeEnum.GravityMultiplier] = statSO.baseGravityMultiplier;
+            _baseValues[StatTypeEnum.TerminalVelocity] = statSO.baseTerminalVelocity;
+
+            //Resources
+            _baseValues[StatTypeEnum.MaxHealth] = statSO.baseMaxHealth;
+            _baseValues[StatTypeEnum.MaxEnergy] = statSO.baseMaxEnergy;
+            _baseValues[StatTypeEnum.HealthRegen] = statSO.baseHealthRegen;
+            _baseValues[StatTypeEnum.EnergyRegen] = statSO.baseEnergyRegen;
+            _baseValues[StatTypeEnum.CarryCapacity] = statSO.baseCarryCapacity;
+            _baseValues[StatTypeEnum.InventorySpace] = statSO.baseInventorySpace;
+            _baseValues[StatTypeEnum.LootMultiplier] = statSO.baseLootMultiplier;
+            _baseValues[StatTypeEnum.Hunger] = statSO.baseHunger;
+            _baseValues[StatTypeEnum.Thirst] = statSO.baseThirst;
+
+            //Combat
+            _baseValues[StatTypeEnum.MeleeDamage] = statSO.baseMeleeDamage;
+            _baseValues[StatTypeEnum.ProjectileDamage] = statSO.baseProjectileDamage;
+            _baseValues[StatTypeEnum.ProjectileRange] = statSO.baseProjectileRange;
+            _baseValues[StatTypeEnum.SpellPower] = statSO.baseSpellPower;
+            _baseValues[StatTypeEnum.ArmorValue] = statSO.baseArmorValue;
+            _baseValues[StatTypeEnum.CritChance] = statSO.baseCritChance;
+            _baseValues[StatTypeEnum.CritMultiplier] = statSO.baseCritMultiplier;
+            _baseValues[StatTypeEnum.DeflectionChance] = statSO.baseDeflectionChance;
+            _baseValues[StatTypeEnum.MagicResistance] = statSO.baseMagicResistance;
+            _baseValues[StatTypeEnum.FireResistance] = statSO.baseFireResistance;
+            _baseValues[StatTypeEnum.IceResistance] = statSO.baseIceResistance;
+            _baseValues[StatTypeEnum.VoidResistance] = statSO.baseVoidResistance;
+            _baseValues[StatTypeEnum.SonicResistance] = statSO.baseSonicResistance;
+            _baseValues[StatTypeEnum.SoulResistance] = statSO.baseSoulResistance;
+            _baseValues[StatTypeEnum.ReflectChance] = statSO.baseReflectChance;
+            _baseValues[StatTypeEnum.EnvironmentalResistance] = statSO.baseEnvironmentalResistance;
+            _baseValues[StatTypeEnum.ParryAndBlockTime] = statSO.baseParryAndBlockTime;
+            _baseValues[StatTypeEnum.ClueRange] = statSO.baseClueRange;
+            _baseValues[StatTypeEnum.CharmChance] = statSO.baseCharmChance;
+            _baseValues[StatTypeEnum.KnowledgeChance] = statSO.baseKnowledgeChance;
+            _baseValues[StatTypeEnum.DeceptionChance] = statSO.baseDeceptionChance;
+            _baseValues[StatTypeEnum.IntimidationChance] = statSO.baseIntimidationChance;
+
+            foreach (StatTypeEnum stat in System.Enum.GetValues(typeof(StatTypeEnum)))
+            {
+                if (!_baseValues.ContainsKey(stat))
                 {
-                    _modifiersByCategory[statName][catagory] = new List<StatModifier>();
+                    _baseValues[stat] = 0f;
+                }
+
+                _modifiersByCategory[stat] = new Dictionary<ModifierCategory, List<StatModifier>>();
+
+                foreach (ModifierCategory category in System.Enum.GetValues(typeof(ModifierCategory)))
+                {
+                    _modifiersByCategory[stat][category] = new List<StatModifier>();
                 }
 
             }
-            
+
             // saveData used by ProgressionService to push attribute modifiers after initialisation
         }
 
@@ -91,168 +105,326 @@ namespace Sol
             UpdateModifierDurations();
         }
 
+        private void LateUpdate()
+        {
+            if (_statsDirty && _onStatsChangedEvent != null)
+            {
+                _onStatsChangedEvent.Raise();
+                _statsDirty = false;
+            }
+        }
+
         private void UpdateModifierDurations()
         {
+            HashSet<StatTypeEnum> affectedStats = new(); // ADD
             foreach (var statEntry in _modifiersByCategory)
             {
-                string statName = statEntry.Key;
-
-                foreach (var catagoryEntry in statEntry.Value)
+                StatTypeEnum statType = statEntry.Key;
+                foreach (var categoryEntry in statEntry.Value)
                 {
-                    ModifierCatagory catagory = catagoryEntry.Key;
-                    List<StatModifier> modifiers = catagoryEntry.Value;
-                    
-                    List<string> expiredModifiers = new List<string>();
-
-                    for (int i = 0; i < modifiers.Count; i++)
+                    List<StatModifier> modifiers = categoryEntry.Value;
+                    for (int i = modifiers.Count - 1; i >= 0; i--)
                     {
                         var modifier = modifiers[i];
-
-                        if (modifier.duration > 0)
+                        if (modifier.duration > 0f)
                         {
-                            var updatedModifier = modifier;
-                            updatedModifier.duration -= Time.deltaTime;
-                            
-                            modifiers[i] = updatedModifier;
+                            modifier.duration -= Time.deltaTime;
 
-                            if (updatedModifier.duration <= 0)
+                            if (modifier.duration <= 0f)
                             {
-                                expiredModifiers.Add(updatedModifier.id);
+                                modifiers.RemoveAt(i);
+                                _modifierToStatLookup.Remove(modifier.id); // ADD
+                                affectedStats.Add(statType); // ADD
+                            }
+                            else
+                            {
+                                modifiers[i] = modifier;
                             }
                         }
                     }
-
-                    foreach (var id in expiredModifiers)
-                    {
-                        RemoveModifier(statName, id);
-                    }
                 }
+            }
+
+            foreach (StatTypeEnum stat in affectedStats)
+                RefreshDerivedStat(stat);
+
+            // foreach (var statEntry in _modifiersByCategory)
+            // {
+            //     var statType = statEntry.Key;
+            //
+            //     foreach (var catagoryEntry in statEntry.Value)
+            //     {
+            //         ModifierCategory category = catagoryEntry.Key;
+            //         List<StatModifier> modifiers = catagoryEntry.Value;
+            //         
+            //         List<string> expiredModifiers = new List<string>();
+            //
+            //         for (int i = 0; i < modifiers.Count; i++)
+            //         {
+            //             var modifier = modifiers[i];
+            //
+            //             if (modifier.duration > 0)
+            //             {
+            //                 var updatedModifier = modifier;
+            //                 updatedModifier.duration -= Time.deltaTime;
+            //                 
+            //                 modifiers[i] = updatedModifier;
+            //
+            //                 if (updatedModifier.duration <= 0)
+            //                 {
+            //                     expiredModifiers.Add(updatedModifier.id);
+            //                 }
+            //             }
+            //         }
+            //
+            //         foreach (var id in expiredModifiers)
+            //         {
+            //             RemoveModifier(id);
+            //         }
+            //     }
+            // }
+        }
+
+        public float GetBaseStat(StatTypeEnum statType)
+        {
+            return _baseValues.TryGetValue(statType, out float value) ? value : 0f;
+        }
+
+
+        public float GetStat(StatTypeEnum statType)
+        {
+
+            if (_derivedCache.TryGetValue(statType, out float cached))
+                return cached;
+            // Stat hasn't been calculated yet (e.g. queried before any modifier applied)
+            RefreshDerivedStat(statType);
+            return _derivedCache.GetValueOrDefault(statType, _baseValues.GetValueOrDefault(statType, 0f));
+            // if (!_baseValues.TryGetValue(statType, out float baseValue))
+            //     return 0f;
+            // // Flatten all modifiers for this stat, skipping Base category in the filter if desired
+            // StatModifier[] mods = _modifiersByCategory[statType]
+            //     .SelectMany(kvp => kvp.Value)
+            //     .Where(m => m.category != ModifierCategory.Base)
+            //     .ToArray();
+            // return _calculator.Calculate(statType, baseValue, mods);
+
+            // if (!_baseValues.ContainsKey(statType))
+            // {
+            //     Debug.LogWarning($"Stat {statType} not found!");
+            //     return 0f;
+            // }
+            //
+            // float finalValue = _baseValues[statType];
+            //
+            // foreach (ModifierCategory category in System.Enum.GetValues(typeof(ModifierCategory)))
+            // {
+            //     if (category == ModifierCategory.Base) continue;
+            //     
+            //     //Apply additive modifiers fAor this category
+            //     float additiveModifier = 0f;
+            //     foreach (var mod in _modifiersByCategory[statType][category]
+            //                  .Where(m => m.type == ModifierType.FlatAdditive))
+            //     {
+            //         additiveModifier += mod.value;
+            //     }
+            //     finalValue += additiveModifier;
+            //     
+            //     //Apply multiplication modifiers for this category
+            //     float percentSum = 0f;
+            //     foreach (var mod in _modifiersByCategory[statType][category]
+            //                  .Where(m => m.type == ModifierType.PercentAdditive))
+            //     {
+            //         percentSum += mod.value;
+            //     }
+            //     finalValue *= (1f + percentSum);
+            // }
+            //
+            // return finalValue;
+        }
+
+        public void SetBaseStat(StatTypeEnum statType, float baseValue)
+        {
+            _baseValues[statType] = baseValue;
+            RefreshDerivedStat(statType);
+        }
+
+        private void RefreshDerivedStat(StatTypeEnum statType)
+        {
+            if (!_baseValues.TryGetValue(statType, out float baseValue))
+                return;
+            StatModifier[] mods = _modifiersByCategory[statType]
+                .SelectMany(kvp => kvp.Value)
+                .Where(m => m.category != ModifierCategory.Base)
+                .ToArray();
+            float newValue = _calculator.Calculate(statType, baseValue, mods);
+            float oldValue = _derivedCache.GetValueOrDefault(statType, baseValue);
+            if (!Mathf.Approximately(oldValue, newValue))
+            {
+                _derivedCache[statType] = newValue;
+                _statsDirty = true;
             }
         }
 
-        public float GetStat(string statName)
+        public string ApplyOrReplaceModifier(StatModifier modifier)
         {
-            if (!_baseValues.ContainsKey(statName))
-            {
-                Debug.LogWarning($"Stat {statName} not found!");
-                return 0f;
-            }
-            
-            float finalValue = _baseValues[statName];
+            StatTypeEnum statType = modifier.statType;
+            ModifierCategory category = modifier.category;
 
-            foreach (ModifierCatagory category in System.Enum.GetValues(typeof(ModifierCatagory)))
+            if (!_modifiersByCategory.ContainsKey(statType))
             {
-                if (category == ModifierCatagory.Base) continue;
-                
-                //Apply additive modifiers for this category
-                float additiveModifier = 0f;
-                foreach (var mod in _modifiersByCategory[statName][category]
-                             .Where(m => m.type == ModifierType.Additive))
-                {
-                    additiveModifier += mod.value;
-                }
-                finalValue += additiveModifier;
-                
-                //Apply multiplication modifiers for this category
-                float multiplier = 1f;
-                foreach (var mod in _modifiersByCategory[statName][category]
-                             .Where(m => m.type == ModifierType.Multiplicative))
-                {
-                    multiplier *= mod.value;
-                }
-                finalValue *= multiplier;
-            }
-            
-            return finalValue;
-        }
-        
-        public string ApplyOrReplaceModifier(string statName, StatModifier modifier, ModifierCatagory category, string sourceId)
-        {
-            if (!_modifiersByCategory.ContainsKey(statName))
-            {
-                Debug.LogWarning($"Stat {statName} not found!");
+                Debug.LogWarning($"Stat {statType} not found!");
                 return null;
             }
-    
-            // Set the sourceId on the modifier
-            modifier.sourceId = sourceId;
-    
-            // Check if there's already a modifier with this sourceId in this category
-            int existingIndex = _modifiersByCategory[statName][category].FindIndex(m => m.sourceId == sourceId);
-    
-            if (existingIndex >= 0)
+
+            // Defensive: if the inner dictionary is somehow missing this category bucket
+            if (!_modifiersByCategory[statType].ContainsKey(category))
             {
-                // Replace the existing modifier but keep its ID
-                string existingId = _modifiersByCategory[statName][category][existingIndex].id;
-                modifier.id = existingId;
-                _modifiersByCategory[statName][category][existingIndex] = modifier;
-        
-                Debug.Log($"Replaced modifier for {statName} from source {sourceId}. Value: {modifier.value}, Duration: {modifier.duration}");
-                return existingId;
-            }
-            else
-            {
-                // Generate a new ID for this modifier
-                modifier.id = System.Guid.NewGuid().ToString();
-        
-                // Add the new modifier
-                _modifiersByCategory[statName][category].Add(modifier);
-        
-                Debug.Log($"Added new modifier for {statName} from source {sourceId}. Value: {modifier.value}, Duration: {modifier.duration}");
-                return modifier.id;
-            }
-        }
-        
-        public string ApplyModifier(string statName, StatModifier modifier, ModifierCatagory modifierCatagory)
-        {
-            if (!_modifiersByCategory.ContainsKey(statName))
-            {
-                Debug.LogWarning($"Stat {statName} not found!");
+                Debug.LogWarning($"Category {category} not initialized for stat {statType}!");
                 return null;
             }
-            
+
+            // Work on a copy so the input parameter stays pristine
+            StatModifier modToStore = modifier;
+            // Ensure identity exists (handles manual struct initialization that skipped the constructor)
+            if (string.IsNullOrEmpty(modToStore.id))
+                modToStore.id = System.Guid.NewGuid().ToString();
+            var modifiers = _modifiersByCategory[statType][category];
+            bool wasReplaced = false;
+            // Replacement only makes sense when we know the logical source
+            if (!string.IsNullOrEmpty(modToStore.sourceId))
+            {
+                int existingIndex = modifiers.FindIndex(m => m.sourceId == modToStore.sourceId);
+                if (existingIndex >= 0)
+                {
+                    // Preserve the old GUID so the outside world doesn't notice a swap
+                    modToStore.id = modifiers[existingIndex].id;
+                    modifiers[existingIndex] = modToStore;
+                    Debug.Log($"Replaced modifier for {statType} from source {modToStore.sourceId}. " +
+                              $"Value: {modToStore.value}, Duration: {modToStore.duration}");
+                    return modToStore.id;
+                }
+            }
+
+            // Fresh Entry
+            if (!wasReplaced)
+            {
+                modifiers.Add(modToStore);
+                Debug.Log(
+                    $"Added new modifier for {statType} from source {modToStore.sourceId}. Value: {modToStore.value}, Duration: {modToStore.duration}");
+            }
+
+            _modifierToStatLookup[modToStore.id] = statType;
+            RefreshDerivedStat(statType);
+
+            return modToStore.id;
+        }
+
+
+        public string ApplyModifier(StatModifier modifier)
+        {
+            if (!_modifiersByCategory.ContainsKey(modifier.statType))
+            {
+                Debug.LogWarning($"Stat {modifier} not found!");
+                return null;
+            }
+
             //Generate unique ID
             modifier.id = System.Guid.NewGuid().ToString();
-            
-            _modifiersByCategory[statName][modifierCatagory].Add(modifier);
-            
+
+            _modifiersByCategory[modifier.statType][modifier.category].Add(modifier);
+
+            _modifierToStatLookup[modifier.id] = modifier.statType;
+            RefreshDerivedStat(modifier.statType);
+
             return modifier.id;
         }
 
-        public void RemoveModifier(string statName, string modifierId)
+        public void RemoveModifier(string modifierId)
         {
-            if (!_modifiersByCategory.ContainsKey(statName)) return;
-
-            foreach (var category in _modifiersByCategory[statName].Keys)
-            {
-                _modifiersByCategory[statName][category].RemoveAll(m => m.id == modifierId);
-            }
-        }
-        
-        public void RemoveModifiersFromSource(string statName, string sourceId)
-        {
-            if (!_modifiersByCategory.ContainsKey(statName))
+            if (!_modifierToStatLookup.TryGetValue(modifierId, out StatTypeEnum statType))
                 return;
-                
-            foreach (var category in _modifiersByCategory[statName].Keys)
+            foreach (var categoryList in _modifiersByCategory[statType].Values)
             {
-                _modifiersByCategory[statName][category].RemoveAll(m => m.sourceId == sourceId);
+                int index = categoryList.FindIndex(m => m.id == modifierId);
+                if (index >= 0)
+                {
+                    categoryList.RemoveAt(index);
+                    break;
+                }
             }
+
+            _modifierToStatLookup.Remove(modifierId);
+            RefreshDerivedStat(statType);
+
+            // foreach (var statEntry in _modifiersByCategory)
+            // {
+            //     foreach (var categoryEntry in statEntry.Value)
+            //     {
+            //         List<StatModifier> modifiers = categoryEntry.Value;
+            //         for (int i = 0; i < modifiers.Count; i++)
+            //         {
+            //             if (modifiers[i].id == modifierId)
+            //             {
+            //                 modifiers.RemoveAt(i);
+            //                 return;
+            //             }
+            //         }
+            //     }
+            // }
         }
 
-        public void RemoveAllModifiersOfType(string statName, ModifierCatagory modifierCatagory)
+        public void RemoveModifiersFromSource(string sourceId)
         {
-            if (!_modifiersByCategory.ContainsKey(statName)) return;
-            
-            _modifiersByCategory[statName][modifierCatagory].Clear();
+            HashSet<StatTypeEnum>
+                affectedStats =
+                    new(); // Enforces unique entries, making sure we're never doing a duplicate remove action.
+
+            foreach (var statEntry in _modifiersByCategory)
+            {
+                StatTypeEnum statType = statEntry.Key;
+                bool changed = false;
+
+                foreach (var categoryEntry in statEntry.Value)
+                {
+                    List<StatModifier> modifiers = categoryEntry.Value;
+                    int removedCount = modifiers.RemoveAll(m => m.sourceId == sourceId);
+                    if (removedCount > 0) changed = true;
+                }
+
+                if (changed)
+                    affectedStats.Add(statType); // ADD
+            }
+
+            foreach (StatTypeEnum stat in affectedStats)
+                RefreshDerivedStat(stat);
+
+            // foreach (var statEntry in _modifiersByCategory)
+            // {
+            //     foreach (var categoryEntry in statEntry.Value)
+            //     {
+            //         List<StatModifier> modifiers = categoryEntry.Value;
+            //         modifiers.RemoveAll(m => m.sourceId == sourceId);
+            //     }
+            // }
         }
-        
+
+        public void RemoveAllModifiersOfType(StatTypeEnum statType, ModifierCategory category)
+        {
+            if (!_modifiersByCategory.ContainsKey(statType)) return;
+
+            foreach (var mod in _modifiersByCategory[statType][category])
+                _modifierToStatLookup.Remove(mod.id);
+
+            _modifiersByCategory[statType][category].Clear();
+
+            RefreshDerivedStat(statType);
+        }
+
         public float GetSpeedMultiplier()
         {
-            float baseSpeed = _baseValues["moveSpeed"];
-            float currentSpeed = GetStat("moveSpeed");
-            
-            return currentSpeed / baseSpeed;
+            float baseSpeed = GetBaseStat(StatTypeEnum.MoveSpeed);
+            if (baseSpeed == 0f) return 0f;
+            return GetStat(StatTypeEnum.MoveSpeed) / baseSpeed;
         }
 
     }

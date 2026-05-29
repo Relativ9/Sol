@@ -12,6 +12,8 @@ namespace Sol
         Vector3 GetCameraForward();
         Vector3 GetCameraRight();
         float GetCameraYaw();
+        void OnActivate();
+        void OnDeactivate();
         
     }
 }

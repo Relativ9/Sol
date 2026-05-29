@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 
 namespace Sol
 {
-    public class SaveManager : MonoBehaviour
+    public class SaveManager : MonoBehaviour, ISaveManager
     {
         [Header("Settings")]
         [SerializeField] private float debounceInterval = 2f;
@@ -10,9 +11,15 @@ namespace Sol
         private ISaveService _saveService;
         private IProgressionService _progressionService;
         private ITalentStateService _talentStateService;
+        private Coroutine _pendingSaveCoroutine;
+        
         private float lastSaveTime;
         private bool pendingSave;
-        
+
+        private void Awake()
+        {
+            ServiceLocator.RegisterService<ISaveManager>(this);
+        }
 
         void Start()
         {
@@ -24,27 +31,39 @@ namespace Sol
                 Debug.LogWarning($"[{nameof(SaveManager)}] TalentTreeController not found in ServiceLocator");
         }
         
-        // This is called by GameEventListener (configured in Inspector)
-        public void OnGameStateChanged()
+
+        public void RequestLazySave()
         {
-            if (Time.time - lastSaveTime < debounceInterval)
+            if (_pendingSaveCoroutine != null) return; // Already waiting
+    
+            float elapsed = Time.unscaledTime - lastSaveTime;
+            if (elapsed < debounceInterval)
             {
-                if (!pendingSave)
-                {
-                    pendingSave = true;
-                    float delay = debounceInterval - (Time.time - lastSaveTime);
-                    Invoke(nameof(PerformSave), delay);
-                }
-                return;
+                float wait = debounceInterval - elapsed;
+                _pendingSaveCoroutine = StartCoroutine(SaveAfterDelay(wait));
             }
-            
+            else
+            {
+                RequestImmediateSave();
+            }
+        }
+
+        public void RequestImmediateSave()
+        {
+            if (_pendingSaveCoroutine != null)
+            {
+                StopCoroutine(_pendingSaveCoroutine);
+                _pendingSaveCoroutine = null;
+            }
+            pendingSave = false;
             PerformSave();
         }
+
         
         void PerformSave()
         {
             pendingSave = false;
-            lastSaveTime = Time.time;
+            lastSaveTime = Time.unscaledTime;
             
             PlayerSaveData data = BuildSaveData();
             _saveService.Save(data, "default");
@@ -54,17 +73,33 @@ namespace Sol
         
         PlayerSaveData BuildSaveData()
         {
-            var data = new PlayerSaveData
+            var entries = new System.Collections.Generic.List<TalentAllocationEntry>();
+    
+            if (_talentStateService != null)
+            {
+                foreach (var nodeId in _talentStateService.GetAllocatedNodeIds())
+                {
+                    int pts = _talentStateService.GetAllocatedPoints(nodeId);
+                    if (pts > 0)
+                        entries.Add(new TalentAllocationEntry { nodeId = nodeId, allocatedPoints = pts });
+                }
+            }
+            int available = _progressionService.GetAvailableTalentPoints();
+            return new PlayerSaveData
             {
                 level = _progressionService.GetLevel(),
-                selectedTalentIds = _talentStateService?.GetAllocatedNodeIds() ?? new string[0]
+                totalTalentPoints = _progressionService.GetTotalTalentPoints(),
+                talentAllocations = entries.ToArray()
             };
-            
-            int total = _progressionService.GetTotalTalentPoints();
-            int available = _progressionService.GetAvailableTalentPoints();
-            data.spentTalentPoints = total - available;
-            
-            return data;
+        }
+        
+        
+        System.Collections.IEnumerator SaveAfterDelay(float delay)
+        {
+            pendingSave = true;
+            yield return new WaitForSecondsRealtime(delay);
+            _pendingSaveCoroutine = null;
+            PerformSave();
         }
     }
 }

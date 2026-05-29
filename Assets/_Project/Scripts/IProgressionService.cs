@@ -7,6 +7,11 @@ namespace Sol
         int GetAvailableTalentPoints();
         bool SpendTalentPoint();
         void RefundTalentPoint();
-        void Initialize(PlayerProgressionSO progressionSO, PlayerSaveData saveData);
+
+        void Initialize(PlayerProgressionSO progressionSO, PlayerStatSO defaultStats, IStatsService statsService, int level, int totalTalentPoints, int totalAttributePoints, AttributeAllocationEntry[] attributeAllocations);
+        void SetSpentTalentPoints(int spent);
+        
+        void ReloadAllBaseStats();
+        
     }
 }

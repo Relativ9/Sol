@@ -23,6 +23,7 @@ namespace Sol
     
         [Header("Cursor Settings")]
         [SerializeField] private float _cursorSpeed = 800f;
+        [SerializeField] private float _mouseSensitivity = 1f; 
         [SerializeField] private StyleSheet _cursorStyleSheet;
     
         [Header("Optional Visual")]
@@ -36,7 +37,7 @@ namespace Sol
         {
             // Create input abstraction
             _input = new CursorInputActionMap(_inputAsset);
-            _cursor = new VirtualCursor(_input, _cursorStyleSheet, _cursorSpeed);
+            _cursor = new VirtualCursor(_input, _cursorStyleSheet, _cursorSpeed, _mouseSensitivity);
     
             Debug.Log($"[VirtualCursorController] Registering cursor instance: {_cursor.GetHashCode()}");
             ServiceLocator.RegisterService<IVirtualCursor>(_cursor);

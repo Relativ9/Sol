@@ -11,8 +11,8 @@ namespace Sol
         [SerializeField] private float _gravityMultiplier = 0.5f;
         [SerializeField] private bool _persistWhileInTrigger = false;
         [SerializeField] private float _duration = 3.0f;
-        [SerializeField] private ModifierType _modifierType = ModifierType.Multiplicative;
-        [SerializeField] private ModifierCatagory _modifierCatagory = ModifierCatagory.Temporary;
+        [SerializeField] private ModifierType _modifierType = ModifierType.PercentAdditive;
+        [SerializeField] private ModifierCategory _modifierCatagory = ModifierCategory.Temporary;
         
         [Header("Source Identification")]
         [SerializeField] private string _sourceId = "";
@@ -83,34 +83,29 @@ namespace Sol
         private void ApplyGravityModifier()
         {
             if (_statsService == null) return;
-            
-            // Create the modifier with appropriate duration
             float modifierDuration = _persistWhileInTrigger ? -1f : _duration;
-            
-            StatModifier gravityModifier = new StatModifier
-            {
-                value = _gravityMultiplier,
-                type = _modifierType,
-                duration = modifierDuration,
-            };
-            
-            // Apply the modifier
-            string modifierId = ((StatsService)_statsService).ApplyOrReplaceModifier(
-                "gravityMultiplier", 
-                gravityModifier, 
-                _modifierCatagory, 
-                _sourceId
+            // Convert inspector "target multiplier" into percent-additive delta
+            // Example: 0.5f target → -0.5f additive
+            float additiveValue = _gravityMultiplier - 1f;
+            StatModifier gravMod = new StatModifier(
+                type: ModifierType.PercentAdditive,
+                category: ModifierCategory.Temporary,
+                statType: StatTypeEnum.GravityMultiplier,
+                value: additiveValue,
+                sourceId: _sourceId,
+                duration: modifierDuration
             );
-            
-            string durationText = _persistWhileInTrigger ? "while in trigger" : $"for {_duration} seconds";
-            Debug.Log($"Applied gravity modifier from {_sourceId}: {_gravityMultiplier} {durationText}. ID: {modifierId}");
+            string modifierId = _statsService.ApplyOrReplaceModifier(gravMod);
+            string durationText = _persistWhileInTrigger 
+                ? "while in trigger" 
+                : $"for {_duration} seconds";
+            Debug.Log($"Applied gravity modifier from {_sourceId}: {additiveValue} ({_gravityMultiplier}x target) {durationText}. ID: {modifierId}");
         }
         
         private void RemoveGravityModifier()
         {
             if (_statsService == null) return;
-            
-            _statsService.RemoveModifiersFromSource("gravityMultiplier", _sourceId);
+            _statsService.RemoveModifiersFromSource(_sourceId);
             Debug.Log($"Removed gravity modifier from {_sourceId}");
         }
 

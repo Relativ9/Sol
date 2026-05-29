@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System;
 
 namespace Sol
 {
@@ -8,33 +9,38 @@ namespace Sol
     {
         private readonly ITalentTreeGenerator _treeGenerator;
         private readonly GameEvent _talentStateChangedEvent; // Your SO GameEvent type
+        private IStatsService _statsService; //injected after construction
         
         private Dictionary<string, int> _allocatedPoints = new();
+        
 
         // Dependencies injected - testable, no hidden ServiceLocator calls
-        public TalentStateService(
-            ITalentTreeGenerator treeGenerator, 
-            GameEvent stateChangedEvent)
+        public TalentStateService(ITalentTreeGenerator treeGenerator, GameEvent stateChangedEvent)
         {
             _treeGenerator = treeGenerator;
             _talentStateChangedEvent = stateChangedEvent;
         }
         
+        
         // Called by GameInitializer with save data
-        public void Initialize(PlayerSaveData saveData)
+        public void Initialize(PlayerSaveData saveData, IStatsService statsService)
         {
+            _statsService = statsService;
             _allocatedPoints.Clear();
             
-            if (saveData?.selectedTalentIds != null)
+            if (saveData?.talentAllocations != null)
             {
-                foreach (var nodeId in saveData.selectedTalentIds)
+                foreach (var entry in saveData.talentAllocations)
                 {
-                    IncrementPointAllocation(nodeId);
+                    if (entry.allocatedPoints > 0)
+                        _allocatedPoints[entry.nodeId] = entry.allocatedPoints;
                 }
-            }
+            } 
             
             ValidateLoadedData();
         }
+        
+        public int GetTotalAllocatedPoints() => _allocatedPoints.Values.Sum();
         
         public int GetAllocatedPoints(string nodeId) => 
             _allocatedPoints.GetValueOrDefault(nodeId);
@@ -75,16 +81,15 @@ namespace Sol
         
         public void ResetAll()
         {
+            if (_statsService != null)
+            {
+                foreach (var nodeId in _allocatedPoints.Keys.ToArray())
+                {
+                    _statsService.RemoveModifiersFromSource(nodeId);
+                }
+            }
             _allocatedPoints.Clear();
             RaiseStateChanged();
-        }
-        
-        public PlayerSaveData BuildSaveData()
-        {
-            return new PlayerSaveData
-            {
-                selectedTalentIds = GetAllocatedNodeIds()
-            };
         }
         
         // Private helpers
@@ -104,7 +109,13 @@ namespace Sol
         
         void RaiseStateChanged()
         {
-            _talentStateChangedEvent?.Raise();
+            if (_talentStateChangedEvent == null)
+            {
+                Debug.Log("[TalentStateService] GameEvent is NULL! Assign it in TalentTreeGenerator inspector.");
+                return;
+            }
+            Debug.Log("[TalentStateService] Raising GameEvent: " + _talentStateChangedEvent.name);
+            _talentStateChangedEvent.Raise();
         }
         
         bool PrerequisitesMet(TalentNodeDataSO data)

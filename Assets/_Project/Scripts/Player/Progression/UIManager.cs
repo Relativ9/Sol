@@ -11,12 +11,15 @@ namespace Sol
         [SerializeField] private UIDocument _document;
         [SerializeField] private VisualTreeAsset _nodeTemplate;
         [SerializeField] private VisualTreeAsset _tooltipTemplate;
+        [SerializeField] private GameEvent _onImmediateSaveRequest;
         
         private Dictionary<string, VisualElement> _panels = new();
         private IUIStateService _uiStateService;
         private ITalentTreeGenerator _talentTreeGenerator;
         private ITalentStateService _talentStateService;
         private IVirtualCursor _virtualCursor;
+        private ICameraController _cameraController;
+        
         
         private bool _isTalentPanelInitialized = false;
         
@@ -35,6 +38,7 @@ namespace Sol
             _uiStateService = ServiceLocator.Get<IUIStateService>();
             _talentTreeGenerator = ServiceLocator.Get<ITalentTreeGenerator>();
             _talentStateService = ServiceLocator.Get<ITalentStateService>();
+            _cameraController =  ServiceLocator.Get<ICameraController>();
             
             // Ensure virtual cursor is disabled on start
             _virtualCursor?.UnregisterDocument(_document);
@@ -67,13 +71,21 @@ namespace Sol
             {
                 OpenPanel(panelName);
             }
-            
             ServiceLocator.Get<ITimeManager>()?.TogglePause();
         }
 
         public void OpenPanel(string panelName)
         {
             _virtualCursor?.SetActiveDocument(_document);
+            
+            if (_cameraController != null)
+            {
+                _cameraController.OnDeactivate();
+            }
+            else
+            {
+                Debug.LogError("Camera is null!");
+            }
             
             Debug.Log($"[UIManager] OpenPanel - virtualCursor null={_virtualCursor == null}, document null={_document == null}");
             
@@ -106,12 +118,27 @@ namespace Sol
                 
                 _isTalentPanelInitialized = true;
             });
+            
+            if (panel.name == "talent-wheel-root")
+            {
+                // Bypass debounce. Player explicitly closed the panel; 
+                // they expect their points to stick.
+                ServiceLocator.Get<ISaveManager>()?.RequestImmediateSave();
+            }
         }
 
         public void ClosePanel(string panelName)
         {
             _virtualCursor?.UnregisterDocument(_document);
-            
+            if (_cameraController != null)
+            {
+                _cameraController.OnActivate();
+            }
+            else
+            {
+                Debug.LogError("Camera is null!");
+            }
+
             if (_panels.TryGetValue(panelName, out VisualElement panel))
             {
                 panel.style.display = DisplayStyle.None;
@@ -131,6 +158,7 @@ namespace Sol
                     _isTalentPanelInitialized = false;
                 }
             }
+            _onImmediateSaveRequest.Raise();
         }
 
         public bool IsPanelOpen(string panelName)

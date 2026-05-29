@@ -15,6 +15,9 @@ namespace Sol
         void SetLookAheadDirection(Vector3 worldDirection); // Called by Movement to aim the look-ahead probe
         
         event Action<bool> OnGroundedStateChanged;
+        
+        bool HasLookAheadHit { get; }
+        RaycastHit LookAheadHit { get; }
 
         
     }

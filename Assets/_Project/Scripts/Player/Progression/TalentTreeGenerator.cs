@@ -17,7 +17,7 @@ namespace Sol
         [Header("Configuration")]
         [SerializeField] private TreeLayoutCollectionSO _treeCollectionSO;
         [SerializeField] private TalentTreeSettingsSO _settingsSO;
-        [SerializeField] private GameEvent _talentStateChangedEvent; // For StateService injection
+        [SerializeField] private GameEvent _gameStateChangedEvent; // For StateService injection
         
         // Runtime state
         private Dictionary<string, NodeInstance> _nodeRegistry = new();
@@ -31,10 +31,10 @@ namespace Sol
         {
             // Self-registration
             ServiceLocator.RegisterService<ITalentTreeGenerator>(this);
-            
+
             // Factory: Create and register the plain C# state service
             // StateService needs us for validation, and the GameEvent for state change notifications
-            var stateService = new TalentStateService(this, _talentStateChangedEvent);
+            var stateService = new TalentStateService(this, _gameStateChangedEvent);
             ServiceLocator.RegisterService<ITalentStateService>(stateService);
         }
 
@@ -88,7 +88,7 @@ namespace Sol
             // Position container
             if (_nodeRegistry.Count > 0)
             {
-                wheelContainer.style.left = Length.Percent(0f);
+                wheelContainer.style.left = Length.Percent(20f);
                 wheelContainer.style.top = Length.Percent(100f);
             }
         }

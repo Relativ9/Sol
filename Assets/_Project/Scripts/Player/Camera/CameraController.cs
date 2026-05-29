@@ -1,4 +1,4 @@
-using Unity.Cinemachine;
+    using Unity.Cinemachine;
 using UnityEngine;
 
 namespace Sol
@@ -25,7 +25,12 @@ namespace Sol
         // State
         private float _rotationX;
         private float _rotationY;
-        
+
+
+        public void Awake()
+        {
+            ServiceLocator.RegisterService<ICameraController>(this);
+        }
         public void Initialize(IPlayerContext context)
         {
             _context = context;
@@ -74,13 +79,13 @@ namespace Sol
         public void OnActivate()
         {
             _isActive = true;
-            Debug.Log("Camera controller activated");
+            LockCursor(false);
         }
         
         public void OnDeactivate()
         {
             _isActive = false;
-            Debug.Log("Camera controller deactivated");
+            LockCursor(true);
         }
         
         public bool CanBeActivated()
@@ -90,6 +95,7 @@ namespace Sol
         
         private void Update()
         {
+
             // Debug the state of the controller
             if (_debugMode && !_isActive)
             {
@@ -99,6 +105,12 @@ namespace Sol
             }
             
             if (!_isActive || _cameraTarget == null) return;
+            if (Time.timeScale == 0f) return;
+
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                LockCursor(true);
+            }
             
             // Get look input from context
             Vector2 lookInput = _context.GetLookInput();
@@ -111,7 +123,7 @@ namespace Sol
             }
             
             // Apply sensitivity
-            Vector2 lookDelta = lookInput * _sensitivity * Time.deltaTime;
+            Vector2 lookDelta = lookInput * _sensitivity;
             
             // Apply inversion if needed
             if (_invertY)
@@ -149,7 +161,7 @@ namespace Sol
             }
             else
             {
-                Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.Confined;
                 Cursor.visible = true;
             }
         }

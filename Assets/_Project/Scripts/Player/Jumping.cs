@@ -117,10 +117,9 @@ namespace Sol
         }
         private (float force, float directionBoost, float maxDoubleJump) GetJumpParameters()
         {
-            float force = _statsService?.GetStat("JumpForce") ?? _defaultJumpForce;
-            float boost = _statsService?.GetStat("JumpDirectionBoost") ?? _defaultJumpDirectionBoost;
-            float maxDouble = _statsService?.GetStat("MaxDoubleJump") ?? _defaultDoubleJumpCount;
-            
+            float force = _statsService?.GetStat(StatTypeEnum.JumpForce) ?? _defaultJumpForce;
+            float boost = _statsService?.GetStat(StatTypeEnum.JumpDirectionBoost) ?? _defaultJumpDirectionBoost;
+            float maxDouble = _statsService?.GetStat(StatTypeEnum.MaxDoubleJump)?? _defaultDoubleJumpCount;
             return (force, boost, maxDouble);
         }
         // --- Jump Execution ---
@@ -200,102 +199,6 @@ namespace Sol
             EndJumpPriority();
             if (_debugJump) Debug.Log("Jump priority cleared");
         }
-        
-        // public void HandleJumpInput()
-        // {
-        //     if (!_isActive || _rigidbody == null) return;
-        //     
-        //     // Check cooldown to prevent accidental double-taps
-        //     if (Time.time - _lastJumpTime < _jumpCooldown)
-        //     {
-        //         if (_debugJump) Debug.Log("Jump ignored due to cooldown");
-        //         return;
-        //     }
-        //     
-        //     bool isGrounded = _groundChecker != null ? _groundChecker.IsGrounded : 
-        //                     _context.GetStateValue<bool>("IsGrounded", false);
-        //     
-        //     // Get jump parameters from stats service
-        //     float jumpForce = _statsService != null ? _statsService.GetStat("JumpForce") : _defaultJumpForce;
-        //     float jumpDirectionBoost = _statsService != null ? _statsService.GetStat("JumpDirectionBoost") : _defaultJumpDirectionBoost;
-        //     float maxDoubleJump = _statsService != null ? _statsService.GetStat("MaxDoubleJump") : _defaultDoubleJumpCount;
-        //     
-        //     // Set jump priority to prevent movement from overriding our velocity
-        //     _context.SetStateValue("JumpPriority", true);
-        //     StartCoroutine(ClearJumpPriority(0.1f));
-        //     
-        //     if (isGrounded)
-        //     {
-        //         // Reset double jump counter when grounded
-        //         _currentDoubleJumpCount = 0;
-        //         
-        //         // Get current velocity
-        //         Vector3 currentVelocity = _rigidbody.linearVelocity;
-        //         
-        //         // Extract horizontal velocity
-        //         Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
-        //         
-        //         // Apply direction boost if we have horizontal velocity
-        //         if (horizontalVelocity.magnitude > 0.1f && jumpDirectionBoost > 1.0f)
-        //         {
-        //             // Boost horizontal velocity
-        //             Vector3 boostedHorizontalVelocity = horizontalVelocity * jumpDirectionBoost;
-        //             
-        //             // Apply the jump with boosted horizontal velocity
-        //             _rigidbody.linearVelocity = new Vector3(
-        //                 boostedHorizontalVelocity.x,
-        //                 currentVelocity.y, // Will be overridden by the jump force
-        //                 boostedHorizontalVelocity.z
-        //             );
-        //         }
-        //         
-        //         // Apply the jump force
-        //         _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        //         
-        //         if (_debugJump) Debug.Log($"Ground jump with force: {jumpForce}");
-        //         
-        //         // Trigger animation
-        //         _context.SetStateValue("JumpTriggered", true);
-        //         StartCoroutine(ResetJumpTrigger());
-        //     }
-        //     else if (_currentDoubleJumpCount < maxDoubleJump)
-        //     {
-        //         // Increment double jump counter
-        //         _currentDoubleJumpCount += 1;
-        //         
-        //         // Get current velocity
-        //         Vector3 currentVelocity = _rigidbody.linearVelocity;
-        //         
-        //         // For double jumps, we might want to reset vertical velocity to prevent stacking
-        //         // This makes double jumps more consistent
-        //         if (currentVelocity.y < 0)
-        //         {
-        //             // If falling, reset vertical velocity
-        //             _rigidbody.linearVelocity = new Vector3(
-        //                 currentVelocity.x,
-        //                 0, // Reset vertical velocity
-        //                 currentVelocity.z
-        //             );
-        //         }
-        //         
-        //         // Apply the jump force
-        //         _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        //         
-        //         if (_debugJump) Debug.Log($"Double jump {_currentDoubleJumpCount}/{maxDoubleJump} with force: {jumpForce}");
-        //         
-        //         // Trigger animation
-        //         _context.SetStateValue("DoubleJumpTriggered", true);
-        //         StartCoroutine(ResetDoubleJumpTrigger());
-        //     }
-        //     else
-        //     {
-        //         if (_debugJump) Debug.Log("Cannot jump: not grounded and out of double jumps");
-        //         return; // Don't update last jump time if we didn't actually jump
-        //     }
-        //     
-        //     // Record jump time
-        //     _lastJumpTime = Time.time;
-        // }
         
         private IEnumerator ClearJumpPriority(float delay)
         {

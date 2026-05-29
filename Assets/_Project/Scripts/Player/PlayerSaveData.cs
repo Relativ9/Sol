@@ -1,6 +1,20 @@
 namespace Sol
 {
     [System.Serializable]
+    public struct TalentAllocationEntry
+    {
+        public string nodeId;
+        public int allocatedPoints;
+    }
+
+    [System.Serializable]
+    public class AttributeAllocationEntry
+    {
+        public StatTypeEnum statType;
+        public int pointsAllocated; //points for attributes above (or below) the starting default
+    }
+    
+    [System.Serializable]
     public class PlayerSaveData
     {
         public static PlayerSaveData CreateNewGame(PlayerProgressionSO progression)
@@ -8,28 +22,23 @@ namespace Sol
             return new PlayerSaveData
             {
                 level = progression.startingLevel,
-                talentPoints = progression.startingTalentPoints,
-                attributePoints = 3, // For spending during character creation
+                totalTalentPoints = progression.startingTalentPoints,
+                totalAttributePoints = progression.startingAttributePoints,
+                talentAllocations = System.Array.Empty<TalentAllocationEntry>(),
                 // All allocations default to 0 (meaning 10 Brawn, 10 Finesse, etc.)
             };
         }
+        
         // Progression
         public int level;
-        public int talentPoints;
-        public int spentTalentPoints;
+        public int totalTalentPoints;
         public int prestigePoints;
-        public int attributePoints;
+        public int totalAttributePoints;
 
-        // Attribute allocations (delta above base, not final values)
-        public int brawnAllocation;
-        public int finesseAllocation;
-        public int insightAllocation;
-        public int focusAllocation;
-        public int vigorAllocation;
-        public int willpowerAllocation;
-
+        
         // Selected talent IDs (resolved against TalentDataSO registry on load)
-        public string[] selectedTalentIds;
+        public TalentAllocationEntry[] talentAllocations;
+        public AttributeAllocationEntry[] attributeAllocations;
 
         // Current resource state (mutable gameplay values, not derived from stats)
         public float currentHealth;

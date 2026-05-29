@@ -22,6 +22,9 @@ namespace Sol
         private Vector3 _customGravityDirection;
         private bool _useCustomGravityDirection;
         
+        // NEW: Local physics multiplier. Replaces the old stat-modifier hack.
+        private float _currentInternalScale;
+        
         public void Initialize(IPlayerContext context)
         {
             _context = context;
@@ -34,14 +37,14 @@ namespace Sol
                 _rigidbody = gameObject.AddComponent<Rigidbody>();
             }
             
-            // Disable Unity's built-in gravity
             _rigidbody.useGravity = false;
+            
+            // NEW: Start at default
+            _currentInternalScale = _defaultGravityMultiplier;
         }
         
         public bool CanBeActivated() => true;
-        
         public void OnActivate() => _isActive = true;
-        
         public void OnDeactivate() => _isActive = false;
         
         private void FixedUpdate()
@@ -56,35 +59,36 @@ namespace Sol
         {
             if (_rigidbody == null || !_gravityEnabled) return;
 
-            float gravityScale = GetCurrentGravityScale();
+            // Read EXTERNAL modifiers (zones, gear, spells) once per frame
+            float externalScale = _statsService != null 
+                ? _statsService.GetStat(StatTypeEnum.GravityMultiplier) 
+                : 1.0f;
             
-            // Calculate gravity force
             Vector3 gravityForce;
+            
             if (_useCustomGravityDirection)
             {
-
-                gravityForce = _customGravityDirection * gravityScale;
+                // CHANGED: apply external scale, but no internal falling logic here
+                gravityForce = _customGravityDirection * externalScale;
             }
             else
             {
-                if (_rigidbody.linearVelocity.y <= 0)
-                {
-                    gravityForce = _defaultGravityDirection.normalized * (_defaultGravityStrength * gravityScale);
-                }
-                else
-                {
-                    gravityForce = _defaultGravityDirection.normalized * (_defaultGravityStrength * _defaultGravityMultiplier);
-                }
+                // CHANGED: internal scale depends on rising vs falling.
+                // StatsService is NOT involved in this decision.
+                float internalScale = _rigidbody.linearVelocity.y > 0 
+                    ? _defaultGravityMultiplier 
+                    : _currentInternalScale;
+                    
+                float finalScale = internalScale * externalScale;
+                
+                gravityForce = _defaultGravityDirection.normalized * (_defaultGravityStrength * finalScale);
             }
             
-            // Apply gravity force - always the same regardless of velocity
             _rigidbody.AddForce(gravityForce, ForceMode.Acceleration);
             
-            // Clamp to terminal velocity
             float currentTerminalVelocity = _statsService != null ? 
-                _statsService.GetStat("terminalVelocity") : _terminalVelocity;
+                _statsService.GetStat(StatTypeEnum.TerminalVelocity) : _terminalVelocity;
                 
-            // Only clamp vertical velocity
             if (_rigidbody.linearVelocity.y < currentTerminalVelocity)
             {
                 Vector3 clampedVelocity = _rigidbody.linearVelocity;
@@ -95,24 +99,8 @@ namespace Sol
         
         public void SetGravityScale(float scale)
         {
-            // Apply as a modifier to the stat
-            if (_statsService != null)
-            {
-                StatModifier scaleModifier = new StatModifier(
-                    ModifierType.Multiplicative,
-                    ModifierCatagory.Temporary,
-                    scale,
-                    this,
-                    -1f // No duration (will be removed manually)
-                );
-                
-                _statsService.ApplyOrReplaceModifier(
-                    "gravityMultiplier", 
-                    scaleModifier, 
-                    ModifierCatagory.Temporary, 
-                    "gravityController"
-                );
-            }
+            // CHANGED: Local state only. Do NOT touch StatsService.
+            _currentInternalScale = scale;
         }
         
         public void SetCustomGravityDirection(Vector3 gravity)
@@ -125,17 +113,29 @@ namespace Sol
         {
             _useCustomGravityDirection = false;
             
-            // Remove any gravity scale modifiers
-            if (_statsService != null)
-            {
-                _statsService.RemoveModifiersFromSource("gravityMultiplier", "gravityController");
-            }
+            // CHANGED: Reset local state only.
+            _currentInternalScale = _defaultGravityMultiplier;
+            
+            // REMOVED: _statsService.RemoveModifiersFromSource(...)
+            // If an external zone is still active, its stat modifier lives on
+            // because the zone owns that lifespan, not this controller.
         }
         
         public float GetCurrentGravityScale()
         {
-            return _statsService != null ? 
-                _statsService.GetStat("gravityMultiplier") : _defaultGravityMultiplier;
+            // CHANGED: Return the combined multiplier as it would apply right now
+            float externalScale = _statsService != null 
+                ? _statsService.GetStat(StatTypeEnum.GravityMultiplier) 
+                : 1.0f;
+                
+            if (_useCustomGravityDirection)
+                return externalScale;
+                
+            float internalScale = (_rigidbody != null && _rigidbody.linearVelocity.y > 0)
+                ? _defaultGravityMultiplier
+                : _currentInternalScale;
+                
+            return internalScale * externalScale;
         }
         
         public Vector3 GetCurrentGravity()

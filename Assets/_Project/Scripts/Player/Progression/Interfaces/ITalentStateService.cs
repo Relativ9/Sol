@@ -3,14 +3,13 @@ namespace Sol
 {
     public interface ITalentStateService
     {
-        void Initialize(PlayerSaveData saveData);
+        void Initialize(PlayerSaveData saveData, IStatsService statsService);
         int GetAllocatedPoints(string nodeId);
         string[] GetAllocatedNodeIds();
         bool HasAllocatedPoints(string nodeId);
         bool TryAllocatePoint(string nodeId);
         bool TryRemovePoint(string nodeId);
         void ResetAll();
-        PlayerSaveData BuildSaveData();
-        // Remove OnStateChanged event - handled via GameEvent SO now
+        int GetTotalAllocatedPoints();
     }
 }

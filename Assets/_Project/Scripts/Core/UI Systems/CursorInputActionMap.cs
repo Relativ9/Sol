@@ -66,14 +66,26 @@ public class CursorInputActionMap : ICursorInput, IDisposable
 
     public Vector2 GetMovementDelta()
     {
-        if (Mouse.current != null && Mouse.current.delta.ReadValue().magnitude > 0.01f)
+        
+        if (IsMouseBeingUsed())
         {
-            // Mouse gives delta directly - scale it down to match gamepad feel
-            return Mouse.current.delta.ReadValue() * 0.1f;
+            return Mouse.current.delta.ReadValue(); // Raw pixels
         }
-    
-        // Gamepad stick gives -1 to 1
         return _moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
+        
+        // if (Mouse.current != null && Mouse.current.delta.ReadValue().magnitude > 0.01f)
+        // {
+        //     // Mouse gives delta directly - scale it down to match gamepad feel
+        //     return Mouse.current.delta.ReadValue() * 0.1f;
+        // }
+        //
+        // // Gamepad stick gives -1 to 1
+        // return _moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
+    }
+
+    public bool IsDeltaPointerDriven()
+    {
+        return IsMouseBeingUsed();
     }
 
     public bool WasPrimaryPressed()

@@ -170,7 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Sol_Scripts::Sol.TalentTreeGenerator
   _treeCollectionSO: {fileID: 11400000, guid: fc1a0795214e979ae9fdee0522e9e733, type: 2}
   _settingsSO: {fileID: 11400000, guid: 3418f1081cad51d228ed8d36d73f1244, type: 2}
-  _talentStateChangedEvent: {fileID: 11400000, guid: 96ac776596ad3df4887ae197ee6b1729, type: 2}
+  _gameStateChangedEvent: {fileID: 11400000, guid: 22b154ef827f07344abc3b9240c338af, type: 2}
 --- !u!1 &36548949
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,7 +543,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157207112}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 0.8254717, g: 0.94156736, b: 1, a: 1}
   m_Intensity: 90000
@@ -595,7 +595,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0.025
   m_ShadowAngle: 1.47
   m_LightUnit: 2
   m_LuxAtDistance: 1
@@ -638,7 +638,8 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: 1
-  m_Version: 14
+  m_ShapeRadius: -1
+  m_Version: 15
   m_ObsoleteShadowResolutionTier: 1
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
@@ -651,7 +652,6 @@ MonoBehaviour:
   m_AffectDiffuse: 1
   m_AffectSpecular: 1
   m_NonLightmappedOnly: 0
-  m_ShapeRadius: 0.025
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
@@ -689,7 +689,6 @@ MonoBehaviour:
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
-  m_LightShadowRadius: 0.5
   m_SemiTransparentShadow: 0
   m_ColorShadow: 1
   m_DistanceBasedFiltering: 0
@@ -1050,8 +1049,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 206663306}
-  - component: {fileID: 206663308}
   - component: {fileID: 206663307}
+  - component: {fileID: 206663309}
+  - component: {fileID: 206663308}
   m_Layer: 0
   m_Name: SaveManager
   m_TagString: Untagged
@@ -1086,7 +1086,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1affbe9c7e63d982bc2d2b007baa34a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Sol_Scripts::Sol.SaveManager
-  debounceInterval: 2
+  debounceInterval: 20
 --- !u!114 &206663308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,7 +1105,35 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 206663307}
         m_TargetAssemblyTypeName: Sol.SaveManager, Sol_Scripts
-        m_MethodName: OnGameStateChanged
+        m_MethodName: RequestLazySave
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &206663309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206663305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df783e241952c02acaf897a02a4e6f0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.GameEventListener
+  _gameEvent: {fileID: 11400000, guid: 8b10a637d48705140a1709cacdfc74a6, type: 2}
+  _response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 206663307}
+        m_TargetAssemblyTypeName: Sol.SaveManager, Sol_Scripts
+        m_MethodName: RequestImmediateSave
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1351,7 +1379,8 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: 1
-  m_Version: 14
+  m_ShapeRadius: -1
+  m_Version: 15
   m_ObsoleteShadowResolutionTier: 1
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
@@ -1364,7 +1393,6 @@ MonoBehaviour:
   m_AffectDiffuse: 1
   m_AffectSpecular: 1
   m_NonLightmappedOnly: 0
-  m_ShapeRadius: 0.025
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
@@ -1402,7 +1430,6 @@ MonoBehaviour:
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
-  m_LightShadowRadius: 0.5
   m_SemiTransparentShadow: 0
   m_ColorShadow: 1
   m_DistanceBasedFiltering: 0
@@ -1478,7 +1505,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 277559465}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0
@@ -1530,7 +1557,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0.025
   m_ShadowAngle: 4
   m_LightUnit: 2
   m_LuxAtDistance: 1
@@ -1764,6 +1791,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -6798,6 +6826,7 @@ MonoBehaviour:
   _inputAsset: {fileID: -944628639613478452, guid: 1816fe33611e1194ca2ed5da4b003b17, type: 3}
   _actionMapName: UI
   _cursorSpeed: 800
+  _mouseSensitivity: 1
   _cursorStyleSheet: {fileID: 7433441132597879392, guid: a0e414667bf519b6a9a1234c9952d07c, type: 3}
   _cursorTexture: {fileID: 2800000, guid: b750c8e4c3b4eea1387f299a50387a92, type: 3}
 --- !u!1 &446571575
@@ -7777,6 +7806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e799e663e228b44a94eb4ef2fd23cdc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Sol_Scripts::Sol.StatsService
+  _onStatsChangedEvent: {fileID: 0}
 --- !u!4 &711337461 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -9166285093476956020, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -7879,6 +7909,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -7981,6 +8012,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -8789,7 +8821,8 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: 1
-  m_Version: 14
+  m_ShapeRadius: -1
+  m_Version: 15
   m_ObsoleteShadowResolutionTier: 1
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
@@ -8802,7 +8835,6 @@ MonoBehaviour:
   m_AffectDiffuse: 1
   m_AffectSpecular: 1
   m_NonLightmappedOnly: 0
-  m_ShapeRadius: 0.025
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
@@ -8840,7 +8872,6 @@ MonoBehaviour:
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
-  m_LightShadowRadius: 0.5
   m_SemiTransparentShadow: 0
   m_ColorShadow: 1
   m_DistanceBasedFiltering: 0
@@ -8916,7 +8947,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1283548524}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0
@@ -8968,7 +8999,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0.025
   m_ShadowAngle: 4
   m_LightUnit: 2
   m_LuxAtDistance: 1
@@ -14852,7 +14883,8 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: 1
-  m_Version: 14
+  m_ShapeRadius: -1
+  m_Version: 15
   m_ObsoleteShadowResolutionTier: 1
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
@@ -14865,7 +14897,6 @@ MonoBehaviour:
   m_AffectDiffuse: 1
   m_AffectSpecular: 1
   m_NonLightmappedOnly: 0
-  m_ShapeRadius: 0.025
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
@@ -14903,7 +14934,6 @@ MonoBehaviour:
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
-  m_LightShadowRadius: 0.5
   m_SemiTransparentShadow: 0
   m_ColorShadow: 1
   m_DistanceBasedFiltering: 0
@@ -14979,7 +15009,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1655173276}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 10000
@@ -15031,7 +15061,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0.025
   m_ShadowAngle: 1
   m_LightUnit: 2
   m_LuxAtDistance: 1
@@ -15531,6 +15561,7 @@ GameObject:
   - component: {fileID: 1826156586}
   - component: {fileID: 1826156588}
   - component: {fileID: 1826156587}
+  - component: {fileID: 1826156589}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -15571,6 +15602,7 @@ MonoBehaviour:
   _document: {fileID: 1561581042}
   _nodeTemplate: {fileID: 9197481963319205126, guid: 2b39f5ba8afc51833b5cd891c4d4d9e3, type: 3}
   _tooltipTemplate: {fileID: 9197481963319205126, guid: aa0e1ebaaba47e3bb98810e5a4fa13bc, type: 3}
+  _onImmediateSaveRequest: {fileID: 11400000, guid: 8b10a637d48705140a1709cacdfc74a6, type: 2}
 --- !u!114 &1826156586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15678,6 +15710,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d86f1fec75d79a42a37ca5224171d23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Sol.UIInputController
+--- !u!114 &1826156589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826156583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df783e241952c02acaf897a02a4e6f0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.GameEventListener
+  _gameEvent: {fileID: 11400000, guid: 065b63ffd5ff6f5e4b7cd624868bed5f, type: 2}
+  _response:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1844287460
 GameObject:
   m_ObjectHideFlags: 0
@@ -16025,6 +16073,7 @@ MonoBehaviour:
   playerStatSO: {fileID: 11400000, guid: 6b8b5e174e3a426469cb0623ee87618d, type: 2}
   playerProgressionSO: {fileID: 11400000, guid: 12a3532e67962fc32a80cf3889e877dd, type: 2}
   statsService: {fileID: 707063840}
+  _forceNewGame: 0
 --- !u!4 &1962008662 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 281297371296666442, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -17084,7 +17133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4383e27ef4e694a4694c8b8a45d4b27c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sensitivity: 2
+  _sensitivity: 0.025
   _invertY: 0
   _lockCursorOnStart: 1
   _cinemachineCamera: {fileID: 1427533668}
@@ -17104,7 +17153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4f316acd51b51545a49dc0449d98b51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _defaultJumpForce: 5
+  _defaultJumpForce: 6
   _defaultJumpDirectionBoost: 1
   _defaultDoubleJumpCount: 0
   _debugJump: 1
@@ -17389,7 +17438,8 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: 1
-  m_Version: 14
+  m_ShapeRadius: -1
+  m_Version: 15
   m_ObsoleteShadowResolutionTier: 1
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
@@ -17402,7 +17452,6 @@ MonoBehaviour:
   m_AffectDiffuse: 1
   m_AffectSpecular: 1
   m_NonLightmappedOnly: 0
-  m_ShapeRadius: 0.025
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
@@ -17440,7 +17489,6 @@ MonoBehaviour:
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
-  m_LightShadowRadius: 0.5
   m_SemiTransparentShadow: 0
   m_ColorShadow: 1
   m_DistanceBasedFiltering: 0
@@ -17516,7 +17564,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2128289268}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0
@@ -17568,7 +17616,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0.025
   m_ShadowAngle: 4
   m_LightUnit: 2
   m_LuxAtDistance: 1

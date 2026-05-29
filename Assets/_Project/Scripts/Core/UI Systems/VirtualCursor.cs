@@ -19,6 +19,7 @@ public class VirtualCursor : IVirtualCursor
     // Dependencies injected via constructor
     private readonly ICursorInput _input;
     private readonly float _speed;
+    private readonly float _mouseSensitivity;
     
     // Document management
     private readonly List<UIDocument> _registeredDocuments = new();
@@ -42,10 +43,12 @@ public class VirtualCursor : IVirtualCursor
     /// </summary>
     /// <param name="input">Input abstraction (Input System, touch, or mock)</param>
     /// <param name="speed">Movement speed in pixels per second</param>
-    public VirtualCursor(ICursorInput input, StyleSheet cursorStyleSheet, float speed = 800f)
+    public VirtualCursor(ICursorInput input, StyleSheet cursorStyleSheet, 
+        float speed = 800f, float mouseSensitivity = 1f)
     {
         _input = input;
         _speed = speed;
+        _mouseSensitivity = mouseSensitivity;
         _cursorStyleSheet = cursorStyleSheet;
         _currentPosition = new Vector2(Screen.width / 2f, Screen.height / 2f);
     }
@@ -186,18 +189,27 @@ public class VirtualCursor : IVirtualCursor
 
     private void UpdatePosition(float deltaTime)
     {
+
         Vector2 input = _input.GetMovementDelta();
-    
-        Vector2 delta = input * _speed * deltaTime;
-    
-        _currentPosition.x += delta.x;
-        _currentPosition.y -= delta.y; // Flip Y: mouse delta is bottom-up, screen position tracks top-down
-    
+
+        Vector2 delta = _input.IsDeltaPointerDriven() ? input * _mouseSensitivity : input * _speed * deltaTime;
+        
+        
+        
+        // Vector2 input = _input.GetMovementDelta();
+        //
+        // Vector2 delta = input * _speed * deltaTime;
+        //
+        // if (delta.magnitude > 100f && input.magnitude < 5f) Debug.LogError($"SHIT'S WRONG YO! input = {input}, deltatime={deltaTime}. delta = {delta}");
+        //
+         _currentPosition.x += delta.x;
+         _currentPosition.y -= delta.y; // Flip Y: mouse delta is bottom-up, screen position tracks top-down
+        
         _currentPosition.x = Mathf.Clamp(_currentPosition.x, 0, Screen.width);
-        _currentPosition.y = Mathf.Clamp(_currentPosition.y, 0, Screen.height);
-        Vector2 panelPosition = GetPanelPosition();
-        _cursorElement.style.left = panelPosition.x - CURSOR_OFFSET;
-        _cursorElement.style.top = panelPosition.y - CURSOR_OFFSET;
+         _currentPosition.y = Mathf.Clamp(_currentPosition.y, 0, Screen.height);
+         Vector2 panelPosition = GetPanelPosition();
+         _cursorElement.style.left = panelPosition.x - CURSOR_OFFSET;
+         _cursorElement.style.top = panelPosition.y - CURSOR_OFFSET;
     }
 
     /// <summary>

@@ -115,6 +115,7 @@ namespace Sol
                 // We refresh visuals immediately for responsiveness.
                 UpdateNodeVisual(nodeId, nodeInstance);
                 RefreshDependents(nodeId);
+                UpdatePointsDisplay();
             }
             else
             {
@@ -133,6 +134,7 @@ namespace Sol
                 _progressionService.RefundTalentPoint();
                 UpdateNodeVisual(nodeId, nodeInstance);
                 RefreshDependents(nodeId);
+                UpdatePointsDisplay();
             }
         }
         

@@ -191,7 +191,7 @@
                     "name": "CursorMove",
                     "type": "Value",
                     "id": "43c6be22-d904-48fd-bbfc-2cd34bea9050",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Delta",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -230,7 +230,7 @@
                 {
                     "name": "",
                     "id": "c37a47e1-7b3e-49e2-897a-624e6ebf4f32",
-                    "path": "<Mouse>/position",
+                    "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

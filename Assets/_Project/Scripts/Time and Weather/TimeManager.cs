@@ -358,7 +358,7 @@ namespace Sol
             
             _cachedTimeScale = Time.timeScale;
             _cachedCelestialTimeScale = _celestialTimeScale;
-            
+
             Time.timeScale = 0f;
             SetCelestialTimeScale(0f);
             if (_enableDebugLogging)
@@ -370,6 +370,7 @@ namespace Sol
         public void ResumeTime()
         {
             _isPaused = false;
+
             Time.timeScale = _cachedTimeScale;
             SetCelestialTimeScale(_cachedCelestialTimeScale);
             

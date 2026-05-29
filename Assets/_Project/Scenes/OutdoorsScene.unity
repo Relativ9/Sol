@@ -569,7 +569,7 @@ Transform:
   m_GameObject: {fileID: 222581136}
   serializedVersion: 2
   m_LocalRotation: {x: -0.12411064, y: 0.016661294, z: 0.1803121, w: 0.9756058}
-  m_LocalPosition: {x: 50.19, y: 0.14, z: 17.96}
+  m_LocalPosition: {x: 50.19, y: 2.31, z: 17.96}
   m_LocalScale: {x: 10, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3743,7 +3743,7 @@ Transform:
   m_GameObject: {fileID: 405157651}
   serializedVersion: 2
   m_LocalRotation: {x: 0.6385574, y: -0.28996876, z: -0.2825917, w: -0.6544498}
-  m_LocalPosition: {x: 56.19, y: 4.77, z: 23.71}
+  m_LocalPosition: {x: 55.17, y: 6.9399996, z: 22.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3761,10 +3761,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87f81c54b3ba5744faa694b15ef4d5ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gravityMultiplier: 0.25
+  _gravityMultiplier: 0.5
   _persistWhileInTrigger: 0
-  _duration: 2
-  _modifierType: 2
+  _duration: 6
+  _modifierType: 1
   _modifierCatagory: 4
   _sourceId: 
   _generateUniqueId: 0
@@ -5329,7 +5329,8 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: -1
-  m_Version: 14
+  m_ShapeRadius: -1
+  m_Version: 15
   m_ObsoleteShadowResolutionTier: 1
   m_ObsoleteUseShadowQualitySettings: 0
   m_ObsoleteCustomShadowResolution: 512
@@ -5342,7 +5343,6 @@ MonoBehaviour:
   m_AffectDiffuse: 1
   m_AffectSpecular: 1
   m_NonLightmappedOnly: 0
-  m_ShapeRadius: 0.2
   m_SoftnessScale: 1
   m_UseCustomSpotLightShadowCone: 0
   m_CustomSpotLightShadowCone: 30
@@ -5380,7 +5380,6 @@ MonoBehaviour:
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
-  m_LightShadowRadius: 0.5
   m_SemiTransparentShadow: 0
   m_ColorShadow: 1
   m_DistanceBasedFiltering: 0
@@ -5456,7 +5455,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978594437}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 20.466913
@@ -5508,7 +5507,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0.2
+  m_ShapeRadius: 0.2
   m_ShadowAngle: 0
   m_LightUnit: 0
   m_LuxAtDistance: 1
@@ -6234,7 +6233,7 @@ MonoBehaviour:
   _gravityMultiplier: 5
   _persistWhileInTrigger: 1
   _duration: 2
-  _modifierType: 2
+  _modifierType: 1
   _modifierCatagory: 4
   _sourceId: 
   _generateUniqueId: 0

@@ -14,7 +14,7 @@ namespace Sol
         {
             public string statName;
             public ModifierType modifierType;
-            public ModifierCatagory modifierCategory;
+            public ModifierCategory modifierCategory;
             public float value;
         }
     }

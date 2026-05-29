@@ -37,6 +37,9 @@ namespace Sol
         public float GroundNormalSlope => Vector3.Angle(Vector3.up, _groundHit.normal);
         public RaycastHit GroundHit => _groundHit;
         
+        public bool HasLookAheadHit => _hasLookAheadHit;
+        public RaycastHit LookAheadHit => _lookAheadHit;
+        
         public event Action<bool> OnGroundedStateChanged;
         
         public void Initialize(IPlayerContext context)

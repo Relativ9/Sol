@@ -4,12 +4,14 @@ namespace Sol
 {
     public interface IStatsService
     {
-        float GetStat(string statName);
-        string ApplyModifier(string statName, StatModifier modifier, ModifierCatagory modifierCatagory);
-        string ApplyOrReplaceModifier(string statName, StatModifier modifier, ModifierCatagory category, string sourceId);
-        void RemoveModifier(string statName, string modifierId);
-        void RemoveModifiersFromSource(string statName, string sourceId);
-        void RemoveAllModifiersOfType(string statName, ModifierCatagory modifierCatagory);
+        float GetStat(StatTypeEnum statType);
+        float GetBaseStat(StatTypeEnum statType);
+        void SetBaseStat(StatTypeEnum statType, float value);
+        string ApplyModifier(StatModifier modifier);
+        string ApplyOrReplaceModifier(StatModifier modifier);
+        void RemoveModifier(string modifierId);
+        void RemoveModifiersFromSource(string sourceID);
+        void RemoveAllModifiersOfType(StatTypeEnum statType, ModifierCategory category);
         float GetSpeedMultiplier();
         
         // // Progression

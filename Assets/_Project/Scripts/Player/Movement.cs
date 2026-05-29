@@ -164,29 +164,25 @@ namespace Sol
             if (_isRunning)
             {
                 // Get the run multiplier from stats
-                float runMultiplier = _statsService.GetStat("runMultiplier");
+                float runMultiplier = _statsService.GetStat(StatTypeEnum.RunMultiplier);
                 
                 // Create a running modifier
-                StatModifier runModifier = new StatModifier(
-                    ModifierType.Multiplicative,
-                    ModifierCatagory.Temporary,
-                    runMultiplier,
-                    this,
-                    -1f // No duration (will be removed manually)
+                StatModifier runMod = new StatModifier(
+                    type: ModifierType.PercentAdditive,
+                    category: ModifierCategory.Temporary,
+                    statType: StatTypeEnum.MoveSpeed,
+                    value: runMultiplier,
+                    sourceId: _runModifierSourceId,
+                    duration: -1f
                 );
                 
                 // Apply the modifier
-                _statsService.ApplyOrReplaceModifier(
-                    "moveSpeed",
-                    runModifier,
-                    ModifierCatagory.Temporary,
-                    _runModifierSourceId
-                );
+                _statsService.ApplyOrReplaceModifier(runMod);
             }
             else
             {
                 // Remove the running modifier
-                _statsService.RemoveModifiersFromSource("moveSpeed", _runModifierSourceId);
+                _statsService.RemoveModifiersFromSource(_runModifierSourceId);
             }
         }
         
@@ -230,7 +226,7 @@ namespace Sol
         private void ProcessGroundedMovement()
         {
             UpdateCurrentSpeed();
-            Vector3 groundNormal = GetGroundNormal();
+            Vector3 groundNormal = GetMovementGroundNormal();
             float slopeAngle = Vector3.Angle(Vector3.up, groundNormal);
             if (_hasMoveInput && slopeAngle <= _maxWalkableSlopeAngle)
                 ApplyGroundedVelocity(groundNormal);
@@ -240,15 +236,30 @@ namespace Sol
         
         private void UpdateCurrentSpeed()
         {
-            float targetSpeed = _statsService != null ? _statsService.GetStat("moveSpeed") : _defaultSpeed;
+            float targetSpeed = _statsService != null ? _statsService.GetStat(StatTypeEnum.MoveSpeed) : _defaultSpeed;
             _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.fixedDeltaTime * _speedTransitionRate);
         }
         
-        private Vector3 GetGroundNormal()
+        private Vector3 GetMovementGroundNormal()
         {
-            return _groundChecker != null
-                ? _groundChecker.GetSmoothedGroundNormal()
-                : Vector3.up;
+            if (_groundChecker == null)
+                return Vector3.up;
+            // Look-ahead sees nothing (void, ledge, too far down). 
+            // Trust only what is physically under the player's feet right now.
+            if (!_groundChecker.HasLookAheadHit)
+                return _groundChecker.GroundHit.normal;
+            // Look-ahead sees geometry, but it's a cliff face or un-walkable slide.
+            // Don't let Movement blend the player onto it.
+            float lookAheadSlope = Vector3.Angle(Vector3.up, _groundChecker.LookAheadHit.normal);
+            if (lookAheadSlope > _maxWalkableSlopeAngle)
+                return _groundChecker.GroundHit.normal;
+            // Look-ahead confirms a continuous walkable ramp ahead.
+            // Safe to smooth the transition between current hit and upcoming hit.
+            return _groundChecker.GetSmoothedGroundNormal();
+            
+            // return _groundChecker != null
+            //     ? _groundChecker.GetSmoothedGroundNormal()
+            //     : Vector3.up;
         }
         
         private void ApplyGroundedVelocity(Vector3 groundNormal)
@@ -275,7 +286,7 @@ namespace Sol
         
         private void ApplyDeceleration()
         {
-            float deceleration = _statsService != null ? _statsService.GetStat("deceleration") : _defaultDeceleration;
+            float deceleration = _statsService != null ? _statsService.GetStat(StatTypeEnum.Deceleration) : _defaultDeceleration;
             Vector3 currentVelocity = _rigidbody.linearVelocity;
             Vector3 horizontalVelocity = new Vector3(currentVelocity.x, 0, currentVelocity.z);
             if (horizontalVelocity.magnitude <= 0.1f)
@@ -299,7 +310,15 @@ namespace Sol
         private void ApplyGroundStickiness()
         {
             if (_timeSinceGrounded <= _ungroundedDelay)
-                _rigidbody.AddForce(Vector3.down * _groundStickyForce, ForceMode.Acceleration);
+            {
+                float slopeAngle = _groundChecker != null 
+                    ? _groundChecker.GroundNormalSlope 
+                    : 0f;
+                if (slopeAngle <= _maxWalkableSlopeAngle)
+                {
+                    _rigidbody.AddForce(Vector3.down * _groundStickyForce, ForceMode.Acceleration);
+                }
+            }
         }
         
         //Look ahead, used to calculate movement direction normal.

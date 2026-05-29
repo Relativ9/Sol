@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Sol
 {
@@ -14,6 +13,12 @@ namespace Sol
         /// Expected range: -1 to 1 on both axes. Will be scaled by cursor speed.
         /// </summary>
         Vector2 GetMovementDelta();
+
+        /// <summary>
+        /// true for mouse/touch false for gamepad/joystick/analogs
+        /// </summary>
+        /// <returns></returns>
+        bool IsDeltaPointerDriven();
     
         /// <summary>
         /// Primary action (typically South button/Face Down on controllers, Left Click on mouse).

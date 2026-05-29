@@ -53,7 +53,6 @@ namespace Sol
                 eventDispatcher = gameObject.AddComponent<AnimationEventDispatcher>();
             }
             
-            InitializeComponents();
             if (_gravityController != null)
             {
                 RegisterService<IGravityController>(_gravityController);
@@ -77,6 +76,7 @@ namespace Sol
         void Start()
         {
             _timeManager = ServiceLocator.Get<ITimeManager>();
+            InitializeComponents();
         }
 
         private void DetermineActiveMovementState()

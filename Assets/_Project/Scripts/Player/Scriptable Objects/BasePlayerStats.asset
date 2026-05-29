@@ -12,33 +12,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6eee5ab6e68d040b1d33109f2dedbb, type: 3}
   m_Name: BasePlayerStats
   m_EditorClassIdentifier: 
-  baseMoveSpeed: 3
-  baseRunMultiplier: 4
-  baseDeceleration: 8
-  baseCrouchSpeed: 3
-  baseJumpForce: 5
-  baseJumpDirectionBoost: 1
-  baseMaxDoubleJump: 1
-  baseJumpCooldown: 0.1
-  baseFallDamageMultiplier: 1
-  baseGravityMultiplier: 2.5
-  baseTerminalVelocity: -20
   brawn: 10
   finesse: 10
   insight: 10
   focus: 10
   vigor: 10
   willpower: 10
-  baseHealth: 100
+  baseMoveSpeed: 3
+  baseRunMultiplier: 2
+  baseDeceleration: 8
+  baseCrouchSpeed: 3
+  baseJumpForce: 4
+  baseJumpDirectionBoost: 1
+  baseMaxDoubleJump: 1
+  baseJumpCooldown: 0.1
+  baseFallDamageMultiplier: 1
+  baseGravityMultiplier: 1.5
+  baseTerminalVelocity: -20
+  baseMaxHealth: 100
   baseHealthRegen: 1
-  baseEnergy: 100
+  baseMaxEnergy: 100
   baseEnergyRegen: 10
+  baseCarryCapacity: 40
+  baseInventorySpace: 10
+  baseLootMultiplier: 1
+  baseHunger: 10
+  baseThirst: 10
   baseMeleeDamage: 1
   baseProjectileDamage: 1
   baseProjectileRange: 10
   baseSpellPower: 0
   baseArmorValue: 0
-  baseCarryCapacity: 40
   baseCritChance: 0
   baseCritMultiplier: 1.2
   baseDeflectionChance: 0
