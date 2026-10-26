@@ -1,0 +1,16 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>time</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_time {
+    label=<<B>TimeManager</B><BR/><FONT POINT-SIZE="9">Organizer. Time, day, season, year events</FONT>>; style="rounded,filled"; fillcolor="#e8eaf6"; color="#283593";
+    TM       [label=<<B>TimeManager</B><BR/><FONT POINT-SIZE="9">CelestialTime, pause, day, season, year</FONT>>];
+    WORLD    [label=<<B>World scripts</B><BR/><FONT POINT-SIZE="9">Celestial, clouds, wind, skybox, clock (polled)</FONT>>];
+  }
+    GL       [label=<<B>GameEventListener</B> [scene]<BR/><FONT POINT-SIZE="9">Listens to a GameEvent, calls RequestLazySave</FONT>>, style="rounded,filled,dashed"];
+    UIM      [label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">TogglePanel, OpenPanel, ClosePanel</FONT>>];
+  UIM -> TM       [label="TogglePause (bool)"];
+  TM -> GL        [label="OnDay, OnSeason, OnYear (GameEvent)"];
+  TM -> WORLD     [label="CelestialTime, season index (polled)", style=dashed];
+}

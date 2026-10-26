@@ -1,0 +1,36 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>stats</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_stats {
+    label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">Organizer. Single source of truth for stats and modifiers</FONT>>; style="rounded,filled"; fillcolor="#fff3e0"; color="#e65100";
+    SS       [label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource</FONT>>];
+    MODG     [label=<<B>Gravity trigger</B><BR/><FONT POINT-SIZE="9">Collider. Adds GravityMultiplier on enter</FONT>>];
+    MODZ     [label=<<B>Gravity zone</B><BR/><FONT POINT-SIZE="9">Collider. Sets custom gravity direction</FONT>>];
+    MODS     [label=<<B>Speed boost trigger</B><BR/><FONT POINT-SIZE="9">Collider. Adds MoveSpeed from RunMultiplier</FONT>>];
+    SPD      [label=<<B>SpeedVisualizer</B><BR/><FONT POINT-SIZE="9">Particles and FOV from speed multiplier</FONT>>];
+    ROT      [label=<<B>Rotator</B><BR/><FONT POINT-SIZE="9">Spins props. Not player state</FONT>>];
+  }
+    CAM      [label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Pitch clamped -80 to 80. Yaw used by Movement</FONT>>];
+    GI       [label=<<B>GameInitializer</B><BR/><FONT POINT-SIZE="9">Start: load or create, then initialize services</FONT>>];
+    GL       [label=<<B>GameEventListener</B> [scene]<BR/><FONT POINT-SIZE="9">Listens to a GameEvent, calls RequestLazySave</FONT>>, style="rounded,filled,dashed"];
+    GRAV     [label=<<B>GravityController</B><BR/><FONT POINT-SIZE="9">Gravity each FixedUpdate. Terminal velocity clamp</FONT>>];
+    MOVE     [label=<<B>Movement</B><BR/><FONT POINT-SIZE="9">Ground and air movement. Sets velocity</FONT>>];
+    PS       [label=<<B>ProgressionService</B><BR/><FONT POINT-SIZE="9">Point pool. SpendTalentPoint, RefundTalentPoint</FONT>>];
+    RUNMOD   [label=<<B>Run modifier</B><BR/><FONT POINT-SIZE="9">MoveSpeed modifier while run is held</FONT>>];
+    TSS      [label=<<B>TalentStateService</B><BR/><FONT POINT-SIZE="9">Points per node. Raises talent event</FONT>>];
+  RUNMOD -> SS    [label="ApplyOrReplaceModifier (StatModifier)"];
+  MOVE -> SS      [label="GetStat MoveSpeed (float, read)", style=dashed, dir=back];
+  MODG -> SS      [label="ApplyOrReplaceModifier (StatModifier)"];
+  MODG -> GRAV    [label="Trigger enter and exit (Collider, tag Player)", style=dotted, dir=back];
+  MODZ -> GRAV    [label="SetGravityScale, custom direction (Vector3)"];
+  MODS -> SS      [label="ApplyOrReplaceModifier (RunMultiplier)"];
+  GRAV -> SS      [label="GetStat Gravity and Terminal (float, read)", style=dashed, dir=back];
+  SS -> SPD       [label="GetSpeedMultiplier (float, polled)", style=dashed, dir=back];
+  SS -> GL        [label="OnStatsChanged (GameEvent)"];
+  ROT -> CAM      [label="Faces camera (Transform, optional)", style=dotted, dir=back];
+  TSS -> SS       [label="RemoveModifiersFromSource (reset only)", style=dashed];
+  PS -> SS        [label="SetBaseStat (attribute value)", style=dashed];
+  GI -> SS        [label="Initialize (base stats)"];
+}

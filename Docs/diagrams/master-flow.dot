@@ -1,0 +1,153 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>Sol: Systems Map (capped flow)</B>>, ratio=0.5];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_input {
+    label=<<B>INPUT</B><BR/><FONT POINT-SIZE="9">PlayerInput.inputactions</FONT>>; style="rounded,filled"; fillcolor="#e3f2fd"; color="#1565c0";
+    IN_SPACE [label=<<B>Space</B>: Jump<BR/><FONT POINT-SIZE="9">Button, Keyboard space</FONT>>];
+    IN_WASD  [label=<<B>WASD</B>: Move and Run<BR/><FONT POINT-SIZE="9">Vector2, Shift = run</FONT>>];
+    IN_MOUSE [label=<<B>Mouse</B>: Look<BR/><FONT POINT-SIZE="9">Vector2 delta</FONT>>];
+    IN_ATK   [label=<<B>MainHand</B>: Attack<BR/><FONT POINT-SIZE="9">Button</FONT>>];
+    IN_TW    [label=<<B>ToggleWeapon</B><BR/><FONT POINT-SIZE="9">Button</FONT>>];
+    IN_K     [label=<<B>K</B>: Talent panel<BR/><FONT POINT-SIZE="9">Button, Keyboard k</FONT>>];
+    IN_CLICK [label=<<B>Left and Right Click</B><BR/><FONT POINT-SIZE="9">UI map, polled each frame</FONT>>];
+  }
+  subgraph cluster_pc {
+    label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">Organizer. Routes input. Implements IPlayerContext</FONT>>; style="rounded,filled"; fillcolor="#fdecea"; color="#c62828";
+    PC       [label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">OnJump, OnMove, OnRun, OnLook, OnAttack</FONT>>];
+    PCSTATE  [label=<<B>State dictionary</B><BR/><FONT POINT-SIZE="9">JumpPriority, IsGrounded, IsRunning</FONT>>, shape=cylinder, fillcolor="#fff8e1", color="#b28704"];
+    PCSVC    [label=<<B>Service registry</B><BR/><FONT POINT-SIZE="9">Type to service. GetService T</FONT>>, shape=cylinder, fillcolor="#fff8e1", color="#b28704"];
+    JUMP     [label=<<B>Jumping</B><BR/><FONT POINT-SIZE="9">Impulse and double jump. Cooldown 0.1 s</FONT>>];
+    MOVE     [label=<<B>Movement</B><BR/><FONT POINT-SIZE="9">Ground and air movement. Sets velocity</FONT>>];
+    GC       [label=<<B>GroundChecker</B><BR/><FONT POINT-SIZE="9">Ground cast per FixedUpdate. Coyote 0.15 s</FONT>>, fillcolor="#e8f5e9", color="#2e7d32"];
+    RUNMOD   [label=<<B>Run modifier</B><BR/><FONT POINT-SIZE="9">MoveSpeed modifier while run is held</FONT>>];
+  }
+  subgraph cluster_cam {
+    label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Organizer. Look input to camera rotation</FONT>>; style="rounded,filled"; fillcolor="#f3e8ff"; color="#7e3ff2";
+    CAM      [label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Pitch clamped -80 to 80. Yaw used by Movement</FONT>>];
+    CINE     [label=<<B>CinemachineCamera</B><BR/><FONT POINT-SIZE="9">Scene object. Follows CameraTarget</FONT>>];
+  }
+  subgraph cluster_combat {
+    label=<<B>CombatStateController</B><BR/><FONT POINT-SIZE="9">Organizer. Weapon state and attack timing</FONT>>; style="rounded,filled"; fillcolor="#fff1f0"; color="#b5483c";
+    CSC      [label=<<B>CombatStateController</B><BR/><FONT POINT-SIZE="9">Sheathed, Unsheathed. Attack cooldown 0.8 s</FONT>>];
+    ADISP    [label=<<B>AnimationEventDispatcher</B><BR/><FONT POINT-SIZE="9">Routes animator event names by string</FONT>>];
+    PAC      [label=<<B>PlayerAnimationController</B><BR/><FONT POINT-SIZE="9">Writes animator parameters from state</FONT>>];
+    AEH      [label=<<B>AttackEventHandler</B> [scene]<BR/><FONT POINT-SIZE="9">OverlapSphere, calls IDamageable</FONT>>, style="rounded,filled,dashed"];
+  }
+  subgraph cluster_phys {
+    label=<<B>Physics</B><BR/><FONT POINT-SIZE="9">Shared Rigidbody on the Player</FONT>>; style="rounded,filled"; fillcolor="#eceff1"; color="#455a64";
+    GRAV     [label=<<B>GravityController</B><BR/><FONT POINT-SIZE="9">Gravity each FixedUpdate. Terminal velocity clamp</FONT>>];
+    RB       [label=<<B>Rigidbody</B><BR/><FONT POINT-SIZE="9">linearVelocity, AddForce. Four writers (F2)</FONT>>, shape=cylinder, fillcolor="#cfd8dc"];
+  }
+  subgraph cluster_stats {
+    label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">Organizer. Single source of truth for stats and modifiers</FONT>>; style="rounded,filled"; fillcolor="#fff3e0"; color="#e65100";
+    SS       [label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource</FONT>>];
+    MODG     [label=<<B>Gravity trigger</B><BR/><FONT POINT-SIZE="9">Collider. Adds GravityMultiplier on enter</FONT>>];
+    MODZ     [label=<<B>Gravity zone</B><BR/><FONT POINT-SIZE="9">Collider. Sets custom gravity direction</FONT>>];
+    MODS     [label=<<B>Speed boost trigger</B><BR/><FONT POINT-SIZE="9">Collider. Adds MoveSpeed from RunMultiplier</FONT>>];
+    SPD      [label=<<B>SpeedVisualizer</B><BR/><FONT POINT-SIZE="9">Particles and FOV from speed multiplier</FONT>>];
+    ROT      [label=<<B>Rotator</B><BR/><FONT POINT-SIZE="9">Spins props. Not player state</FONT>>];
+  }
+  subgraph cluster_ui {
+    label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">Organizer. Opens panels, pauses time, requests saves</FONT>>; style="rounded,filled"; fillcolor="#e0f7fa"; color="#00838f";
+    UIIN     [label=<<B>UIInputController</B><BR/><FONT POINT-SIZE="9">Listens for K. Calls TogglePanel</FONT>>];
+    UIM      [label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">TogglePanel, OpenPanel, ClosePanel</FONT>>];
+    VC       [label=<<B>VirtualCursor</B><BR/><FONT POINT-SIZE="9">Cursor from mouse or navigation. Clicks into UI Toolkit</FONT>>];
+  }
+  subgraph cluster_talent {
+    label=<<B>TalentTreeController</B><BR/><FONT POINT-SIZE="9">Organizer. Talent choices, points, reset</FONT>>; style="rounded,filled"; fillcolor="#e0f7fa"; color="#00838f";
+    TTC      [label=<<B>TalentTreeController</B><BR/><FONT POINT-SIZE="9">Left allocates, right removes. Checks prerequisites</FONT>>];
+    TTG      [label=<<B>TalentTreeGenerator</B><BR/><FONT POINT-SIZE="9">Node data (TalentNodeDataSO) and layout</FONT>>];
+    PS       [label=<<B>ProgressionService</B><BR/><FONT POINT-SIZE="9">Point pool. SpendTalentPoint, RefundTalentPoint</FONT>>];
+    TSS      [label=<<B>TalentStateService</B><BR/><FONT POINT-SIZE="9">Points per node. Raises talent event</FONT>>];
+    TEV      [label=<<B>Talent GameEvent</B><BR/><FONT POINT-SIZE="9">ScriptableObject. Raised on any change</FONT>>, shape=note, fillcolor="#fff8e1", color="#b28704"];
+  }
+  subgraph cluster_save {
+    label=<<B>SaveManager</B><BR/><FONT POINT-SIZE="9">Organizer. Decides when to save and builds the data</FONT>>; style="rounded,filled"; fillcolor="#ede7f6"; color="#4527a0";
+    GL       [label=<<B>GameEventListener</B> [scene]<BR/><FONT POINT-SIZE="9">Listens to a GameEvent, calls RequestLazySave</FONT>>, style="rounded,filled,dashed"];
+    SM       [label=<<B>SaveManager</B><BR/><FONT POINT-SIZE="9">2 s debounce. Immediate on panel close</FONT>>];
+    SV       [label=<<B>SaveService</B><BR/><FONT POINT-SIZE="9">JsonUtility to persistentDataPath</FONT>>];
+    DISK     [label=<<B>Save file</B><BR/><FONT POINT-SIZE="9">JSON, PlayerSaveData</FONT>>, shape=cylinder, fillcolor="#cfd8dc"];
+    GI       [label=<<B>GameInitializer</B><BR/><FONT POINT-SIZE="9">Start: load or create, then initialize services</FONT>>];
+  }
+  subgraph cluster_time {
+    label=<<B>TimeManager</B><BR/><FONT POINT-SIZE="9">Organizer. Time, day, season, year events</FONT>>; style="rounded,filled"; fillcolor="#e8eaf6"; color="#283593";
+    TM       [label=<<B>TimeManager</B><BR/><FONT POINT-SIZE="9">CelestialTime, pause, day, season, year</FONT>>];
+    WORLD    [label=<<B>World scripts</B><BR/><FONT POINT-SIZE="9">Celestial, clouds, wind, skybox, clock (polled)</FONT>>];
+  }
+  IN_SPACE -> PC     [label="Button event (OnJump)"];
+  IN_WASD  -> PC     [label="Vector2 and bool (OnMove, OnRun)"];
+  IN_MOUSE -> PC     [label="Vector2 (OnLook)"];
+  IN_ATK   -> PC     [label="Button event (OnAttack)"];
+  IN_TW    -> PC     [label="Button event (OnToggleWeapon)"];
+  IN_K     -> UIIN   [label="Button event (OnOpenTalentWheel)"];
+  IN_CLICK -> VC     [label="Mouse button state, polled"];
+  PC -> PCSTATE   [label="SetStateValue (bool, int, float)", style=dashed];
+  PC -> PCSVC     [label="RegisterService at Awake", style=dashed];
+  PCSTATE -> PAC  [label="GetStateValue, read by animator", style=dashed, dir=back];
+  PC -> JUMP      [label="HandleJumpInput (direct call)"];
+  PC -> MOVE      [label="ProcessMovement (FixedUpdate)"];
+  JUMP -> RB      [label="AddForce Impulse (Vector3)"];
+  MOVE -> RB      [label="linearVelocity (Vector3)"];
+  GRAV -> RB      [label="AddForce Acceleration (Vector3)"];
+  GC -> PCSTATE   [label="SetStateValue IsGrounded (bool)", style=dashed];
+  JUMP -> GC      [label="IsGrounded (bool, read)", style=dashed, dir=back];
+  MOVE -> GC      [label="IsGrounded (bool, read)", style=dashed, dir=back];
+  RUNMOD -> SS    [label="ApplyOrReplaceModifier (StatModifier)"];
+  MOVE -> SS      [label="GetStat MoveSpeed (float, read)", style=dashed, dir=back];
+  PC -> CAM       [label="GetLookInput (Vector2, polled)", style=dashed, dir=back];
+  CAM -> CINE     [label="Rotation (Quaternion)"];
+  CAM -> MOVE     [label="GetCameraYaw (float, polled)", style=dashed];
+  UIM -> CAM      [label="OnDeactivate / OnActivate (lock cursor)"];
+  PC -> CSC       [label="HandleAttackInput, ToggleWeaponState"];
+  CSC -> ADISP    [label="SetTrigger Attack (animator parameter)"];
+  ADISP -> CSC    [label="OnAnimationEvent (string)", style=dashed];
+  ADISP -> PAC    [label="OnAnimationEvent (string)", style=dashed];
+  CSC -> PCSTATE  [label="IsWeaponDrawn, IsAttacking (bool)", style=dashed];
+  AEH -> RB       [label="OverlapSphere (collider query)", style=dotted, dir=back];
+  MODG -> SS      [label="ApplyOrReplaceModifier (StatModifier)"];
+  MODG -> GRAV    [label="Trigger enter and exit (Collider, tag Player)", style=dotted, dir=back];
+  MODZ -> GRAV    [label="SetGravityScale, custom direction (Vector3)"];
+  MODS -> SS      [label="ApplyOrReplaceModifier (RunMultiplier)"];
+  GRAV -> SS      [label="GetStat Gravity and Terminal (float, read)", style=dashed, dir=back];
+  SS -> SPD       [label="GetSpeedMultiplier (float, polled)", style=dashed, dir=back];
+  SS -> GL        [label="OnStatsChanged (GameEvent)"];
+  ROT -> CAM      [label="Faces camera (Transform, optional)", style=dotted, dir=back];
+  UIM -> TTC      [label="InitializeTalentPanel"];
+  TTC -> PS       [label="SpendTalentPoint, RefundTalentPoint (bool)"];
+  TTC -> TSS      [label="TryAllocatePoint, TryRemovePoint (nodeId)"];
+  TTC -> TTG      [label="GetNodeData (TalentNodeDataSO)", style=dashed, dir=back];
+  TSS -> TEV      [label="Raise (GameEvent)"];
+  TSS -> SS       [label="RemoveModifiersFromSource (reset only)", style=dashed];
+  PS -> SS        [label="SetBaseStat (attribute value)", style=dashed];
+  TEV -> GL       [label="OnEventRaised (GameEvent)"];
+  VC -> TTC       [label="Synthesized MouseDownEvent (button 0 or 1)"];
+  UIIN -> UIM     [label="TogglePanel (string)"];
+  UIM -> TM       [label="TogglePause (bool)"];
+  VC -> UIM       [label="SetActiveDocument (UIDocument)"];
+  TM -> GL        [label="OnDay, OnSeason, OnYear (GameEvent)"];
+  TM -> WORLD     [label="CelestialTime, season index (polled)", style=dashed];
+  GL -> SM        [label="RequestLazySave (2 s debounce)"];
+  UIM -> SM       [label="RequestImmediateSave (immediate)"];
+  SM -> SV        [label="Save (PlayerSaveData, JSON)"];
+  SV -> DISK      [label="Write JSON (persistentDataPath)"];
+  DISK -> SV      [label="Read JSON on load", style=dashed];
+  GI -> SV        [label="Load, Delete"];
+  GI -> PS        [label="Initialize, ReloadAllBaseStats"];
+  GI -> TSS       [label="Initialize (allocations)"];
+  GI -> SS        [label="Initialize (base stats)"];
+  SM -> TSS       [label="GetAllocatedNodeIds (read)", style=dashed, dir=back];
+  SM -> PS        [label="GetLevel, GetTotalTalentPoints (read)", style=dashed, dir=back];
+  LEG [shape=plaintext, label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="2" CELLPADDING="4" BGCOLOR="#ffffff">
+      <TR><TD COLSPAN="2"><B>Legend</B></TD></TR>
+      <TR><TD>solid arrow</TD><TD>direct call or event</TD></TR>
+      <TR><TD>dashed arrow</TD><TD>state, polled value, or read</TD></TR>
+      <TR><TD>dotted arrow</TD><TD>collider, trigger, or scene query</TD></TR>
+      <TR><TD>cylinder</TD><TD>data store</TD></TR>
+      <TR><TD>note</TD><TD>ScriptableObject GameEvent</TD></TR>
+      <TR><TD>arrowhead</TD><TD>points at the receiver of the data</TD></TR>
+    </TABLE>>];
+
+}

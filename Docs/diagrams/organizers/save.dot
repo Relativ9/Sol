@@ -1,0 +1,34 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>save</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_save {
+    label=<<B>SaveManager</B><BR/><FONT POINT-SIZE="9">Organizer. Decides when to save and builds the data</FONT>>; style="rounded,filled"; fillcolor="#ede7f6"; color="#4527a0";
+    GL       [label=<<B>GameEventListener</B> [scene]<BR/><FONT POINT-SIZE="9">Listens to a GameEvent, calls RequestLazySave</FONT>>, style="rounded,filled,dashed"];
+    SM       [label=<<B>SaveManager</B><BR/><FONT POINT-SIZE="9">2 s debounce. Immediate on panel close</FONT>>];
+    SV       [label=<<B>SaveService</B><BR/><FONT POINT-SIZE="9">JsonUtility to persistentDataPath</FONT>>];
+    DISK     [label=<<B>Save file</B><BR/><FONT POINT-SIZE="9">JSON, PlayerSaveData</FONT>>, shape=cylinder, fillcolor="#cfd8dc"];
+    GI       [label=<<B>GameInitializer</B><BR/><FONT POINT-SIZE="9">Start: load or create, then initialize services</FONT>>];
+  }
+    PS       [label=<<B>ProgressionService</B><BR/><FONT POINT-SIZE="9">Point pool. SpendTalentPoint, RefundTalentPoint</FONT>>];
+    SS       [label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource</FONT>>];
+    TEV      [label=<<B>Talent GameEvent</B><BR/><FONT POINT-SIZE="9">ScriptableObject. Raised on any change</FONT>>, shape=note, fillcolor="#fff8e1", color="#b28704"];
+    TM       [label=<<B>TimeManager</B><BR/><FONT POINT-SIZE="9">CelestialTime, pause, day, season, year</FONT>>];
+    TSS      [label=<<B>TalentStateService</B><BR/><FONT POINT-SIZE="9">Points per node. Raises talent event</FONT>>];
+    UIM      [label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">TogglePanel, OpenPanel, ClosePanel</FONT>>];
+  SS -> GL        [label="OnStatsChanged (GameEvent)"];
+  TEV -> GL       [label="OnEventRaised (GameEvent)"];
+  TM -> GL        [label="OnDay, OnSeason, OnYear (GameEvent)"];
+  GL -> SM        [label="RequestLazySave (2 s debounce)"];
+  UIM -> SM       [label="RequestImmediateSave (immediate)"];
+  SM -> SV        [label="Save (PlayerSaveData, JSON)"];
+  SV -> DISK      [label="Write JSON (persistentDataPath)"];
+  DISK -> SV      [label="Read JSON on load", style=dashed];
+  GI -> SV        [label="Load, Delete"];
+  GI -> PS        [label="Initialize, ReloadAllBaseStats"];
+  GI -> TSS       [label="Initialize (allocations)"];
+  GI -> SS        [label="Initialize (base stats)"];
+  SM -> TSS       [label="GetAllocatedNodeIds (read)", style=dashed, dir=back];
+  SM -> PS        [label="GetLevel, GetTotalTalentPoints (read)", style=dashed, dir=back];
+}

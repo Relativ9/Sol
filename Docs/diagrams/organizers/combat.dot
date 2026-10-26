@@ -1,0 +1,23 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>combat</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_combat {
+    label=<<B>CombatStateController</B><BR/><FONT POINT-SIZE="9">Organizer. Weapon state and attack timing</FONT>>; style="rounded,filled"; fillcolor="#fff1f0"; color="#b5483c";
+    CSC      [label=<<B>CombatStateController</B><BR/><FONT POINT-SIZE="9">Sheathed, Unsheathed. Attack cooldown 0.8 s</FONT>>];
+    ADISP    [label=<<B>AnimationEventDispatcher</B><BR/><FONT POINT-SIZE="9">Routes animator event names by string</FONT>>];
+    PAC      [label=<<B>PlayerAnimationController</B><BR/><FONT POINT-SIZE="9">Writes animator parameters from state</FONT>>];
+    AEH      [label=<<B>AttackEventHandler</B> [scene]<BR/><FONT POINT-SIZE="9">OverlapSphere, calls IDamageable</FONT>>, style="rounded,filled,dashed"];
+  }
+    PC       [label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">OnJump, OnMove, OnRun, OnLook, OnAttack</FONT>>];
+    PCSTATE  [label=<<B>State dictionary</B><BR/><FONT POINT-SIZE="9">JumpPriority, IsGrounded, IsRunning</FONT>>, shape=cylinder, fillcolor="#fff8e1", color="#b28704"];
+    RB       [label=<<B>Rigidbody</B><BR/><FONT POINT-SIZE="9">linearVelocity, AddForce. Four writers (F2)</FONT>>, shape=cylinder, fillcolor="#cfd8dc"];
+  PCSTATE -> PAC  [label="GetStateValue, read by animator", style=dashed, dir=back];
+  PC -> CSC       [label="HandleAttackInput, ToggleWeaponState"];
+  CSC -> ADISP    [label="SetTrigger Attack (animator parameter)"];
+  ADISP -> CSC    [label="OnAnimationEvent (string)", style=dashed];
+  ADISP -> PAC    [label="OnAnimationEvent (string)", style=dashed];
+  CSC -> PCSTATE  [label="IsWeaponDrawn, IsAttacking (bool)", style=dashed];
+  AEH -> RB       [label="OverlapSphere (collider query)", style=dotted, dir=back];
+}

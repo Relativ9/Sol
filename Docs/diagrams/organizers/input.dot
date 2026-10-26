@@ -1,0 +1,26 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>input</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_input {
+    label=<<B>INPUT</B><BR/><FONT POINT-SIZE="9">PlayerInput.inputactions</FONT>>; style="rounded,filled"; fillcolor="#e3f2fd"; color="#1565c0";
+    IN_SPACE [label=<<B>Space</B>: Jump<BR/><FONT POINT-SIZE="9">Button, Keyboard space</FONT>>];
+    IN_WASD  [label=<<B>WASD</B>: Move and Run<BR/><FONT POINT-SIZE="9">Vector2, Shift = run</FONT>>];
+    IN_MOUSE [label=<<B>Mouse</B>: Look<BR/><FONT POINT-SIZE="9">Vector2 delta</FONT>>];
+    IN_ATK   [label=<<B>MainHand</B>: Attack<BR/><FONT POINT-SIZE="9">Button</FONT>>];
+    IN_TW    [label=<<B>ToggleWeapon</B><BR/><FONT POINT-SIZE="9">Button</FONT>>];
+    IN_K     [label=<<B>K</B>: Talent panel<BR/><FONT POINT-SIZE="9">Button, Keyboard k</FONT>>];
+    IN_CLICK [label=<<B>Left and Right Click</B><BR/><FONT POINT-SIZE="9">UI map, polled each frame</FONT>>];
+  }
+    PC       [label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">OnJump, OnMove, OnRun, OnLook, OnAttack</FONT>>];
+    UIIN     [label=<<B>UIInputController</B><BR/><FONT POINT-SIZE="9">Listens for K. Calls TogglePanel</FONT>>];
+    VC       [label=<<B>VirtualCursor</B><BR/><FONT POINT-SIZE="9">Cursor from mouse or navigation. Clicks into UI Toolkit</FONT>>];
+  IN_SPACE -> PC     [label="Button event (OnJump)"];
+  IN_WASD  -> PC     [label="Vector2 and bool (OnMove, OnRun)"];
+  IN_MOUSE -> PC     [label="Vector2 (OnLook)"];
+  IN_ATK   -> PC     [label="Button event (OnAttack)"];
+  IN_TW    -> PC     [label="Button event (OnToggleWeapon)"];
+  IN_K     -> UIIN   [label="Button event (OnOpenTalentWheel)"];
+  IN_CLICK -> VC     [label="Mouse button state, polled"];
+}
