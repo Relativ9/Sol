@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2924f503e633c51ae842bd09b37cdac6, type: 3}
+  m_Name: DamageTypeTable
+  m_EditorClassIdentifier: Sol_Scripts::Sol.DamageTypeTableSO
+  entries:
+  - type: 0
+    displayName: Physical
+    color: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0}
+    resistanceStat: 30
+  - type: 1
+    displayName: Fire
+    color: {r: 0.94509804, g: 0.60775095, b: 0, a: 0}
+    resistanceStat: 35
+  - type: 2
+    displayName: Ice
+    color: {r: 0, g: 0.8481809, b: 1, a: 0}
+    resistanceStat: 36
+  - type: 3
+    displayName: Void
+    color: {r: 0.88122773, g: 0, b: 1, a: 0}
+    resistanceStat: 37
+  - type: 4
+    displayName: Sonic
+    color: {r: 0, g: 0.9254902, b: 0.18049927, a: 0}
+    resistanceStat: 38
+  - type: 5
+    displayName: Soul
+    color: {r: 0.9716981, g: 0.01375042, b: 0.060620334, a: 0}
+    resistanceStat: 39
+  - type: 6
+    displayName: Magic
+    color: {r: 0.8920202, g: 1, b: 0.0047169924, a: 0}
+    resistanceStat: 34

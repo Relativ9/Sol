@@ -12,11 +12,11 @@ namespace Sol
             _uiManager = ServiceLocator.Get<IUIManager>();
         }
 
-        public void OnOpenTalentWheel(InputAction.CallbackContext context)
+        public void OnOpenMenu(InputAction.CallbackContext context)
         {
             if (context.started)
             {
-                _uiManager.TogglePanel("talent-wheel-root");
+                _uiManager.TogglePanel("menu-root");
                 if (_uiManager == null) Debug.LogError("UI Manager not found!");
             }
         }

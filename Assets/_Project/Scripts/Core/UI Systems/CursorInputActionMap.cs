@@ -107,6 +107,22 @@ public class CursorInputActionMap : ICursorInput, IDisposable
         return delta.magnitude > 0.01f;
     }
 
+    // Mouse wheel reports in raw units, about 120 per notch on most mice. Convert to whole notches.
+    private const float WHEEL_UNITS_PER_NOTCH = 120f;
+
+    public int GetScrollNotches()
+    {
+        if (Mouse.current == null) return 0;
+
+        float raw = Mouse.current.scroll.ReadValue().y;
+        if (Mathf.Abs(raw) < 0.01f) return 0;
+
+        // Round away from zero so even a small trackpad scroll registers as one notch.
+        return raw > 0f
+            ? Mathf.Max(1, Mathf.RoundToInt(raw / WHEEL_UNITS_PER_NOTCH))
+            : Mathf.Min(-1, Mathf.RoundToInt(raw / WHEEL_UNITS_PER_NOTCH));
+    }
+
     public void Dispose()
     {
         Disable();

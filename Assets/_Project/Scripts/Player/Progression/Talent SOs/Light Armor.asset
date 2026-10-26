@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7b1ca21390c65749f4bb455baa537c, type: 3}
   m_Name: Light Armor
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
-  treeName: Plate Armor
-  treeColor: {r: 0.990566, g: 0.126157, b: 0.126157, a: 0}
+  treeName: Flex Armor
+  treeColor: {r: 0.4716981, g: 0.32254294, b: 0.25587398, a: 0}
   nodes: []

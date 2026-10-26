@@ -63,6 +63,26 @@ namespace Sol
             }
         }
 
+        /// <summary>Copies the current save file to a sibling .backup.json. Returns the backup path, or null if no file exists.</summary>
+        public string Backup(string slotId = "default")
+        {
+            string path = GetFilePath(slotId);
+            if (!File.Exists(path)) return null;
+
+            string backupPath = Path.Combine(SaveDirectory, $"save_{slotId}.backup.json");
+            try
+            {
+                File.Copy(path, backupPath, overwrite: true);
+                Debug.Log($"[{nameof(SaveService)}] Backed up save to {backupPath}");
+                return backupPath;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[{nameof(SaveService)}] Backup failed: {e.Message}");
+                return null;
+            }
+        }
+
         public void Delete(string slotId = "default")
         {
             string path = GetFilePath(slotId);

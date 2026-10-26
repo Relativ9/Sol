@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7b1ca21390c65749f4bb455baa537c, type: 3}
   m_Name: Subterfuge
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
-  treeName: Plate Armor
-  treeColor: {r: 0.990566, g: 0.126157, b: 0.126157, a: 0}
+  treeName: Subterfuge
+  treeColor: {r: 0.56224346, g: 0.12549017, b: 0.99215686, a: 0}
   nodes: []

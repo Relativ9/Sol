@@ -17,8 +17,11 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 4282e10a3d8552b348f7e9a2f8a2b628, type: 3}
   maxPoints: 3
   description: Reduces movement penalty from wearing Heavy Armor by 20/35/50%.
+  isActiveSkill: 0
   isHybrid: 0
   tier: 0
   offset: 0
   parentTree: {fileID: 11400000, guid: 6c5cbad20542deb60bfb13d5f627b5e8, type: 2}
   prerequisites: []
+  effects:
+  - {fileID: 11400000, guid: 8f3d3755b739b8e7896af921dd6dd87d, type: 2}

@@ -78,7 +78,27 @@ public class VirtualCursor : IVirtualCursor
         {
             _activeDocument = null;
             HideCursor();
+            ReleaseOsCursor();
         }
+    }
+
+    /// <inheritdoc />
+    public int GetScrollNotches() => _input.GetScrollNotches();
+
+    /// <inheritdoc />
+    public bool IsOsCursorOwned { get; private set; }
+
+    // The virtual cursor owns the OS cursor while it's active: hidden and locked, so the two can't both show.
+    private void ClaimOsCursor()
+    {
+        IsOsCursorOwned = true;
+        UnityEngine.Cursor.visible = false;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void ReleaseOsCursor()
+    {
+        IsOsCursorOwned = false;
     }
 
     /// <inheritdoc />
@@ -89,14 +109,14 @@ public class VirtualCursor : IVirtualCursor
         if (document == null)
         {
             _cursorElement?.RemoveFromHierarchy();
-            UnityEngine.Cursor.visible = false;
-            UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+            _activeDocument = null;
+            ReleaseOsCursor();
             return;
         }
-        // Hide OS cursor - virtual cursor takes over
-        UnityEngine.Cursor.visible = false;
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        
+
+        // Claim the OS cursor immediately, so there's no frame where it shows before Update runs.
+        ClaimOsCursor();
+
         _activeDocument = document;
         Debug.Log($"[VirtualCursor] _activeDocument set to: {_activeDocument.name}");
     
@@ -144,6 +164,8 @@ public class VirtualCursor : IVirtualCursor
         }
 
         ShowCursor();
+        // Re-assert every frame, so nothing else (camera, Cinemachine, the OS) can leave the OS cursor visible.
+        ClaimOsCursor();
         // Update position based on analog input
         UpdatePosition(deltaTime);
         

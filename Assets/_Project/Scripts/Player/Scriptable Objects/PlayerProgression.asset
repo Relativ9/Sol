@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Sol_Scripts::Sol.PlayerProgressionSO
   startingLevel: 1
   talentPointsPerLevel: 1
-  startingTalentPoints: 4
+  startingTalentPoints: 6
+  attributePointsPerLevel: 3
+  startingAttributePoints: 3

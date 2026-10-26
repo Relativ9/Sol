@@ -6,6 +6,7 @@ namespace Sol
         PlayerSaveData Load(string slotId = "default");
         void Save(PlayerSaveData data, string slotId = "default");
         void Delete(string slotId = "default");
+        string Backup(string slotId = "default");
         string GetLastSaveTime(string slotId = "default");
     }
 }

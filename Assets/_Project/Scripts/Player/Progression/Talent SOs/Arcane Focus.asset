@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7b1ca21390c65749f4bb455baa537c, type: 3}
   m_Name: Arcane Focus
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
-  treeName: Plate Armor
-  treeColor: {r: 0.990566, g: 0.126157, b: 0.126157, a: 0}
+  treeName: Arcane Focus
+  treeColor: {r: 0.66522783, g: 0.9339623, b: 0.89547515, a: 0}
   nodes: []

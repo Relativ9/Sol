@@ -36,5 +36,11 @@ namespace Sol
         /// When true, virtual cursor should hide and let real mouse take over.
         /// </summary>
         bool IsMouseBeingUsed();
+
+        /// <summary>
+        /// Mouse wheel movement this frame, in notches: positive is scroll up, negative is scroll down, 0 is none.
+        /// Read here so scrolling works while the virtual cursor owns the pointer.
+        /// </summary>
+        int GetScrollNotches();
     }
 }

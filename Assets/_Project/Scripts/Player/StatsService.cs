@@ -80,6 +80,12 @@ namespace Sol
             _baseValues[StatTypeEnum.KnowledgeChance] = statSO.baseKnowledgeChance;
             _baseValues[StatTypeEnum.DeceptionChance] = statSO.baseDeceptionChance;
             _baseValues[StatTypeEnum.IntimidationChance] = statSO.baseIntimidationChance;
+            _baseValues[StatTypeEnum.CovertMovement] = statSO.baseCovertMovement;
+            _baseValues[StatTypeEnum.Tinker] = statSO.baseTinker;
+            _baseValues[StatTypeEnum.StaggerResistance] = statSO.baseStaggerResistance;
+            _baseValues[StatTypeEnum.BleedResistance] = statSO.baseBleedResistance;
+            _baseValues[StatTypeEnum.RigidWeight] = statSO.baseRigidWeight;
+            _baseValues[StatTypeEnum.FlexWeight] = statSO.baseFlexWeight;
 
             foreach (StatTypeEnum stat in System.Enum.GetValues(typeof(StatTypeEnum)))
             {
@@ -299,9 +305,9 @@ namespace Sol
                     // Preserve the old GUID so the outside world doesn't notice a swap
                     modToStore.id = modifiers[existingIndex].id;
                     modifiers[existingIndex] = modToStore;
+                    wasReplaced = true;
                     Debug.Log($"Replaced modifier for {statType} from source {modToStore.sourceId}. " +
                               $"Value: {modToStore.value}, Duration: {modToStore.duration}");
-                    return modToStore.id;
                 }
             }
 
@@ -313,6 +319,7 @@ namespace Sol
                     $"Added new modifier for {statType} from source {modToStore.sourceId}. Value: {modToStore.value}, Duration: {modToStore.duration}");
             }
 
+            // Shared tail: runs for both replace and add so the lookup and cache stay in sync
             _modifierToStatLookup[modToStore.id] = statType;
             RefreshDerivedStat(statType);
 

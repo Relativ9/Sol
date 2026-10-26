@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Void Magic
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
   treeName: Void Magic
-  treeColor: {r: 0.3095235, g: 0.14658241, b: 0.509434, a: 0}
+  treeColor: {r: 0.9477362, g: 0.4669811, b: 1, a: 0}
   nodes:
   - {fileID: 11400000, guid: 677e5115505da3035a33282fcfa53f4e, type: 2}
   - {fileID: 11400000, guid: b066f267fc76e0fae9f0b6d291c3ab5f, type: 2}

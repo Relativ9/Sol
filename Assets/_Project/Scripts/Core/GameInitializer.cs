@@ -5,9 +5,15 @@ namespace Sol
 {
     public class GameInitializer : MonoBehaviour
     {
+        /// <summary>True while the save-repair prompt is waiting for the player. SaveManager checks this to block writes.</summary>
+        public static bool IsSaveRepairPending { get; private set; }
+
         [Header("Configuration - Data Assets")]
         [SerializeField] private PlayerStatSO playerStatSO;
         [SerializeField] private PlayerProgressionSO playerProgressionSO;
+
+        [Tooltip("The one shared damage type table. Every receiver (player, enemies) looks mitigation up through it.")]
+        [SerializeField] private DamageTypeTableSO damageTypeTable;
         
         // TreeLayoutCollectionSO and TalentTreeSettingsSO removed.
         // They now live as serialized fields on the TalentTreeGenerator 
@@ -25,6 +31,8 @@ namespace Sol
         private ISaveService _saveService;
         private IProgressionService _progressionService;
         private ITalentTreeGenerator _talentTreeGenerator;
+        // The single PlayerVitals lives on the player object in the scene. Found in Start, not created here.
+        private PlayerVitals _playerVitals;
 
         void Awake()
         {
@@ -38,6 +46,23 @@ namespace Sol
             
             _progressionService = new ProgressionService();
             ServiceLocator.RegisterService<IProgressionService>(_progressionService);
+
+            // Single source of randomness for every chance roll (deflection, procs, crits, etc).
+            ServiceLocator.RegisterService<IChanceRoller>(new ChanceRoller());
+
+            // Shared damage type table. Without it, every hit is unmitigated, so say so once, clearly.
+            if (damageTypeTable == null)
+            {
+                Debug.LogError($"[{nameof(GameInitializer)}] No DamageTypeTable assigned. Hits will take unmitigated damage.", this);
+            }
+            else
+            {
+                ServiceLocator.RegisterService<IDamageTypeTable>(damageTypeTable);
+            }
+
+
+            // CombatLog registers itself as ICombatLog in its Awake.
+            gameObject.AddComponent<CombatLog>();
         }
 
         void Start()
@@ -59,10 +84,73 @@ namespace Sol
             {
                 saveData = _saveService.Load("default");
                 Debug.Log($"[{nameof(GameInitializer)}] Loaded existing save");
+
+                if (SaveValidator.IsSuspect(saveData, playerProgressionSO, out string reason))
+                {
+                    // Hold startup until the player decides. Services stay uninitialized and saves are blocked.
+                    ShowRepairPrompt(saveData, reason);
+                    return;
+                }
             }
-            
+
+            InitializeGame(saveData);
+        }
+
+        private void ShowRepairPrompt(PlayerSaveData saveData, string reason)
+        {
+            IsSaveRepairPending = true;
+            Debug.LogWarning($"[{nameof(GameInitializer)}] Suspect save: {reason}");
+
+            // Deferred to the next frame: UIManager.Start() runs in an unspecified order relative to this Start(),
+            // and it unregisters the document from the cursor. Showing now could be undone by that.
+            StartCoroutine(ShowRepairPromptNextFrame(saveData, reason));
+        }
+
+        private System.Collections.IEnumerator ShowRepairPromptNextFrame(PlayerSaveData saveData, string reason)
+        {
+            yield return null;
+
+            var uiManager = ServiceLocator.Get<IUIManager>();
+            SaveRepairPrompt.Show(uiManager, reason, choice => OnRepairChoice(choice, saveData));
+        }
+
+        private void OnRepairChoice(SaveRepairPrompt.Choice choice, PlayerSaveData saveData)
+        {
+            IsSaveRepairPending = false;
+
+            if (choice == SaveRepairPrompt.Choice.Repair)
+            {
+                // Keep everything the player has. Only the talent pool is corrected to the asset value.
+                saveData.totalTalentPoints = playerProgressionSO.startingTalentPoints;
+                _saveService.Save(saveData, "default");
+                Debug.Log($"[{nameof(GameInitializer)}] Save repaired: talent points set to {saveData.totalTalentPoints}");
+                ServiceLocator.Get<ICombatLog>()?.Add($"Save repaired: talent points set to {saveData.totalTalentPoints}", CombatLogKind.Warning);
+            }
+            else
+            {
+                // Keep the broken file as a backup, then start fresh.
+                string backup = _saveService.Backup("default");
+                saveData = PlayerSaveData.CreateNewGame(playerProgressionSO);
+                _saveService.Save(saveData, "default");
+                Debug.Log($"[{nameof(GameInitializer)}] New game started. Previous save backed up to {backup ?? "(none)"}");
+                ServiceLocator.Get<ICombatLog>()?.Add("New game started. Previous save backed up.", CombatLogKind.Warning);
+            }
+
+            InitializeGame(saveData);
+        }
+
+        private void InitializeGame(PlayerSaveData saveData)
+        {
             // Core services
             _statsService.Initialize(playerStatSO, saveData);
+            // Vitals need StatsService seeded first (for max values).
+            // Use the one PlayerVitals already on the player, so there is exactly one instance.
+            _playerVitals = FindFirstObjectByType<PlayerVitals>();
+            if (_playerVitals == null)
+            {
+                Debug.LogError($"[{nameof(GameInitializer)}] No PlayerVitals in the scene. Add it to the player object.");
+            }
+            _playerVitals?.Initialize(saveData, _statsService);
             //_progressionService.Initialize(playerProgressionSO, saveData);
             
             // 2. Init progression with TOTAL POOL ONLY
@@ -96,5 +184,6 @@ namespace Sol
             saveService.Delete("default");
             Debug.Log($"[{nameof(GameInitializer)}] Save deleted. Restart to create new game.");
         }
+
     }
 }

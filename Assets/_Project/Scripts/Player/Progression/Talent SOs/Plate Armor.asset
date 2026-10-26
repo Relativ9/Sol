@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Plate Armor
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
   treeName: Plate Armor
-  treeColor: {r: 0.990566, g: 0.126157, b: 0.126157, a: 0}
+  treeColor: {r: 0.2924528, g: 0.2924528, b: 0.2924528, a: 0}
   nodes:
   - {fileID: 11400000, guid: 375dc33c70c3990ceb47cd5753d40026, type: 2}
   - {fileID: 11400000, guid: bc484bbeaa6fc0d0787dd30084966865, type: 2}

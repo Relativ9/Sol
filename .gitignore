@@ -91,3 +91,8 @@ obj/
 **/*Baking Set*
 **/*.CellSharedData.bytes
 **/*.CellSupportData.bytes
+
+# Generated diagram tooling output
+__pycache__/
+*.pyc
+Docs/diagrams/**/*.log

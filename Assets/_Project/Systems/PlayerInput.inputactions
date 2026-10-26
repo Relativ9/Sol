@@ -179,7 +179,7 @@
             "id": "4692c7df-3c79-4964-bd37-23349d0439ed",
             "actions": [
                 {
-                    "name": "OpenTalentPanel",
+                    "name": "OpenMenu",
                     "type": "Button",
                     "id": "ce028a84-d2f5-4769-a2fe-a6a3b35b587f",
                     "expectedControlType": "",
@@ -223,7 +223,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Mouse&Keyboard",
-                    "action": "OpenTalentPanel",
+                    "action": "OpenMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

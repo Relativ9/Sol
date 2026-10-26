@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b7b1ca21390c65749f4bb455baa537c, type: 3}
   m_Name: Blunt Weapons
   m_EditorClassIdentifier: Assembly-CSharp::Sol.TreeLayout
-  treeName: Blunt Weapon
-  treeColor: {r: 0.14538093, g: 0.31132078, b: 0.19404201, a: 0}
+  treeName: Blunt Weapons
+  treeColor: {r: 0.14173195, g: 0.3301887, b: 0.1736314, a: 0}
   nodes:
   - {fileID: 11400000, guid: ab4ce2d772468d9af8dffa06395bc33b, type: 2}
   - {fileID: 11400000, guid: a85191e9f267f336db4ccc9ecd563fad, type: 2}
