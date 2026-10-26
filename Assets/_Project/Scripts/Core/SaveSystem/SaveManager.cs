@@ -62,6 +62,13 @@ namespace Sol
         
         void PerformSave()
         {
+            // Never overwrite a suspect save while the player is still choosing how to repair it.
+            if (GameInitializer.IsSaveRepairPending)
+            {
+                Debug.LogWarning($"[{nameof(SaveManager)}] Save skipped: save repair prompt is open.");
+                return;
+            }
+
             pendingSave = false;
             lastSaveTime = Time.unscaledTime;
             
@@ -89,8 +96,26 @@ namespace Sol
             {
                 level = _progressionService.GetLevel(),
                 totalTalentPoints = _progressionService.GetTotalTalentPoints(),
-                talentAllocations = entries.ToArray()
+                // Derived on load, but written so the file reflects the real pool.
+                totalAttributePoints = _progressionService.GetTotalAttributePoints(),
+                talentAllocations = entries.ToArray(),
+                attributeAllocations = BuildAttributeEntries()
             };
+        }
+
+        // Only attributes with spent points are written.
+        AttributeAllocationEntry[] BuildAttributeEntries()
+        {
+            var list = new System.Collections.Generic.List<AttributeAllocationEntry>();
+            foreach (StatTypeEnum attr in new[]
+                     { StatTypeEnum.Brawn, StatTypeEnum.Finesse, StatTypeEnum.Insight,
+                       StatTypeEnum.Focus, StatTypeEnum.Vigor, StatTypeEnum.Willpower })
+            {
+                int points = _progressionService.GetAllocatedAttributePoints(attr);
+                if (points > 0)
+                    list.Add(new AttributeAllocationEntry { statType = attr, pointsAllocated = points });
+            }
+            return list.ToArray();
         }
         
         

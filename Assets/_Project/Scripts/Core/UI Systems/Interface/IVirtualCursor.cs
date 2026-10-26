@@ -30,5 +30,14 @@ namespace Sol
         /// Enables or disables cursor updates. Use when pausing game or opening modal dialogs.
         /// </summary>
         void SetEnabled(bool enabled);
+
+        /// <summary>
+        /// True while the virtual cursor is active and owns the OS cursor (hidden and locked).
+        /// Other systems (e.g. the camera) must not change Cursor.visible/lockState while this is true.
+        /// </summary>
+        bool IsOsCursorOwned { get; }
+
+        /// <summary>Mouse wheel notches this frame (positive = up). Lets UI react to scroll while the cursor is virtual.</summary>
+        int GetScrollNotches();
     }
 }

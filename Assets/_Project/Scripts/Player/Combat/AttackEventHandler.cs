@@ -16,6 +16,8 @@ namespace Sol
         [SerializeField] private GameObject _slashEffectPrefab;
         [SerializeField] private Transform _slashEffectSpawn;
         [SerializeField] private float _attackRadius = 1.5f;
+        [Tooltip("Damage definition for this weapon's swings. When set, swings use it (damage type, tags, status chances). When empty, the fixed _attackDamage float is used.")]
+        [SerializeField] private DamageSO _attackDamageSO;
         [SerializeField] private float _attackDamage = 25f;
         [SerializeField] private bool _debugAttacks = true;
         
@@ -136,7 +138,22 @@ namespace Sol
                 if (hit.transform == transform || hit.transform.IsChildOf(transform))
                     continue;
                     
-                // Check if it's an enemy
+                // New path: a DamageSO on this weapon sends a typed hit to anything that can receive damage.
+                if (_attackDamageSO != null)
+                {
+                    IDamageReceiver receiver = hit.GetComponentInParent<IDamageReceiver>();
+                    if (receiver != null)
+                    {
+                        // The player's own swing: always logged, regardless of distance.
+                        receiver.ReceiveHit(_attackDamageSO.Build(gameObject.name, 0f, true, transform.position));
+                        if (_impactSound != null && _audioSource != null) _audioSource.PlayOneShot(_impactSound);
+                        hitSomething = true;
+                        if (_debugAttacks) Debug.Log($"Hit {hit.name} with {_attackDamageSO.name}");
+                    }
+                    continue;
+                }
+
+                // Legacy path: fixed float damage to anything implementing IDamageable.
                 IDamageable damageable = hit.GetComponent<IDamageable>();
                 if (damageable != null)
                 {

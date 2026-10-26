@@ -1,0 +1,27 @@
+{
+  "SS": {"what": "StatsService", "detail": "Single source of truth for stats. GetStat reads a cached value, recomputed when a modifier changes. Raises OnStatsChanged when modifiers change.", "verified": true},
+  "MODG": {"what": "Gravity trigger", "detail": "Collider trigger for the Player. On enter, adds a GravityMultiplier modifier keyed by its sourceId. On exit, removes it. Can persist while the player stays inside.", "verified": true},
+  "MODZ": {"what": "Gravity zone", "detail": "Collider trigger that sets a custom gravity direction on GravityController. Trigger methods are verified. The configured values were not traced.", "verified": true},
+  "MODS": {"what": "Speed boost trigger", "detail": "Collider trigger for the Player. Adds a MoveSpeed modifier based on RunMultiplier for a fixed duration. Effects have a 0.5 s cooldown.", "verified": true},
+  "SPD": {"what": "SpeedVisualizer", "detail": "Reads the speed multiplier each Update. Drives particle emission and optional camera FOV. Visual only.", "verified": true},
+  "ROT": {"what": "Rotator", "detail": "Spins a prop around chosen axes. Can face the camera. Not connected to player state.", "verified": true},
+
+  "UIIN": {"what": "UIInputController", "detail": "Listens for the K action and calls UIManager.TogglePanel for the talent wheel.", "verified": true},
+  "UIM": {"what": "UIManager", "detail": "Opens and closes panels. Pauses time on open and close. Deactivates the camera while a panel is open. Requests an immediate save on close.", "verified": true},
+  "VC": {"what": "VirtualCursor", "detail": "Cursor driven by the mouse or navigation input. Sends synthesized clicks into the UI Toolkit tree. Keeps running while the game is paused.", "verified": true},
+
+  "TTC": {"what": "TalentTreeController", "detail": "Handles clicks on talent nodes. Left click allocates, right click removes. Checks max points, prerequisites, and dependents. Reset is scene-wired.", "verified": true},
+  "TTG": {"what": "TalentTreeGenerator", "detail": "Holds talent node data (TalentNodeDataSO) and the layout. Answers GetNodeData for the controller.", "verified": true},
+  "PS": {"what": "ProgressionService", "detail": "Holds the talent point pool and attribute allocations. SpendTalentPoint and RefundTalentPoint are used by the talent UI. Attribute spend and refund have no UI caller yet.", "verified": true},
+  "TSS": {"what": "TalentStateService", "detail": "Tracks allocated points per node. Enforces the rules that TryAllocatePoint and TryRemovePoint check. Raises the talent GameEvent when anything changes.", "verified": true},
+  "TEV": {"what": "Talent GameEvent", "detail": "ScriptableObject event raised on any allocation change. Listeners are scene-wired and call the save path.", "verified": true},
+
+  "GL": {"what": "GameEventListener", "detail": "Scene-wired MonoBehaviour. Subscribes to a GameEvent asset and calls RequestLazySave on the SaveManager when it fires.", "verified": true},
+  "SM": {"what": "SaveManager", "detail": "Decides when to save. Lazy saves are debounced by 2 s. Immediate saves happen on panel close. Builds PlayerSaveData from talents, level, and points.", "verified": true},
+  "SV": {"what": "SaveService", "detail": "Writes and reads PlayerSaveData as JSON in persistentDataPath, slot default. Write errors are logged only.", "verified": true},
+  "DISK": {"what": "Save file", "detail": "JSON file on disk. Holds level, talent points, and talent allocations. Attribute, vitals, and equipment fields are not written during play.", "verified": true},
+  "GI": {"what": "GameInitializer", "detail": "On Start, loads the save or creates a new game, then initializes stats, progression, and talent state. Forced new game deletes the save.", "verified": true},
+
+  "TM": {"what": "TimeManager", "detail": "Owns CelestialTime, pause, day, season, and year. Raises OnDay, OnSeason, and OnYear events when they change.", "verified": true},
+  "WORLD": {"what": "World scripts", "detail": "Celestial, cloud, wind, skybox, and clock scripts. They poll TimeManager values rather than subscribe to events.", "verified": true}
+}

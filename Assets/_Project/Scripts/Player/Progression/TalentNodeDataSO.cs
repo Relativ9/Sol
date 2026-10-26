@@ -23,6 +23,9 @@ namespace Sol
         [Header("Connections")]
         public List<TalentNodeDataSO> prerequisites;  // Which nodes unlock this one
         //public bool requiresHybridParent; // Special: needs BOTH trees to unlock (for hybrids only)
+
+        [Header("Effects")]
+        public List<TalentEffectSO> effects;
     }
 
 }

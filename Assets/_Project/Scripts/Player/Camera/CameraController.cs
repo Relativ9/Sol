@@ -152,8 +152,19 @@ namespace Sol
             _invertY = invertY;
         }
         
+        // TryGet: this runs every frame and can run before VirtualCursorController has registered.
+        private static bool VirtualCursorOwnsOsCursor()
+        {
+            var cursor = ServiceLocator.TryGet<IVirtualCursor>();
+            return cursor != null && cursor.IsOsCursorOwned;
+        }
+
         public void LockCursor(bool locked)
         {
+            // The virtual cursor owns the OS cursor while it is active. Don't let the camera change it.
+            if (VirtualCursorOwnsOsCursor())
+                return;
+
             if (locked)
             {
                 Cursor.lockState = CursorLockMode.Locked;

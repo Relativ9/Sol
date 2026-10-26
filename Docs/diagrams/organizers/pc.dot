@@ -1,0 +1,47 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>pc</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_pc {
+    label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">Organizer. Routes input. Implements IPlayerContext</FONT>>; style="rounded,filled"; fillcolor="#fdecea"; color="#c62828";
+    PC       [label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">OnJump, OnMove, OnRun, OnLook, OnAttack</FONT>>];
+    PCSTATE  [label=<<B>State dictionary</B><BR/><FONT POINT-SIZE="9">JumpPriority, IsGrounded, IsRunning</FONT>>, shape=cylinder, fillcolor="#fff8e1", color="#b28704"];
+    PCSVC    [label=<<B>Service registry</B><BR/><FONT POINT-SIZE="9">Type to service. GetService T</FONT>>, shape=cylinder, fillcolor="#fff8e1", color="#b28704"];
+    JUMP     [label=<<B>Jumping</B><BR/><FONT POINT-SIZE="9">Impulse and double jump. Cooldown 0.1 s</FONT>>];
+    MOVE     [label=<<B>Movement</B><BR/><FONT POINT-SIZE="9">Ground and air movement. Sets velocity</FONT>>];
+    GC       [label=<<B>GroundChecker</B><BR/><FONT POINT-SIZE="9">Ground cast per FixedUpdate. Coyote 0.15 s</FONT>>, fillcolor="#e8f5e9", color="#2e7d32"];
+    RUNMOD   [label=<<B>Run modifier</B><BR/><FONT POINT-SIZE="9">MoveSpeed modifier while run is held</FONT>>];
+  }
+    CAM      [label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Pitch clamped -80 to 80. Yaw used by Movement</FONT>>];
+    CSC      [label=<<B>CombatStateController</B><BR/><FONT POINT-SIZE="9">Sheathed, Unsheathed. Attack cooldown 0.8 s</FONT>>];
+    IN_ATK   [label=<<B>MainHand</B>: Attack<BR/><FONT POINT-SIZE="9">Button</FONT>>];
+    IN_MOUSE [label=<<B>Mouse</B>: Look<BR/><FONT POINT-SIZE="9">Vector2 delta</FONT>>];
+    IN_SPACE [label=<<B>Space</B>: Jump<BR/><FONT POINT-SIZE="9">Button, Keyboard space</FONT>>];
+    IN_TW    [label=<<B>ToggleWeapon</B><BR/><FONT POINT-SIZE="9">Button</FONT>>];
+    IN_WASD  [label=<<B>WASD</B>: Move and Run<BR/><FONT POINT-SIZE="9">Vector2, Shift = run</FONT>>];
+    PAC      [label=<<B>PlayerAnimationController</B><BR/><FONT POINT-SIZE="9">Writes animator parameters from state</FONT>>];
+    RB       [label=<<B>Rigidbody</B><BR/><FONT POINT-SIZE="9">linearVelocity, AddForce. Four writers (F2)</FONT>>, shape=cylinder, fillcolor="#cfd8dc"];
+    SS       [label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource</FONT>>];
+  IN_SPACE -> PC     [label="Button event (OnJump)"];
+  IN_WASD  -> PC     [label="Vector2 and bool (OnMove, OnRun)"];
+  IN_MOUSE -> PC     [label="Vector2 (OnLook)"];
+  IN_ATK   -> PC     [label="Button event (OnAttack)"];
+  IN_TW    -> PC     [label="Button event (OnToggleWeapon)"];
+  PC -> PCSTATE   [label="SetStateValue (bool, int, float)", style=dashed];
+  PC -> PCSVC     [label="RegisterService at Awake", style=dashed];
+  PCSTATE -> PAC  [label="GetStateValue, read by animator", style=dashed, dir=back];
+  PC -> JUMP      [label="HandleJumpInput (direct call)"];
+  PC -> MOVE      [label="ProcessMovement (FixedUpdate)"];
+  JUMP -> RB      [label="AddForce Impulse (Vector3)"];
+  MOVE -> RB      [label="linearVelocity (Vector3)"];
+  GC -> PCSTATE   [label="SetStateValue IsGrounded (bool)", style=dashed];
+  JUMP -> GC      [label="IsGrounded (bool, read)", style=dashed, dir=back];
+  MOVE -> GC      [label="IsGrounded (bool, read)", style=dashed, dir=back];
+  RUNMOD -> SS    [label="ApplyOrReplaceModifier (StatModifier)"];
+  MOVE -> SS      [label="GetStat MoveSpeed (float, read)", style=dashed, dir=back];
+  PC -> CAM       [label="GetLookInput (Vector2, polled)", style=dashed, dir=back];
+  CAM -> MOVE     [label="GetCameraYaw (float, polled)", style=dashed];
+  PC -> CSC       [label="HandleAttackInput, ToggleWeaponState"];
+  CSC -> PCSTATE  [label="IsWeaponDrawn, IsAttacking (bool)", style=dashed];
+}

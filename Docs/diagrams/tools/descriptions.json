@@ -1,0 +1,28 @@
+{
+  "IN_SPACE": {"what": "Jump button", "detail": "Keyboard space bound to the Main map Jump action. Fires once on press. Calls Jumping through PlayerController.OnJump.", "verified": true},
+  "IN_WASD": {"what": "Move and run", "detail": "WASD as a Vector2 composite on Move. Shift is held for Run. Both go into PlayerController state and the movement states.", "verified": true},
+  "IN_MOUSE": {"what": "Look", "detail": "Mouse delta on the Look action. Read by CameraController every Update, scaled by sensitivity. Ignored while Time.timeScale is 0.", "verified": true},
+  "IN_ATK": {"what": "Attack", "detail": "MainHand action. Routed through OnAttack to CombatStateController.HandleAttackInput. Blocked during animations and cooldown.", "verified": true},
+  "IN_TW": {"what": "Toggle weapon", "detail": "Toggles between Sheathed and Unsheathed. Blocked while an attack, sheathe, or draw animation is playing.", "verified": true},
+  "IN_K": {"what": "Talent panel", "detail": "K on the UI map. UIInputController calls UIManager.TogglePanel for the talent wheel. Also pauses time.", "verified": true},
+  "IN_CLICK": {"what": "UI clicks", "detail": "Left and right mouse buttons on the UI map. VirtualCursor reads them each frame and sends synthesized clicks into the UI Toolkit tree.", "verified": true},
+
+  "PC": {"what": "PlayerController", "detail": "Implements IPlayerContext. Receives every player input and routes it. Runs the active movement state in FixedUpdate. Owns the state dictionary and local service registry.", "verified": true},
+  "PCSTATE": {"what": "State dictionary", "detail": "String-keyed store that components use to talk to each other: JumpPriority, IsGrounded, IsRunning, IsWeaponDrawn, IsAttacking. Only some keys are read by another component.", "verified": true},
+  "PCSVC": {"what": "Service registry", "detail": "Per-player dictionary from type to component. Components call GetService<T> to get a collaborator. Filled in PlayerController.Awake.", "verified": true},
+  "JUMP": {"what": "Jumping", "detail": "Grounded jump and one double jump. Adds an impulse to the Rigidbody. Cooldown 0.1 s. Sets JumpPriority for 0.15 s to stop Movement fighting the jump.", "verified": true},
+  "MOVE": {"what": "Movement", "detail": "Grounded and air movement. Sets Rigidbody.linearVelocity from input and the MoveSpeed stat. Applies a sticky downward force when grounded. Skipped while JumpPriority is set.", "verified": true},
+  "GC": {"what": "GroundChecker", "detail": "Sphere or ray cast under the player each FixedUpdate. Writes IsGrounded to the state dictionary. Coyote time 0.15 s lets a jump start just after leaving the ground.", "verified": true},
+  "RUNMOD": {"what": "Run modifier", "detail": "While Run is held and the player moves, adds a MoveSpeed modifier from RunMultiplier. Removed when Run is released.", "verified": true},
+
+  "CAM": {"what": "CameraController", "detail": "Turns look input into camera rotation. Pitch is clamped to -80 to 80 degrees. Yaw is read by Movement so WASD is camera-relative. Locks and unlocks the cursor.", "verified": true},
+  "CINE": {"what": "CinemachineCamera", "detail": "Scene object that follows CameraTarget. Not in code, set up in the scene.", "verified": true},
+
+  "CSC": {"what": "CombatStateController", "detail": "Owns weapon state (Sheathed, Unsheathed, transitions) and attack timing. Attack cooldown 0.8 s. Force-sheathes the weapon when movement changes state.", "verified": true},
+  "ADISP": {"what": "AnimationEventDispatcher", "detail": "Receives animator events by name and forwards them to registered IAnimationEventReceiver components.", "verified": true},
+  "PAC": {"what": "PlayerAnimationController", "detail": "Writes Animator parameters (speed, direction, grounded) from state values IsRunning and IsGrounded. Does not read the jump keys.", "verified": true},
+  "AEH": {"what": "AttackEventHandler", "detail": "Scene-wired. On an attack impact, runs an overlap sphere in front of the player and calls IDamageable.TakeDamage. No IDamageable implementers exist in code yet.", "verified": true},
+
+  "GRAV": {"what": "GravityController", "detail": "Applies gravity every FixedUpdate. Reads GravityMultiplier and TerminalVelocity from StatsService. Clamps falling speed to the terminal velocity.", "verified": true},
+  "RB": {"what": "Rigidbody", "detail": "The Player physics body. linearVelocity and AddForce are written by four components (Jumping, Movement, GravityController, PlayerController). Final velocity depends on execution order.", "verified": true}
+}

@@ -267,7 +267,7 @@ namespace Sol
             ""id"": ""4692c7df-3c79-4964-bd37-23349d0439ed"",
             ""actions"": [
                 {
-                    ""name"": ""OpenTalentPanel"",
+                    ""name"": ""OpenMenu"",
                     ""type"": ""Button"",
                     ""id"": ""ce028a84-d2f5-4769-a2fe-a6a3b35b587f"",
                     ""expectedControlType"": """",
@@ -311,7 +311,7 @@ namespace Sol
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Mouse&Keyboard"",
-                    ""action"": ""OpenTalentPanel"",
+                    ""action"": ""OpenMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -380,7 +380,7 @@ namespace Sol
             m_Main_ToggleWeapon = m_Main.FindAction("ToggleWeapon", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
-            m_UI_OpenTalentPanel = m_UI.FindAction("OpenTalentPanel", throwIfNotFound: true);
+            m_UI_OpenMenu = m_UI.FindAction("OpenMenu", throwIfNotFound: true);
             m_UI_CursorMove = m_UI.FindAction("CursorMove", throwIfNotFound: true);
             m_UI_LeftClick = m_UI.FindAction("Left Click", throwIfNotFound: true);
             m_UI_RightClick = m_UI.FindAction("Right Click", throwIfNotFound: true);
@@ -616,7 +616,7 @@ namespace Sol
         // UI
         private readonly InputActionMap m_UI;
         private List<IUIActions> m_UIActionsCallbackInterfaces = new List<IUIActions>();
-        private readonly InputAction m_UI_OpenTalentPanel;
+        private readonly InputAction m_UI_OpenMenu;
         private readonly InputAction m_UI_CursorMove;
         private readonly InputAction m_UI_LeftClick;
         private readonly InputAction m_UI_RightClick;
@@ -632,9 +632,9 @@ namespace Sol
             /// </summary>
             public UIActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
             /// <summary>
-            /// Provides access to the underlying input action "UI/OpenTalentPanel".
+            /// Provides access to the underlying input action "UI/OpenMenu".
             /// </summary>
-            public InputAction @OpenTalentPanel => m_Wrapper.m_UI_OpenTalentPanel;
+            public InputAction @OpenMenu => m_Wrapper.m_UI_OpenMenu;
             /// <summary>
             /// Provides access to the underlying input action "UI/CursorMove".
             /// </summary>
@@ -673,9 +673,9 @@ namespace Sol
             {
                 if (instance == null || m_Wrapper.m_UIActionsCallbackInterfaces.Contains(instance)) return;
                 m_Wrapper.m_UIActionsCallbackInterfaces.Add(instance);
-                @OpenTalentPanel.started += instance.OnOpenTalentPanel;
-                @OpenTalentPanel.performed += instance.OnOpenTalentPanel;
-                @OpenTalentPanel.canceled += instance.OnOpenTalentPanel;
+                @OpenMenu.started += instance.OnOpenMenu;
+                @OpenMenu.performed += instance.OnOpenMenu;
+                @OpenMenu.canceled += instance.OnOpenMenu;
                 @CursorMove.started += instance.OnCursorMove;
                 @CursorMove.performed += instance.OnCursorMove;
                 @CursorMove.canceled += instance.OnCursorMove;
@@ -696,9 +696,9 @@ namespace Sol
             /// <seealso cref="UIActions" />
             private void UnregisterCallbacks(IUIActions instance)
             {
-                @OpenTalentPanel.started -= instance.OnOpenTalentPanel;
-                @OpenTalentPanel.performed -= instance.OnOpenTalentPanel;
-                @OpenTalentPanel.canceled -= instance.OnOpenTalentPanel;
+                @OpenMenu.started -= instance.OnOpenMenu;
+                @OpenMenu.performed -= instance.OnOpenMenu;
+                @OpenMenu.canceled -= instance.OnOpenMenu;
                 @CursorMove.started -= instance.OnCursorMove;
                 @CursorMove.performed -= instance.OnCursorMove;
                 @CursorMove.canceled -= instance.OnCursorMove;
@@ -812,12 +812,12 @@ namespace Sol
         public interface IUIActions
         {
             /// <summary>
-            /// Method invoked when associated input action "OpenTalentPanel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "OpenMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnOpenTalentPanel(InputAction.CallbackContext context);
+            void OnOpenMenu(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "CursorMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

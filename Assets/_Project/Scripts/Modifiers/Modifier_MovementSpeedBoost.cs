@@ -64,14 +64,6 @@ namespace Sol
 
         private void ApplySpeedBoost(IStatsService statsService)
         {
-            // Create the modifier
-            // StatModifier speedModifier = new StatModifier
-            // {
-            //     value = _speedBoostAmount,
-            //     type = _modifierType,
-            //     duration = _boostDuration
-            // };
-            
             float runMultiplier = _statsService.GetStat(StatTypeEnum.RunMultiplier);
             
             StatModifier runMod = new StatModifier(

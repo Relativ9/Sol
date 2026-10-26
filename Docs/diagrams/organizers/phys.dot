@@ -1,0 +1,24 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>phys</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_phys {
+    label=<<B>Physics</B><BR/><FONT POINT-SIZE="9">Shared Rigidbody on the Player</FONT>>; style="rounded,filled"; fillcolor="#eceff1"; color="#455a64";
+    GRAV     [label=<<B>GravityController</B><BR/><FONT POINT-SIZE="9">Gravity each FixedUpdate. Terminal velocity clamp</FONT>>];
+    RB       [label=<<B>Rigidbody</B><BR/><FONT POINT-SIZE="9">linearVelocity, AddForce. Four writers (F2)</FONT>>, shape=cylinder, fillcolor="#cfd8dc"];
+  }
+    AEH      [label=<<B>AttackEventHandler</B> [scene]<BR/><FONT POINT-SIZE="9">OverlapSphere, calls IDamageable</FONT>>, style="rounded,filled,dashed"];
+    JUMP     [label=<<B>Jumping</B><BR/><FONT POINT-SIZE="9">Impulse and double jump. Cooldown 0.1 s</FONT>>];
+    MODG     [label=<<B>Gravity trigger</B><BR/><FONT POINT-SIZE="9">Collider. Adds GravityMultiplier on enter</FONT>>];
+    MODZ     [label=<<B>Gravity zone</B><BR/><FONT POINT-SIZE="9">Collider. Sets custom gravity direction</FONT>>];
+    MOVE     [label=<<B>Movement</B><BR/><FONT POINT-SIZE="9">Ground and air movement. Sets velocity</FONT>>];
+    SS       [label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource</FONT>>];
+  JUMP -> RB      [label="AddForce Impulse (Vector3)"];
+  MOVE -> RB      [label="linearVelocity (Vector3)"];
+  GRAV -> RB      [label="AddForce Acceleration (Vector3)"];
+  AEH -> RB       [label="OverlapSphere (collider query)", style=dotted, dir=back];
+  MODG -> GRAV    [label="Trigger enter and exit (Collider, tag Player)", style=dotted, dir=back];
+  MODZ -> GRAV    [label="SetGravityScale, custom direction (Vector3)"];
+  GRAV -> SS      [label="GetStat Gravity and Terminal (float, read)", style=dashed, dir=back];
+}

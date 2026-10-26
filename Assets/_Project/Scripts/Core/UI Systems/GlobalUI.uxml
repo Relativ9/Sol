@@ -1,22 +1,62 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="ui-root" style="width: 100%; height: 100%; position: absolute;">
-        
+
         <ui:VisualElement name="hud-root" style="width: 100%; height: 100%; position: absolute;" />
 
-        <ui:VisualElement name="talent-wheel-root" style="visibility: visible; width: 100%; height: 100%; position: absolute; display: none;">
-    
-            <!-- Points label: sibling of wheel-container, NOT inside it -->
-            <ui:VisualElement name="talent-points-container" style="position: absolute; top: 20px; right: 20px;">
-                <ui:Label name="talent-points-label" text="Points: 0/0" 
-                          style="font-size: 18px; color: rgb(255, 185, 105); -unity-font-style: bold;" />
+        <!-- menu-root is a full-screen dimmed backdrop (blocks clicks to the game). menu-panel is the centred window.
+             Tab content is built by IMenuTab implementations; the names below are what they look up. -->
+        <ui:VisualElement name="menu-root" style="visibility: visible; width: 100%; height: 100%; position: absolute; display: none; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.55);">
+
+            <ui:VisualElement name="menu-panel"
+                              style="width: 78%; height: 78%; flex-direction: row; background-color: rgba(20, 16, 12, 0.96); border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(204, 153, 64); border-right-color: rgb(204, 153, 64); border-top-color: rgb(204, 153, 64); border-bottom-color: rgb(204, 153, 64); overflow: hidden;">
+
+                <ui:VisualElement name="menu-content"
+                                  style="flex-grow: 1; position: relative; padding-top: 24px; padding-left: 204px; padding-right: 24px;">
+
+                    <!-- Talents tab content -->
+                    <ui:VisualElement name="talent-tab-content" style="width: 100%; height: 100%; position: absolute; display: none;">
+                        <!-- All nodes generated in here, this is what moves -->
+                        <ui:VisualElement name="wheel-container"
+                                          style="flex-grow: 0; width: 90%; height: 90%;
+                                         position: relative; justify-content: center;
+                                         align-self: center; align-items: center;
+                                         flex-direction: row; flex-shrink: 0;" />
+                    </ui:VisualElement>
+
+                    <!-- Player Stats tab content (built by PlayerStatsTab) -->
+                    <ui:VisualElement name="stats-tab-content" style="width: 100%; height: 100%; position: absolute; display: none;" />
+
+                </ui:VisualElement>
+
+                <!-- Fade-to-black vignette, drawn after the content so it covers the whole panel edge to edge.
+                     picking-mode Ignore: it never blocks clicks. Shown only while the Talents tab is open. -->
+                <ui:VisualElement name="talent-vignette" picking-mode="Ignore"
+                                  style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: none;" />
+
+                <!-- Previous / next tree arrows. Drawn after the content so the picker finds them before the wheel.
+                     Left arrow sits past the 180px tab bar. Shown only while the Talents tab is open. -->
+                <ui:Button name="talent-prev-tree" text="&lt;"
+                           style="position: absolute; left: 200px; top: 50%; width: 48px; height: 48px; font-size: 26px; display: none; border-top-left-radius: 24px; border-top-right-radius: 24px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;" />
+                <ui:Button name="talent-next-tree" text="&gt;"
+                           style="position: absolute; right: 20px; top: 50%; width: 48px; height: 48px; font-size: 26px; display: none; border-top-left-radius: 24px; border-top-right-radius: 24px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;" />
+
+                <!-- Talents header: title banner and points, drawn above the vignette so they stay readable.
+                     Positioned in the Talents area (clear of the 180px sidebar). Shown only while the Talents tab is open. -->
+                <ui:VisualElement name="talent-header" picking-mode="Ignore"
+                                  style="position: absolute; top: 24px; left: 204px; right: 24px; height: 60px; display: none; flex-direction: row; align-items: center;">
+                    <ui:Label name="talent-tree-title" text="" picking-mode="Ignore"
+                              style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; font-size: 26px; -unity-font-style: bold; color: rgb(255, 220, 150); -unity-text-align: middle-center; text-shadow: 0 0 6px rgba(255, 245, 180, 0.5);" />
+                    <ui:Label name="talent-points-label" text="Points: 0/0" picking-mode="Ignore"
+                              style="position: absolute; right: 0; top: 0; bottom: 0; font-size: 18px; color: rgb(255, 185, 105); -unity-font-style: bold; -unity-text-align: middle-right; text-shadow: 0 2px 4px rgb(0, 0, 0);" />
+                </ui:VisualElement>
+
+                <!-- Side tab bar: last child, so it draws over the content and nothing in the Talents area shows through.
+                     Fully opaque. -->
+                <ui:VisualElement name="menu-tab-bar"
+                                  style="position: absolute; left: 0; top: 0; bottom: 0; width: 180px; padding-top: 24px; padding-left: 12px; padding-right: 12px; background-color: rgb(12, 9, 6); border-right-width: 2px; border-right-color: rgb(204, 153, 64);" />
+
             </ui:VisualElement>
-            <!-- All nodes generated in here, this is what moves -->
-            <ui:VisualElement name="wheel-container" 
-                              style="flex-grow: 0; width: 90%; height: 90%; 
-                             position: relative; justify-content: center; 
-                             align-self: center; align-items: center;
-                             flex-direction: row; flex-shrink: 0;" />
-                
+
         </ui:VisualElement>
 
         <ui:VisualElement name="tooltip-root" style="position: absolute; display: none;" />

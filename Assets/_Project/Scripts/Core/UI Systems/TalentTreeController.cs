@@ -15,6 +15,7 @@ namespace Sol
         private IReadOnlyDictionary<string, NodeInstance> _nodes;
         private Label _talentPointsLabel;
         private VisualElement _root;
+        private IVirtualCursor _cursor;
 
         public void Initialize(
             IReadOnlyDictionary<string, NodeInstance> nodes, 
@@ -25,6 +26,7 @@ namespace Sol
             _progressionService = ServiceLocator.Get<IProgressionService>();
             _talentState = ServiceLocator.Get<ITalentStateService>();
             _treeGenerator = ServiceLocator.Get<ITalentTreeGenerator>();
+            _cursor = ServiceLocator.TryGet<IVirtualCursor>();
             _nodes = nodes;
             _root = root;
             
@@ -45,6 +47,25 @@ namespace Sol
             RefreshAllVisuals();
         }
 
+        // The controller is destroyed when the Talents tab closes. Unsubscribe so the generator
+        // doesn't call into a dead controller on the next focus change.
+        void OnDestroy()
+        {
+            if (_treeGenerator != null)
+                _treeGenerator.FocusChanged -= UpdateTreeTitle;
+        }
+
+        // Mouse wheel scrolls the wheel one tier per notch while the talent tab is open.
+        // Scroll is inverted relative to the raw input (scroll up = outer tiers, matching the intended feel).
+        void Update()
+        {
+            if (_treeGenerator == null || _cursor == null) return;
+
+            int notches = _cursor.GetScrollNotches();
+            if (notches != 0)
+                _treeGenerator.ScrollTiers(-notches);
+        }
+
         #region Input Binding
         
         void BindGlobalInput(VisualElement root)
@@ -53,6 +74,105 @@ namespace Sol
             {
                 _tooltipSystem?.UpdatePosition(evt.mousePosition);
             });
+
+            // Arrows change the focused tree. The wheel is rotated, not the buttons.
+            root.Q<Button>("talent-prev-tree")?.RegisterCallback<ClickEvent>(_ => _treeGenerator.FocusTree(_treeGenerator.FocusedTreeIndex - 1));
+            root.Q<Button>("talent-next-tree")?.RegisterCallback<ClickEvent>(_ => _treeGenerator.FocusTree(_treeGenerator.FocusedTreeIndex + 1));
+
+            // Scroll is polled in Update, not a WheelEvent: the virtual cursor never generates wheel events,
+            // so UI Toolkit never sees the scroll. The cursor reads the mouse and exposes it instead.
+            _treeGenerator.FocusChanged += UpdateTreeTitle;
+            UpdateTreeTitle();
+            ApplyVignette(root);
+        }
+
+        // Fade-to-black vignette: transparent in the middle, black at the edges. Visual only, no picking.
+        // The gradient is generated at runtime, so no texture asset is needed.
+        static Texture2D _vignetteTexture;
+
+        void ApplyVignette(VisualElement root)
+        {
+            var vignette = root.Q<VisualElement>("talent-vignette");
+            if (vignette == null) return;
+
+            if (_vignetteTexture == null)
+                _vignetteTexture = BuildVignetteTexture(256);
+
+            vignette.style.backgroundImage = new StyleBackground(_vignetteTexture);
+            vignette.style.unityBackgroundScaleMode = ScaleMode.StretchToFill;
+        }
+
+        static Texture2D BuildVignetteTexture(int size)
+        {
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear
+            };
+
+            var pixels = new Color[size * size];
+            float half = size * 0.5f;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    // Distance from the centre, normalised so the edge midpoint is 1.
+                    float dx = (x - half) / half;
+                    float dy = (y - half) / half;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy) / Mathf.Sqrt(2f);
+
+                    // Clear in the centre, then fade to fully black by 75% of the way to the edge.
+                    // Lower start and end values pull the vignette in and make it stronger toward the centre.
+                    float alpha = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.3f, 0.75f, d));
+                    pixels[y * size + x] = new Color(0f, 0f, 0f, alpha);
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply();
+            return tex;
+        }
+
+        // Outline takes the node's tree colour when it is available or active, so each tree reads as its own.
+        // Locked nodes keep the grey from the stylesheet, so their state still reads at a glance.
+        void ApplyTreeOutline(NodeInstance nodeInstance, VisualElement element, bool locked)
+        {
+            if (locked)
+            {
+                element.style.borderTopColor = StyleKeyword.Null;
+                element.style.borderRightColor = StyleKeyword.Null;
+                element.style.borderBottomColor = StyleKeyword.Null;
+                element.style.borderLeftColor = StyleKeyword.Null;
+                return;
+            }
+
+            Color c = TreeOutlineColor(nodeInstance.TreeIndex);
+            element.style.borderTopColor = c;
+            element.style.borderRightColor = c;
+            element.style.borderBottomColor = c;
+            element.style.borderLeftColor = c;
+        }
+
+        // Same colour that names the tree in the header, forced opaque.
+        Color TreeOutlineColor(int treeIndex)
+        {
+            Color c = _treeGenerator.TreeColor(treeIndex);
+            return new Color(c.r, c.g, c.b, 1f);
+        }
+
+        // Title shows the focused tree's name and colour.
+        void UpdateTreeTitle()
+        {
+            var title = _root?.Q<Label>("talent-tree-title");
+            if (title == null) return;
+
+            int index = _treeGenerator.FocusedTreeIndex;
+            title.text = _treeGenerator.TreeName(index);
+
+            // Tree colours are authored with alpha 0, which made the banner invisible. Keep the RGB
+            // so each tree still has its colour, and force full opacity for the text.
+            Color c = _treeGenerator.TreeColor(index);
+            title.style.color = new Color(c.r, c.g, c.b, 1f);
         }
         
         void BindNodeInteractions()
@@ -71,7 +191,11 @@ namespace Sol
                 element.AddToClassList("talent-node");
 
                 element.RegisterCallback<MouseDownEvent>(evt => OnNodeClicked(evt, capturedNodeId));
-                element.RegisterCallback<MouseEnterEvent>(evt => ShowTooltip(data, evt.mousePosition));
+                element.RegisterCallback<MouseEnterEvent>(evt =>
+                {
+                    // Dimmed nodes (other trees) get no tooltip. Hybrid nodes are always shown.
+                    if (IsNodeInteractive(nodeInstance)) ShowTooltip(data, evt.mousePosition);
+                });
                 element.RegisterCallback<MouseLeaveEvent>(evt => HideTooltip());
             }
         }
@@ -83,9 +207,18 @@ namespace Sol
             return _talentState.GetAllocatedNodeIds();
         }
 
+        // A node is interactive if it belongs to the focused tree, or it is a hybrid node (which spans trees).
+        // Dimmed nodes from other trees get no tooltip and cannot be allocated.
+        bool IsNodeInteractive(NodeInstance nodeInstance)
+        {
+            if (nodeInstance.Data != null && nodeInstance.Data.isHybrid) return true;
+            return nodeInstance.TreeIndex == _treeGenerator.FocusedTreeIndex;
+        }
+
         void OnNodeClicked(MouseDownEvent evt, string nodeId)
         {
             if (!_nodes.TryGetValue(nodeId, out var nodeInstance)) return;
+            if (!IsNodeInteractive(nodeInstance)) return;
     
             if (evt.button == 0)
             {
@@ -212,6 +345,8 @@ namespace Sol
             {
                 element.AddToClassList("available");
             }
+
+            ApplyTreeOutline(nodeInstance, element, locked: !canAllocate && allocated == 0);
             
             if (data.maxPoints > 1)
             {

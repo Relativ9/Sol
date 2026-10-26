@@ -1,0 +1,27 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>ui</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_ui {
+    label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">Organizer. Opens panels, pauses time, requests saves</FONT>>; style="rounded,filled"; fillcolor="#e0f7fa"; color="#00838f";
+    UIIN     [label=<<B>UIInputController</B><BR/><FONT POINT-SIZE="9">Listens for K. Calls TogglePanel</FONT>>];
+    UIM      [label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">TogglePanel, OpenPanel, ClosePanel</FONT>>];
+    VC       [label=<<B>VirtualCursor</B><BR/><FONT POINT-SIZE="9">Cursor from mouse or navigation. Clicks into UI Toolkit</FONT>>];
+  }
+    CAM      [label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Pitch clamped -80 to 80. Yaw used by Movement</FONT>>];
+    IN_CLICK [label=<<B>Left and Right Click</B><BR/><FONT POINT-SIZE="9">UI map, polled each frame</FONT>>];
+    IN_K     [label=<<B>K</B>: Talent panel<BR/><FONT POINT-SIZE="9">Button, Keyboard k</FONT>>];
+    SM       [label=<<B>SaveManager</B><BR/><FONT POINT-SIZE="9">2 s debounce. Immediate on panel close</FONT>>];
+    TM       [label=<<B>TimeManager</B><BR/><FONT POINT-SIZE="9">CelestialTime, pause, day, season, year</FONT>>];
+    TTC      [label=<<B>TalentTreeController</B><BR/><FONT POINT-SIZE="9">Left allocates, right removes. Checks prerequisites</FONT>>];
+  IN_K     -> UIIN   [label="Button event (OnOpenTalentWheel)"];
+  IN_CLICK -> VC     [label="Mouse button state, polled"];
+  UIM -> CAM      [label="OnDeactivate / OnActivate (lock cursor)"];
+  UIM -> TTC      [label="InitializeTalentPanel"];
+  VC -> TTC       [label="Synthesized MouseDownEvent (button 0 or 1)"];
+  UIIN -> UIM     [label="TogglePanel (string)"];
+  UIM -> TM       [label="TogglePause (bool)"];
+  VC -> UIM       [label="SetActiveDocument (UIDocument)"];
+  UIM -> SM       [label="RequestImmediateSave (immediate)"];
+}

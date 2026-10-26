@@ -12,6 +12,7 @@ namespace Sol
         
         private IStatsService _statsService;
         private PlayerStatSO _defaultStats;
+        private DerivedStatResolver _derivedResolver;
         private Dictionary<StatTypeEnum, int> _attributeAllocations = new();
 
         
@@ -19,9 +20,12 @@ namespace Sol
         {
             _statsService = statsService;
             _defaultStats = defaultStats;
+            _derivedResolver = new DerivedStatResolver(statsService, defaultStats);
             _level = level > 0 ? level : progressionSO.startingLevel;
             _totalTalentPoints = totalTalentPoints;
-            _totalAttributePoints = totalAttributePoints;  // ADD
+            // Attribute pool is derived from level, the same rule as the stats doc (3 per level).
+            // The saved value is ignored: a stale or zeroed save must not lock the pool.
+            _totalAttributePoints = DeriveAttributePool(progressionSO, _level);
             _spentTalentPoints = 0;
             
             foreach (var entry in attributeAllocations ?? System.Array.Empty<AttributeAllocationEntry>())
@@ -60,6 +64,7 @@ namespace Sol
             float defaultValue = GetDefaultAttributeValue(statType);
             int allocatedValue = _attributeAllocations.GetValueOrDefault(statType);
             _statsService.SetBaseStat(statType, defaultValue + allocatedValue);
+            _derivedResolver?.RecalculateAll();
         }
 
         public bool TrySpendAttributePoint(StatTypeEnum statType) //call this on level up attribute assignment
@@ -103,6 +108,17 @@ namespace Sol
         }
 
         
+        public int GetTotalAttributePoints() => _totalAttributePoints;
+
+        // Starting pool plus attributePointsPerLevel for each level above the starting level.
+        private static int DeriveAttributePool(PlayerProgressionSO progression, int level)
+        {
+            int levelsGained = Mathf.Max(0, level - progression.startingLevel);
+            return progression.startingAttributePoints + levelsGained * progression.attributePointsPerLevel;
+        }
+
+        public int GetAllocatedAttributePoints(StatTypeEnum statType) => _attributeAllocations.GetValueOrDefault(statType);
+
         public int GetAvailableAttributePoints()
         {
             return _totalAttributePoints - GetTotalSpentAttributePoints();
@@ -114,6 +130,8 @@ namespace Sol
             {
                 RebuildBaseStat(kvp.Key);
             }
+            // Run once even with no allocations, so derived bonuses are always consistent after load.
+            _derivedResolver?.RecalculateAll();
         }
         
         public void SetSpentTalentPoints(int spent)
@@ -160,6 +178,7 @@ namespace Sol
                 float defaultValue = GetDefaultAttributeValue(coreStat);
                 _statsService.SetBaseStat(coreStat, defaultValue);
             }
+            _derivedResolver?.RecalculateAll();
             Debug.Log($"[{nameof(ProgressionService)}] Attributes reset. Available points: {GetAvailableAttributePoints()}/{_totalAttributePoints}");
         }
         

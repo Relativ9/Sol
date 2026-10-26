@@ -10,6 +10,7 @@ namespace Sol
         private readonly ITalentTreeGenerator _treeGenerator;
         private readonly GameEvent _talentStateChangedEvent; // Your SO GameEvent type
         private IStatsService _statsService; //injected after construction
+        private ITalentEffectContext _effectContext;
         
         private Dictionary<string, int> _allocatedPoints = new();
         
@@ -26,6 +27,7 @@ namespace Sol
         public void Initialize(PlayerSaveData saveData, IStatsService statsService)
         {
             _statsService = statsService;
+            _effectContext = new TalentEffectContext { StatsService = statsService };
             _allocatedPoints.Clear();
             
             if (saveData?.talentAllocations != null)
@@ -38,6 +40,10 @@ namespace Sol
             } 
             
             ValidateLoadedData();
+
+            // Replay Permanent modifiers for all loaded allocations
+            foreach (var nodeId in _allocatedPoints.Keys.ToArray())
+                ApplyNodeEffects(nodeId);
         }
         
         public int GetTotalAllocatedPoints() => _allocatedPoints.Values.Sum();
@@ -61,6 +67,7 @@ namespace Sol
             if (!PrerequisitesMet(data)) return false;
             
             IncrementPointAllocation(nodeId);
+            ApplyNodeEffects(nodeId);
             RaiseStateChanged();
             return true;
         }
@@ -75,19 +82,18 @@ namespace Sol
             if (HasAllocatedDependent(nodeId)) return false;
             
             DecrementPointAllocation(nodeId);
+            if (GetAllocatedPoints(nodeId) <= 0)
+                RemoveNodeEffects(nodeId);   // fully strip
+            else
+                ApplyNodeEffects(nodeId);    // re-apply scaled-down value via ApplyOrReplace
             RaiseStateChanged();
             return true;
         }
         
         public void ResetAll()
         {
-            if (_statsService != null)
-            {
-                foreach (var nodeId in _allocatedPoints.Keys.ToArray())
-                {
-                    _statsService.RemoveModifiersFromSource(nodeId);
-                }
-            }
+            foreach (var nodeId in _allocatedPoints.Keys.ToArray())
+                RemoveNodeEffects(nodeId);   // strip before clearing
             _allocatedPoints.Clear();
             RaiseStateChanged();
         }
@@ -118,6 +124,30 @@ namespace Sol
             _talentStateChangedEvent.Raise();
         }
         
+        void ApplyNodeEffects(string nodeId)
+        {
+            if (_effectContext == null) return;
+            var data = _treeGenerator.GetNodeData(nodeId);
+            int points = GetAllocatedPoints(nodeId);
+            if (data?.effects == null) return;
+            foreach (var effect in data.effects)
+                effect?.Apply(_effectContext, nodeId, points);
+        }
+
+        void RemoveNodeEffects(string nodeId)
+        {
+            if (_effectContext == null) return;
+            var data = _treeGenerator.GetNodeData(nodeId);
+            if (data?.effects == null) return;
+            foreach (var effect in data.effects)
+                effect?.Remove(_effectContext, nodeId);
+        }
+
+        private class TalentEffectContext : ITalentEffectContext
+        {
+            public IStatsService StatsService { get; set; }
+        }
+
         bool PrerequisitesMet(TalentNodeDataSO data)
         {
             if (data.prerequisites == null || data.prerequisites.Count == 0)

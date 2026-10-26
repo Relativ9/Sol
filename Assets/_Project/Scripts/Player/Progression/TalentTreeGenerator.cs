@@ -10,6 +10,8 @@ namespace Sol
         public VisualElement Element;
         public Vector2 Position;
         public TalentNodeDataSO Data;
+        // Index of the tree (in TalentTreeCollection order) this node belongs to. Used for focus and dimming.
+        public int TreeIndex;
     }
     
     public class TalentTreeGenerator : MonoBehaviour, ITalentTreeGenerator
@@ -85,14 +87,179 @@ namespace Sol
             // Draw connections now that elements exist
             DrawAllConnections(wheelContainer);
             
-            // Position container
+            // Position container: original offsets (20% left, 100% top). Adjust these to move the wheel on screen.
+            AttachWheel(wheelContainer);
             if (_nodeRegistry.Count > 0)
             {
-                wheelContainer.style.left = Length.Percent(20f);
-                wheelContainer.style.top = Length.Percent(100f);
+                wheelContainer.style.left = Length.Percent(0f);
+                wheelContainer.style.top = Length.Percent(180f);
             }
+            ApplyWheelTransform(animate: false);
+            ApplyFocusVisuals();
         }
         
+        #region Focus (arrow navigation)
+
+        // Wheel centre that nodes are placed around (see CalculateTreePositions). Rotation pivots here.
+        private const float WheelCentreX = 500f;
+        private const float WheelCentreY = 500f;
+
+        private const float DimmedOpacity = 0.3f;
+        private const int TierCount = MAX_TIER;
+
+        private int _focusedTree = 0;
+        private int _tierOffset = 0; // 0 = top tier at the top of the view. Mouse wheel moves this.
+        private VisualElement _focusWheel;
+
+        /// <summary>Raised whenever the focused tree changes, so the UI can update its title.</summary>
+        public event System.Action FocusChanged;
+
+        /// <summary>Current tier offset (0 = top). Clamped to the tree's tier range.</summary>
+        public int TierOffset => _tierOffset;
+
+        /// <summary>Set the wheel container once the UI exists. Called from Generate.</summary>
+        void AttachWheel(VisualElement wheel)
+        {
+            _focusWheel = wheel;
+            // Rotate and scroll about the wheel centre, so the pivot stays where you centred it.
+            _focusWheel.style.transformOrigin = new TransformOrigin(WheelCentreX, WheelCentreY, 0f);
+        }
+
+        /// <summary>Scrolls the wheel by whole tiers. The wheel eases to the new position over a few frames.</summary>
+        public void ScrollTiers(int delta)
+        {
+            _tierOffset = Mathf.Clamp(_tierOffset + delta, 0, TierCount);
+        }
+
+        // Eases the displayed tier offset toward the target each frame.
+        // Exponential smoothing is frame-rate independent: the same feel at 30 fps or 144 fps.
+        private const float ScrollSmoothing = 10f;
+        private float _displayTierOffset = 0f;
+
+        // Eases the displayed rotation toward the focused tree's angle, so arrow changes glide round the wheel.
+        private const float RotateSmoothing = 8f;
+        private float _displayRotationDegrees = 0f;
+
+        void Update()
+        {
+            if (_focusWheel == null) return;
+
+            float t = 1f - Mathf.Exp(-ScrollSmoothing * Time.unscaledDeltaTime);
+            float nextTier = Mathf.Lerp(_displayTierOffset, _tierOffset, t);
+            if (Mathf.Abs(nextTier - _tierOffset) < 0.001f) nextTier = _tierOffset;
+
+            // Rotation uses its own rate. Take the shortest way round the circle, so moving from the last tree
+            // to the first turns one section, not almost a full revolution.
+            float targetRotation = TargetRotationDegrees();
+            float rotationDelta = Mathf.DeltaAngle(_displayRotationDegrees, targetRotation);
+            float rt = 1f - Mathf.Exp(-RotateSmoothing * Time.unscaledDeltaTime);
+            float nextRotation = _displayRotationDegrees + rotationDelta * rt;
+            if (Mathf.Abs(Mathf.DeltaAngle(nextRotation, targetRotation)) < 0.01f) nextRotation = targetRotation;
+
+            bool changed = !Mathf.Approximately(nextTier, _displayTierOffset)
+                        || !Mathf.Approximately(nextRotation, _displayRotationDegrees);
+
+            _displayTierOffset = nextTier;
+            _displayRotationDegrees = nextRotation;
+
+            if (changed) ApplyWheelTransform(animate: true);
+        }
+
+        private float TargetRotationDegrees()
+        {
+            int count = TreeCount;
+            float sectionAngle = count > 0 ? 360f / count : 0f;
+            return -_focusedTree * sectionAngle;
+        }
+
+        // Rotation (which tree is in front) and vertical tier offset combined into one transform.
+        private void ApplyWheelTransform(bool animate)
+        {
+            if (_focusWheel == null) return;
+
+            // Uses the eased rotation, so changing tree glides instead of snapping.
+            float rotationDegrees = _displayRotationDegrees;
+
+            float tierSpacing = (_settingsSO.outerRadius - _settingsSO.innerRadius) / MAX_TIER;
+            // UI Y grows downward, so a negative shift moves the wheel up. Scrolling up raises the tier offset,
+            // which must move the wheel up the screen.
+            // Uses the eased display offset, so the wheel glides rather than jumping.
+            float verticalShift = -_displayTierOffset * tierSpacing;
+
+            _focusWheel.style.rotate = new Rotate(new Angle(rotationDegrees, AngleUnit.Degree));
+            _focusWheel.style.translate = new Translate(new Length(0f), new Length(verticalShift));
+            _focusWheel.style.scale = new Scale(new Vector2(WheelZoom, WheelZoom));
+
+            CounterRotateNodeLabels(rotationDegrees);
+        }
+
+        // Each node turns with the wheel. Rotating its labels by the opposite angle, about the label's own centre,
+        // keeps icons, counters and text upright whichever tree is in focus.
+        private void CounterRotateNodeLabels(float wheelRotationDegrees)
+        {
+            var counter = new Rotate(new Angle(-wheelRotationDegrees, AngleUnit.Degree));
+            foreach (var kvp in _nodeRegistry)
+            {
+                NodeInstance node = kvp.Value;
+                if (node.Element == null) continue;
+
+                foreach (string labelName in new[] { "icon-slot", "point-counter" })
+                {
+                    VisualElement label = node.Element.Q<VisualElement>(labelName);
+                    if (label == null) continue;
+                    label.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(50), 0f);
+                    label.style.rotate = counter;
+                }
+            }
+        }
+
+        // Uniform zoom applied to the whole wheel about its centre. Spacing between nodes and tiers is unchanged.
+        private const float WheelZoom = 1.25f;
+
+        public int TreeCount => _treeCollectionSO?.trees?.Count ?? 0;
+
+        public int FocusedTreeIndex => _focusedTree;
+
+        public string TreeName(int index) => TreeAt(index)?.treeName ?? "";
+
+        public Color TreeColor(int index) => TreeAt(index)?.treeColor ?? Color.white;
+
+        private TreeLayoutSO TreeAt(int index)
+        {
+            if (_treeCollectionSO?.trees == null || index < 0 || index >= _treeCollectionSO.trees.Count) return null;
+            return _treeCollectionSO.trees[index];
+        }
+
+        /// <summary>Rotates the wheel so the given tree is at the front, and dims all other trees.</summary>
+        public void FocusTree(int index, bool animate = true)
+        {
+            int count = TreeCount;
+            if (count == 0) return;
+
+            // Wrap around, so the arrows loop through all trees.
+            _focusedTree = ((index % count) + count) % count;
+
+            ApplyWheelTransform(animate);
+            ApplyFocusVisuals();
+            FocusChanged?.Invoke();
+        }
+
+        // Full opacity and clickable for the focused tree; dimmed and click-through for the rest.
+        private void ApplyFocusVisuals()
+        {
+            foreach (var kvp in _nodeRegistry)
+            {
+                NodeInstance node = kvp.Value;
+                if (node.Element == null) continue;
+
+                bool focused = node.TreeIndex == _focusedTree;
+                node.Element.style.opacity = focused ? 1f : DimmedOpacity;
+                node.Element.pickingMode = focused ? PickingMode.Position : PickingMode.Ignore;
+            }
+        }
+
+        #endregion
+
         // Clears UI but keeps data (called when panel closes)
         public void ClearUI()
         {
@@ -162,6 +329,7 @@ namespace Sol
                     {
                         Position = pos,
                         Data = nodeData,
+                        TreeIndex = treeIndex,
                         Element = null // Created during Generate()
                     };
                 }

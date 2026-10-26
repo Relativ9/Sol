@@ -18,16 +18,16 @@ MonoBehaviour:
   focus: 10
   vigor: 10
   willpower: 10
-  baseMoveSpeed: 3
-  baseRunMultiplier: 2
+  baseMoveSpeed: 8
+  baseRunMultiplier: 0.5
   baseDeceleration: 8
   baseCrouchSpeed: 3
-  baseJumpForce: 4
+  baseJumpForce: 8
   baseJumpDirectionBoost: 1
   baseMaxDoubleJump: 1
   baseJumpCooldown: 0.1
   baseFallDamageMultiplier: 1
-  baseGravityMultiplier: 1.5
+  baseGravityMultiplier: 2
   baseTerminalVelocity: -20
   baseMaxHealth: 100
   baseHealthRegen: 1

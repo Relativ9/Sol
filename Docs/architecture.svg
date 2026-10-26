@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <text x="600" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#222">Sol: Architecture Map</text>
+  <text x="600" y="62" text-anchor="middle" font-size="13" fill="#666">Unity 6000.4.6f1 | HDRP | Input System | namespace Sol</text>
+
+  <!-- 1. Bootstrap -->
+  <rect x="40" y="80" width="1120" height="100" rx="10" fill="#e8f0fe" stroke="#4a6fa5" stroke-width="2"/>
+  <text x="56" y="102" font-size="14" font-weight="bold" fill="#2c4a7a">BOOTSTRAP (Persistant Scene)</text>
+  <rect x="70" y="112" width="500" height="54" rx="6" fill="#ffffff" stroke="#4a6fa5"/>
+  <text x="84" y="134" font-size="14" font-weight="bold" fill="#222">ServiceLocator</text>
+  <text x="84" y="154" font-size="12" fill="#444">Static registry, DontDestroyOnLoad, order -100</text>
+  <rect x="630" y="112" width="500" height="54" rx="6" fill="#ffffff" stroke="#4a6fa5"/>
+  <text x="644" y="134" font-size="14" font-weight="bold" fill="#222">GameInitializer</text>
+  <text x="644" y="154" font-size="12" fill="#444">Awake: create SaveService + ProgressionService</text>
+
+  <line x1="600" y1="180" x2="600" y2="212" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="612" y="200" font-size="12" fill="#444">RegisterService / Get</text>
+
+  <!-- 2. Core services -->
+  <rect x="40" y="214" width="1120" height="170" rx="10" fill="#eefaf0" stroke="#3c8d5a" stroke-width="2"/>
+  <text x="56" y="236" font-size="14" font-weight="bold" fill="#246b41">CORE SERVICES (MonoBehaviours or plain C#)</text>
+
+  <rect x="50" y="250" width="170" height="122" rx="6" fill="#ffffff" stroke="#3c8d5a"/>
+  <text x="60" y="272" font-size="13" font-weight="bold" fill="#222">Time / World</text>
+  <text x="60" y="292" font-size="11" fill="#444">TimeManager (ITimeManager)</text>
+  <text x="60" y="310" font-size="11" fill="#444">CelestialCalculator</text>
+  <text x="60" y="328" font-size="11" fill="#444">Seasons, day, pause</text>
+
+  <rect x="236" y="250" width="170" height="122" rx="6" fill="#ffffff" stroke="#3c8d5a"/>
+  <text x="246" y="272" font-size="13" font-weight="bold" fill="#222">Stats</text>
+  <text x="246" y="292" font-size="11" fill="#444">StatsService (IStatsService)</text>
+  <text x="246" y="310" font-size="11" fill="#444">Modifiers apply effects</text>
+  <text x="246" y="328" font-size="11" fill="#444">Raises OnStatsChanged</text>
+
+  <rect x="422" y="250" width="170" height="122" rx="6" fill="#ffffff" stroke="#3c8d5a"/>
+  <text x="432" y="272" font-size="13" font-weight="bold" fill="#222">Progression</text>
+  <text x="432" y="292" font-size="11" fill="#444">ProgressionService</text>
+  <text x="432" y="310" font-size="11" fill="#444">(IProgressionService)</text>
+  <text x="432" y="328" font-size="11" fill="#444">Level, talent points</text>
+
+  <rect x="608" y="250" width="170" height="122" rx="6" fill="#ffffff" stroke="#3c8d5a"/>
+  <text x="618" y="272" font-size="13" font-weight="bold" fill="#222">Talents</text>
+  <text x="618" y="292" font-size="11" fill="#444">TalentTreeGenerator</text>
+  <text x="618" y="310" font-size="11" fill="#444">TalentStateService</text>
+  <text x="618" y="328" font-size="11" fill="#444">Plain C# state</text>
+
+  <rect x="794" y="250" width="170" height="122" rx="6" fill="#ffffff" stroke="#3c8d5a"/>
+  <text x="804" y="272" font-size="13" font-weight="bold" fill="#222">Save</text>
+  <text x="804" y="292" font-size="11" fill="#444">SaveManager (debounced)</text>
+  <text x="804" y="310" font-size="11" fill="#444">SaveService (ISaveService)</text>
+  <text x="804" y="328" font-size="11" fill="#444">2 s debounce interval</text>
+
+
+  <rect x="980" y="250" width="170" height="122" rx="6" fill="#ffffff" stroke="#3c8d5a"/>
+  <text x="990" y="272" font-size="13" font-weight="bold" fill="#222">UI Systems</text>
+  <text x="990" y="292" font-size="11" fill="#444">UIManager, UIStateService</text>
+  <text x="990" y="310" font-size="11" fill="#444">VirtualCursor</text>
+  <text x="990" y="328" font-size="11" fill="#444">UIInputController</text>
+
+  <line x1="600" y1="384" x2="600" y2="416" stroke="#555" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="612" y="404" font-size="12" fill="#444">Raise / listen</text>
+
+  <!-- 3. Event bus -->
+  <rect x="40" y="418" width="1120" height="70" rx="10" fill="#fff6e5" stroke="#c98a1b" stroke-width="2"/>
+  <text x="56" y="440" font-size="14" font-weight="bold" fill="#8a5a0b">EVENT BUS (ScriptableObject)</text>
+  <text x="56" y="464" font-size="12" fill="#444">GameEvent.Raise() -&gt; GameEventListener -&gt; UnityEvent | OnDayChanged, OnSeasonChanged, OnYearChanged, OnStatsChanged, OnTalentChanged</text>
+
+  <line x1="600" y1="488" x2="600" y2="520" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 4. Data -->
+  <rect x="40" y="522" width="1120" height="70" rx="10" fill="#f4eefc" stroke="#7b5cb5" stroke-width="2"/>
+  <text x="56" y="544" font-size="14" font-weight="bold" fill="#5a3c8a">DATA (ScriptableObjects)</text>
+  <text x="56" y="568" font-size="12" fill="#444">WorldTimeData, SeasonalData, WeatherData | PlayerStatSO, PlayerProgressionSO | WeaponDataSO, EquipmentDataSO | TalentNodeDataSO, TreeLayoutSO | UIState</text>
+
+  <line x1="600" y1="592" x2="600" y2="624" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 5. Player -->
+  <rect x="40" y="626" width="550" height="120" rx="10" fill="#fdecec" stroke="#b5483c" stroke-width="2"/>
+  <text x="56" y="648" font-size="14" font-weight="bold" fill="#8a2f25">PLAYER (PlayerController : IPlayerContext)</text>
+  <text x="56" y="670" font-size="12" fill="#444">Locomotion: Movement, Jumping, GravityController, GroundChecker, CameraController</text>
+  <text x="56" y="690" font-size="12" fill="#444">Combat: CombatStateController, AnimationEventDispatcher</text>
+  <text x="56" y="710" font-size="12" fill="#444">Modifiers: MovementSpeedBoost, GravityDirectionZone, GravityMultiplierTrigger</text>
+  <text x="56" y="732" font-size="11" fill="#666">Local registry via GetService&lt;T&gt;()</text>
+
+  <!-- 6. World -->
+  <rect x="610" y="626" width="550" height="120" rx="10" fill="#e6f5f7" stroke="#2a8497" stroke-width="2"/>
+  <text x="626" y="648" font-size="14" font-weight="bold" fill="#1d5f6d">WORLD / PRESENTATION</text>
+  <text x="626" y="670" font-size="12" fill="#444">CelestialRotator, SkyboxRotator, CloudController, WindController</text>
+  <text x="626" y="690" font-size="12" fill="#444">SkyAndFogController (HDRP Volume), SnowCoverController, Rotator</text>
+  <text x="626" y="710" font-size="12" fill="#444">SpeedVisualizer, ClockAndDate</text>
+
+  <!-- Legend -->
+  <text x="40" y="790" font-size="13" font-weight="bold" fill="#222">Legend</text>
+  <line x1="40" y1="812" x2="90" y2="812" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="100" y="817" font-size="12" fill="#444">Direct call or registration</text>
+  <line x1="330" y1="812" x2="380" y2="812" stroke="#555" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  <text x="390" y="817" font-size="12" fill="#444">Event (pub/sub)</text>
+  <text x="40" y="850" font-size="11" fill="#666">Source: Docs/ARCHITECTURE.md. Services listed are those registered via ServiceLocator.RegisterService.</text>
+</svg>

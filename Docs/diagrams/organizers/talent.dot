@@ -1,0 +1,33 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>talent</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_talent {
+    label=<<B>TalentTreeController</B><BR/><FONT POINT-SIZE="9">Organizer. Talent choices, points, reset</FONT>>; style="rounded,filled"; fillcolor="#e0f7fa"; color="#00838f";
+    TTC      [label=<<B>TalentTreeController</B><BR/><FONT POINT-SIZE="9">Left allocates, right removes. Checks prerequisites</FONT>>];
+    TTG      [label=<<B>TalentTreeGenerator</B><BR/><FONT POINT-SIZE="9">Node data (TalentNodeDataSO) and layout</FONT>>];
+    PS       [label=<<B>ProgressionService</B><BR/><FONT POINT-SIZE="9">Point pool. SpendTalentPoint, RefundTalentPoint</FONT>>];
+    TSS      [label=<<B>TalentStateService</B><BR/><FONT POINT-SIZE="9">Points per node. Raises talent event</FONT>>];
+    TEV      [label=<<B>Talent GameEvent</B><BR/><FONT POINT-SIZE="9">ScriptableObject. Raised on any change</FONT>>, shape=note, fillcolor="#fff8e1", color="#b28704"];
+  }
+    GI       [label=<<B>GameInitializer</B><BR/><FONT POINT-SIZE="9">Start: load or create, then initialize services</FONT>>];
+    GL       [label=<<B>GameEventListener</B> [scene]<BR/><FONT POINT-SIZE="9">Listens to a GameEvent, calls RequestLazySave</FONT>>, style="rounded,filled,dashed"];
+    SM       [label=<<B>SaveManager</B><BR/><FONT POINT-SIZE="9">2 s debounce. Immediate on panel close</FONT>>];
+    SS       [label=<<B>StatsService</B><BR/><FONT POINT-SIZE="9">GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource</FONT>>];
+    UIM      [label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">TogglePanel, OpenPanel, ClosePanel</FONT>>];
+    VC       [label=<<B>VirtualCursor</B><BR/><FONT POINT-SIZE="9">Cursor from mouse or navigation. Clicks into UI Toolkit</FONT>>];
+  UIM -> TTC      [label="InitializeTalentPanel"];
+  TTC -> PS       [label="SpendTalentPoint, RefundTalentPoint (bool)"];
+  TTC -> TSS      [label="TryAllocatePoint, TryRemovePoint (nodeId)"];
+  TTC -> TTG      [label="GetNodeData (TalentNodeDataSO)", style=dashed, dir=back];
+  TSS -> TEV      [label="Raise (GameEvent)"];
+  TSS -> SS       [label="RemoveModifiersFromSource (reset only)", style=dashed];
+  PS -> SS        [label="SetBaseStat (attribute value)", style=dashed];
+  TEV -> GL       [label="OnEventRaised (GameEvent)"];
+  VC -> TTC       [label="Synthesized MouseDownEvent (button 0 or 1)"];
+  GI -> PS        [label="Initialize, ReloadAllBaseStats"];
+  GI -> TSS       [label="Initialize (allocations)"];
+  SM -> TSS       [label="GetAllocatedNodeIds (read)", style=dashed, dir=back];
+  SM -> PS        [label="GetLevel, GetTotalTalentPoints (read)", style=dashed, dir=back];
+}

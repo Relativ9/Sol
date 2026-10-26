@@ -38,6 +38,24 @@ namespace Sol
         public float baseHunger = 10f;
         public float baseThirst = 10f;
         
+        [Header("Attribute Scaling (per point above default)")]
+        [Tooltip("Brawn → MeleeDamage, per point above default.")]
+        public float brawnToMeleeDamage = 0.5f;
+        [Tooltip("Brawn → CarryCapacity (kg), per point above default.")]
+        public float brawnToCarryCapacity = 2f;
+        [Tooltip("Finesse → ProjectileDamage (archery), per point above default.")]
+        public float finesseToProjectileDamage = 0.5f;
+        [Tooltip("Insight → SpellPower, per point above default.")]
+        public float insightToSpellPower = 1f;
+        [Tooltip("Insight → CritMultiplier, per point above default. Design cap is 3.")]
+        public float insightToCritMultiplier = 0.02f;
+        [Tooltip("Focus → CritChance, per point above default.")]
+        public float focusToCritChance = 0.005f;
+        [Tooltip("Vigor → MaxHealth, per point above default.")]
+        public float vigorToMaxHealth = 5f;
+        [Tooltip("Willpower → MaxEnergy, per point above default.")]
+        public float willpowerToMaxEnergy = 5f;
+
         [Header("Combat")]
         public float baseMeleeDamage = 1f; //Weapon damage on equipped weapons add to this, unarmed attacks do 1 damage (unless boosted)
         public float baseProjectileDamage = 1f; //even throwing rocks deal some damage, effects throwing weapons, arrows, and projectile spells.
@@ -61,6 +79,12 @@ namespace Sol
         public float baseKnowledgeChance = 0f; //speech check
         public float baseDeceptionChance = 0f; //speech check
         public float baseIntimidationChance = 0f; //speech check
+        public float baseCovertMovement = 0f; //replaces stealth. Reduces detection radius and noise.
+        public float baseTinker = 0f; //replaces lock-picking. Lock-picking and repairs.
+        public float baseStaggerResistance = 0f; //from heavy plate (rigid weight x 0.2%)
+        public float baseBleedResistance = 0f; //from flexible armour (flex weight x 0.333%)
+        public float baseRigidWeight = 0f; //kg of plate equipped. Set by equipment later.
+        public float baseFlexWeight = 0f; //kg of flexible armour equipped. Set by equipment later.
 
         // [Header("Camera")]
         // public float baseFOV = 60f;

@@ -67,6 +67,16 @@ namespace Sol
             return null;
         }
 
+        /// <summary>
+        /// Like Get, but returns null silently when the service isn't registered yet.
+        /// Use for per-frame checks that can legitimately run before a service exists.
+        /// </summary>
+        public static T TryGet<T>() where T : class
+        {
+            if (_instance == null) return null;
+            return _instance._services.TryGetValue(typeof(T), out object service) ? service as T : null;
+        }
+
         private void OnDestroy()
         {
             if (_instance == this)

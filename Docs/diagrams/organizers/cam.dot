@@ -1,0 +1,20 @@
+digraph SolMap {
+  graph [rankdir=LR, newrank=true, fontname="Helvetica", fontsize=16, nodesep=0.25, ranksep=1.2, bgcolor="white", labelloc=t, label=<<B>cam</B> and its direct links>, ratio=0.6];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, fillcolor="#ffffff", color="#555555", margin="0.14,0.08"];
+  edge  [fontname="Helvetica", fontsize=9, color="#666666", arrowsize=0.6];
+
+  subgraph cluster_cam {
+    label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Organizer. Look input to camera rotation</FONT>>; style="rounded,filled"; fillcolor="#f3e8ff"; color="#7e3ff2";
+    CAM      [label=<<B>CameraController</B><BR/><FONT POINT-SIZE="9">Pitch clamped -80 to 80. Yaw used by Movement</FONT>>];
+    CINE     [label=<<B>CinemachineCamera</B><BR/><FONT POINT-SIZE="9">Scene object. Follows CameraTarget</FONT>>];
+  }
+    MOVE     [label=<<B>Movement</B><BR/><FONT POINT-SIZE="9">Ground and air movement. Sets velocity</FONT>>];
+    PC       [label=<<B>PlayerController</B><BR/><FONT POINT-SIZE="9">OnJump, OnMove, OnRun, OnLook, OnAttack</FONT>>];
+    ROT      [label=<<B>Rotator</B><BR/><FONT POINT-SIZE="9">Spins props. Not player state</FONT>>];
+    UIM      [label=<<B>UIManager</B><BR/><FONT POINT-SIZE="9">TogglePanel, OpenPanel, ClosePanel</FONT>>];
+  PC -> CAM       [label="GetLookInput (Vector2, polled)", style=dashed, dir=back];
+  CAM -> CINE     [label="Rotation (Quaternion)"];
+  CAM -> MOVE     [label="GetCameraYaw (float, polled)", style=dashed];
+  UIM -> CAM      [label="OnDeactivate / OnActivate (lock cursor)"];
+  ROT -> CAM      [label="Faces camera (Transform, optional)", style=dotted, dir=back];
+}

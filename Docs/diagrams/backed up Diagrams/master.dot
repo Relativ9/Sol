@@ -1,0 +1,159 @@
+digraph Sol {
+  newrank=true;
+  graph [rankdir=LR, fontname="Helvetica", fontsize=11, nodesep=0.35, ranksep=0.9, splines=spline, bgcolor="white", label="Sol: Complete Functional Flow Map (source: Docs/FLOWS.md)", labelloc=t, fontsize=18];
+  node  [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#ffffff", color="#555555"];
+  edge  [fontname="Helvetica", fontsize=8, color="#555555", arrowsize=0.6];
+
+  subgraph cluster_input { label="INPUT (PlayerInput.inputactions)"; style="rounded,filled"; fillcolor="#e3f2fd"; color="#1565c0";
+    IN_JUMP  [label="Space: Jump\n<Keyboard>/space"];
+    IN_MOVE  [label="WASD: Move"];
+    IN_RUN   [label="Run (held)"];
+    IN_LOOK  [label="Mouse: Look"];
+    IN_TW    [label="ToggleWeapon"];
+    IN_ATK   [label="MainHand: Attack"];
+    IN_K     [label="K: OpenTalentPanel\n<Keyboard>/k"];
+    IN_CUR   [label="UI: CursorMove and Clicks"];
+  }
+
+  subgraph cluster_player { label="PLAYER (PlayerController : IPlayerContext)"; style="rounded,filled"; fillcolor="#fdecea"; color="#c62828";
+    PC_JUMP  [label="OnJump"];
+    PC_MOVE  [label="OnMove / OnRun / OnLook"];
+    PC_ATK   [label="OnAttack / OnToggleWeapon"];
+    PC_STATE [label="State dictionary\nSetStateValue / GetStateValue", shape=cylinder, fillcolor="#fff8e1", color="#b28704"];
+    PC_FIX   [label="FixedUpdate: active movement state"];
+  }
+
+  subgraph cluster_movement { label="MOVEMENT STATES (IBaseMovement)"; style="rounded,filled"; fillcolor="#fdecea"; color="#c62828";
+    JUMP     [label="Jumping\nHandleJumpInput\nAddForce Impulse"];
+    MOVE     [label="Movement\nUpdate: direction, run\nFixedUpdate: ProcessMovement"];
+    RUNMOD   [label="UpdateRunningState\nApply/Remove MoveSpeed modifier\n(source PlayerRunning)"];
+  }
+
+  subgraph cluster_camera { label="CAMERA (ICameraController)"; style="rounded,filled"; fillcolor="#f3e8ff"; color="#7e3ff2";
+    CAM      [label="CameraController\nlookDelta, pitch clamp -80..80"];
+    CM       [label="CinemachineCamera [scene]"];
+    CURSOR   [label="Cursor lock state"];
+  }
+
+  subgraph cluster_combat { label="COMBAT (ICombatController)"; style="rounded,filled"; fillcolor="#fff1f0"; color="#b5483c";
+    CSC      [label="CombatStateController\nToggleWeaponState, HandleAttackInput\ncooldown 0.8 s"];
+    ADISP    [label="AnimationEventDispatcher"];
+    AEH      [label="AttackEventHandler [scene]\nCheckForHits -> IDamageable"];
+    PAC      [label="PlayerAnimationController\nUpdateAnimationParameters"];
+  }
+
+  subgraph cluster_physics { label="PHYSICS AND GROUND"; style="rounded,filled"; fillcolor="#eceff1"; color="#455a64";
+    GC       [label="GroundChecker (IGroundChecker)\nFixedUpdate cast, coyote 0.15 s"];
+    GRAV     [label="GravityController (IGravityController)\nFixedUpdate ProcessGravity"];
+    RB       [label="Rigidbody\nlinearVelocity, AddForce", shape=cylinder, fillcolor="#cfd8dc"];
+  }
+
+  subgraph cluster_stats { label="STATS AND ENVIRONMENT"; style="rounded,filled"; fillcolor="#fff3e0"; color="#e65100";
+    SS       [label="StatsService (IStatsService)\nApplyOrReplaceModifier, GetStat\nRaises OnStatsChanged"];
+    MOD_G    [label="Modifier_GravityMultiplierTrigger\nOnTriggerEnter / Exit"];
+    MOD_Z    [label="Modifier_GravityDirectionZone\nOnTriggerEnter / Exit"];
+    MOD_S    [label="Modifier_MovementSpeedBoost\nOnTriggerEnter"];
+    SPD      [label="SpeedVisualizer\nparticles, FOV"];
+    ROT      [label="Rotator\nspin and face camera"];
+  }
+
+  subgraph cluster_prog { label="PROGRESSION AND TALENTS"; style="rounded,filled"; fillcolor="#e0f7fa"; color="#00838f";
+    UIIN     [label="UIInputController\nOnOpenTalentWheel"];
+    UIM      [label="UIManager (IUIManager)\nTogglePanel, OpenPanel, ClosePanel"];
+    TTC      [label="TalentTreeController\nOnNodeClicked, TryAllocate, TryRemove, Reset"];
+    PS       [label="ProgressionService (IProgressionService)\nSpendTalentPoint, RefundTalentPoint\nTrySpend/RefundAttributePoint [no UI caller]"];
+    TSS      [label="TalentStateService (ITalentStateService)\nTryAllocatePoint, TryRemovePoint, ResetAll"];
+    TTG      [label="TalentTreeGenerator (ITalentTreeGenerator)\nGetNodeData, LoadData"];
+    TEV      [label="Talent GameEvent", shape=note, fillcolor="#fff8e1", color="#b28704"];
+  }
+
+  subgraph cluster_save { label="PERSISTENCE"; style="rounded,filled"; fillcolor="#ede7f6"; color="#4527a0";
+    GL       [label="GameEventListeners [scene-wired]\nbind RequestLazySave / RequestImmediateSave"];
+    SM       [label="SaveManager (ISaveManager)\nRequestLazySave 2 s debounce\nRequestImmediateSave, BuildSaveData"];
+    SV       [label="SaveService (ISaveService)\nLoad, Save, Delete (JsonUtility)"];
+    SAVE_F   [label="JSON file\npersistentDataPath / default", shape=cylinder, fillcolor="#cfd8dc"];
+    GI       [label="GameInitializer\nStart: load or new, init services"];
+  }
+
+  subgraph cluster_time { label="TIME AND WORLD"; style="rounded,filled"; fillcolor="#e8eaf6"; color="#283593";
+    TM       [label="TimeManager (ITimeManager)\nCelestialTime, pause\nOnDay / OnSeason / OnYear events"];
+    WORLD    [label="Celestial, CloudController, WindController,\nSkyboxRotator, SkyAndFogController,\nClockAndDate (polled)"];
+  }
+
+  // Input to player
+  IN_JUMP -> PC_JUMP -> JUMP;
+  IN_MOVE -> PC_MOVE;
+  IN_RUN  -> PC_MOVE;
+  IN_LOOK -> PC_MOVE;
+  IN_TW   -> PC_ATK;
+  IN_ATK  -> PC_ATK;
+  IN_K    -> UIIN;
+  IN_CUR  -> TTC [label="MouseDownEvent"];
+
+  // Jump
+  JUMP -> RB [label="AddForce Impulse"];
+  JUMP -> PC_STATE [label="JumpPriority, JumpTriggered"];
+  JUMP -> GC [label="IsGrounded"];
+
+  // Move and run
+  PC_MOVE -> MOVE [label="input"];
+  PC_MOVE -> CAM  [label="GetLookInput"];
+  PC_MOVE -> PC_STATE [label="IsRunning, IsMoving"];
+  PC_FIX -> MOVE;
+  PC_FIX -> JUMP;
+  MOVE -> RB [label="linearVelocity, sticky force"];
+  MOVE -> SS [label="GetStat MoveSpeed"];
+  MOVE -> PC_STATE [label="IsGrounded, JumpPriority"];
+  RUNMOD -> SS [label="ApplyOrReplaceModifier / Remove"];
+  MOVE -> RUNMOD [style=dashed, label="on run"];
+  GC -> PC_STATE [label="IsGrounded"];
+
+  // Look and camera
+  CAM -> CM [label="rotation"];
+  CAM -> CURSOR [label="lock on activate"];
+  CAM -> MOVE [label="GetCameraYaw", style=dashed];
+
+  // Combat
+  PC_ATK -> CSC;
+  CSC -> PC_STATE [label="IsWeaponDrawn, IsAttacking"];
+  CSC -> ADISP;
+  ADISP -> PAC [label="OnAnimationEvent"];
+  ADISP -> CSC [label="OnAnimationEvent", style=dashed];
+  PAC -> PC_STATE [label="animator params"];
+
+  // Gravity and environment
+  GRAV -> RB [label="AddForce, clamp y"];
+  GRAV -> SS [label="GetStat Gravity, Terminal"];
+  MOD_G -> SS [label="ApplyOrReplaceModifier"];
+  MOD_Z -> GRAV [label="SetGravityScale, custom direction"];
+  MOD_S -> SS [label="MoveSpeed modifier"];
+  SS -> SPD [label="GetSpeedMultiplier"];
+  SS -> GL [label="OnStatsChanged"];
+
+  // Progression and talents
+  UIIN -> UIM [label="TogglePanel"];
+  UIM -> TM [label="TogglePause"];
+  UIM -> CAM [label="OpenPanel: deactivate"];
+  UIM -> TTC [label="InitializeTalentPanel"];
+  UIM -> SM [label="RequestImmediateSave on open/close"];
+  TTC -> PS [label="SpendTalentPoint / Refund"];
+  TTC -> TSS [label="TryAllocatePoint / TryRemovePoint"];
+  TTC -> TTG [label="GetNodeData"];
+  TSS -> TEV [label="Raise"];
+  TSS -> SS [label="ResetAll: RemoveModifiersFromSource", style=dashed];
+  PS -> SS [label="SetBaseStat (attributes)", style=dashed];
+  TEV -> GL;
+
+  // Save
+  GL -> SM [label="RequestLazySave"];
+  SM -> SV [label="Save(data)"];
+  SV -> SAVE_F;
+  GI -> SV [label="Load / Delete"];
+  GI -> PS [label="Initialize, ReloadAllBaseStats"];
+  GI -> TSS [label="Initialize(saveData)"];
+  GI -> SS [label="Initialize(stats)"];
+
+  // Time
+  TM -> GL [label="day / season / year events"];
+  TM -> WORLD [label="polled CelestialTime", style=dashed];
+}

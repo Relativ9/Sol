@@ -12,6 +12,13 @@ namespace Sol
         void SetSpentTalentPoints(int spent);
         
         void ReloadAllBaseStats();
+
+        // Attributes (core six). Used by the Player Stats tab.
+        bool TrySpendAttributePoint(StatTypeEnum statType);
+        bool TryRefundAttributePoint(StatTypeEnum statType);
+        int GetAvailableAttributePoints();
+        int GetTotalAttributePoints();
+        int GetAllocatedAttributePoints(StatTypeEnum statType);
         
     }
 }

@@ -9531,10 +9531,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _worldTimeData: {fileID: 11400000, guid: 7f3a3ebdbd5da5f45adddde98d687f39, type: 2}
-  _startingTimeOfDay: 0.4
-  _startingDay: 1
+  _startingTimeOfDay: 0.7
+  _startingDay: 200
   _startingYear: 1
-  _celestialTimeScale: 400
+  _celestialTimeScale: 20
   _isPaused: 0
   _onDayChanged: {fileID: 11400000, guid: 727d73a369cc46e17ab6b3a4dde14c90, type: 2}
   _onSeasonChanged: {fileID: 11400000, guid: 28100ae44fcb65decb9537b51cf5c7bb, type: 2}
@@ -15669,7 +15669,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1826156588}
         m_TargetAssemblyTypeName: Sol.UIInputController, Assembly-CSharp
-        m_MethodName: OnOpenTalentWheel
+        m_MethodName: OnOpenMenu
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15680,7 +15680,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
     m_ActionId: ce028a84-d2f5-4769-a2fe-a6a3b35b587f
-    m_ActionName: 'Shared/OpenTalentPanel[/Keyboard/k]'
+    m_ActionName: 'Shared/OpenMenu[/Keyboard/k]'
   - m_PersistentCalls:
       m_Calls: []
     m_ActionId: 43c6be22-d904-48fd-bbfc-2cd34bea9050
@@ -16072,7 +16072,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Sol_Scripts::Sol.GameInitializer
   playerStatSO: {fileID: 11400000, guid: 6b8b5e174e3a426469cb0623ee87618d, type: 2}
   playerProgressionSO: {fileID: 11400000, guid: 12a3532e67962fc32a80cf3889e877dd, type: 2}
-  statsService: {fileID: 707063840}
+  damageTypeTable: {fileID: 11400000, guid: 294c5f93bc510e9a087be9c0aac70be4, type: 2}
+  _statsService: {fileID: 707063840}
   _forceNewGame: 0
 --- !u!4 &1962008662 stripped
 Transform:
@@ -16776,6 +16777,7 @@ GameObject:
   - component: {fileID: 2100861488}
   - component: {fileID: 2100861487}
   - component: {fileID: 2100861490}
+  - component: {fileID: 2100861491}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -17241,8 +17243,23 @@ MonoBehaviour:
   _slashEffectPrefab: {fileID: 0}
   _slashEffectSpawn: {fileID: 0}
   _attackRadius: 1.5
+  _attackDamageSO: {fileID: 11400000, guid: a834503c57c7655c9b5ddcc92aed007b, type: 2}
   _attackDamage: 25
-  _debugAttacks: 0
+  _debugAttacks: 1
+--- !u!114 &2100861491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100861468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16b2c3685d824f2fcbc9631f36e5aa55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.PlayerVitals
+  _hungerDecayPerSecond: 0.2
+  _thirstDecayPerSecond: 0.3
 --- !u!1 &2117785315
 GameObject:
   m_ObjectHideFlags: 0
