@@ -39,5 +39,5 @@ MonoBehaviour:
     resistanceStat: 39
   - type: 6
     displayName: Magic
-    color: {r: 0.8920202, g: 1, b: 0.0047169924, a: 0}
+    color: {r: 0.39251927, g: 0.015686259, b: 0.972549, a: 0}
     resistanceStat: 34

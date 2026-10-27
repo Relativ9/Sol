@@ -43,274 +43,106 @@ Sol is a first-person open-world action RPG in the vein of The Elder Scrolls (Sk
 
 ## 2. The Overall Plan
 
-This section captures the full high-level development plan agreed upon over the course of the project so far, ordered from earliest to latest. This is the roadmap from scratch to a functional character pipeline.
+The roadmap from scratch to a working character pipeline, in the order it was built.
 
 ### Phase 1 — Core Infrastructure (DONE)
-- Service Locator pattern
-- SO-based GameEvent system
-- `GameInitializer` as composition root with strict Awake/Start split
+- Service Locator, SO-based GameEvent system, `GameInitializer` composition root with strict Awake/Start split
 - `SaveService` / `ISaveManager` with lazy (debounced) and immediate save
-- `PlayerSaveData` schema design (stable, migration-safe)
+- `PlayerSaveData` schema (stable, append-only enums; see §12)
 
 ### Phase 2 — Physics & Movement (DONE)
-- `GravityController` owns vertical force
-- `Movement` owns horizontal velocity and slope projection
-- `GroundChecker` exposes `HasLookAheadHit` and `LookAheadHit`
-- Slowfall/ledge interaction bug fixed via `GetMovementGroundNormal()` gating
+- `GravityController` owns vertical force; `Movement` owns horizontal velocity and slope projection
+- Slowfall/ledge bug fixed via `GetMovementGroundNormal()` gating
 
-### Phase 3 — Stat System Architecture (DONE)
-- Migrated from string-based stat keys to `StatTypeEnum` for compile-time safety
-- `StatModifier` struct with GUID id, sourceId, type, category, value, duration
-- `ModifierType` collapsed to `FlatAdditive` / `PercentAdditive`
-- `ModifierCategory`: Base, Permanent, Equipment, Temporary, Environmental
-- `IStatCalculator` interface and `StandardStatCalculator` (pure, stateless, plain C#)
-- `StatsService` refactored: typed dictionaries, derived cache, reverse lookup, batched event
-- `PercentAdditive` math fixed: additive summation `(1 + sum)`, not compounding per modifier
-- `SetBaseStat()` added to `IStatsService`
+### Phase 3 — Stat System (DONE)
+- `StatTypeEnum` for compile-time safety; `StatModifier` struct; `ModifierType` and `ModifierCategory`
+- `StandardStatCalculator` (pure), `StatsService` with typed dictionaries, derived cache, reverse lookup, batched event
 
-### Phase 4 — Progression & Attribute System (DONE)
-- `ProgressionService` extended with attribute point pool and allocation tracking
-- `TrySpendAttributePoint`, `TryRefundAttributePoint`, `ResetAllAttributes`, `ReloadAllBaseStats`
-- `PlayerSaveData` migrated to `AttributeAllocationEntry[]` (removed individual allocation ints)
-- Save stores deltas (points above default), not final values
-- `GameInitializer.Start()` wired to call `ReloadAllBaseStats()` after progression init (Gap 1 fix)
+### Phase 4 — Progression & Attributes (DONE)
+- Attribute pool derived from level (`startingAttributePoints + levels × attributePointsPerLevel`); saved value is ignored on load
+- Spend, refund, reset, reload; attribute allocations saved as deltas above default
 
-### Phase 5 — Talent → StatsService Wiring (DONE, pending in-editor verification)
-- `TalentStateService` receives `IStatsService` via `Initialize(saveData, statsService)`
-- `ResetAll()` strips Permanent modifiers before clearing allocations
-- Gap 2 implemented: `TalentEffectSO`, `StatModifierTalentEffectSO`, `PassiveTalentEffectSO` (stub), `ITalentEffectContext`
-- `TalentNodeDataSO.effects` added; `TryAllocatePoint` / `TryRemovePoint` / `Initialize` / `ResetAll` wired
-- Verified in Unity: talent allocation and stacking work
-- Known limitation: multiple effects on one node share `sourceId = nodeId` and overwrite each other
+### Phase 5 — Talent → StatsService (DONE)
+- `TalentEffectSO` strategy assets (`StatModifierTalentEffectSO`, `PassiveTalentEffectSO` stub) via `ITalentEffectContext`
+- Effects applied on allocate, reduced on remove, stripped on reset, replayed on load
+- Known limitation: multiple effects on one node share `sourceId = nodeId` and overwrite each other (see §15)
 
-### Phase 6 — Derived Stat Resolver (NEXT AFTER GAP 2)
-- Plain C# `DerivedStatResolver`: Brawn → MeleeDamage, Vigor → MaxHealth, etc.
-- Formula floats stored in `PlayerStatSO` as designer-tunable fields
-- Pushes `Permanent` modifiers with reserved sourceIds like `"Derived_Brawn"`
-- Conditional reactive effects (e.g., armor-based health bonus) also live here
+### Phase 6 — Derived Stat Resolver (DONE)
+- `DerivedStatResolver` maps attributes to secondary stats with tunable scalars on `PlayerStatSO`
+- Reserved `Derived_*` sourceIds; recalculated on spend, refund, reset and load
 
-### Phase 7 — Inventory & Equipment System (PLANNED)
-- Equipment pushes `ModifierCategory.Equipment` modifiers into `StatsService`
-- `sourceId = itemInstanceId` (unique per item instance)
-- On equip: `ApplyOrReplaceModifier` per stat bonus
-- On unequip: `RemoveModifiersFromSource(itemInstanceId)`
+### Phase 6.5 — Player Stats & Menu (DONE)
+- K opens a full-screen menu with a vertical tab bar (`IMenuTab`, `MenuTabBar`)
+- Talents tab (wheel, arrows, mouse-wheel tier scroll, tree header, outlines in tree colour)
+- Player Stats tab (attributes with spend/refund, vitals, derived stats in a 4-column grid)
+- Menu hides the HUD while open
 
-### Phase 8 — Main Menu & Full Save/Load (PLANNED)
-- Separate lightweight `MainMenu` scene
-- New Game / Continue / Load Game buttons
-- `GameInitializer` lives only in `PersistentGameScene`, never in Main Menu
-- Full save round-trip validation (load character → verify identical derived stats)
+### Phase 7 — Damage & Status (IN PROGRESS: first pass built, not yet fully playtested)
+- Damage is typed data: `DamageSO` builds `DamageInfo`, delivered via `IDamageReceiver`
+- One shared `DamageTypeTableSO` behind `IDamageTypeTable`, registered by `GameInitializer`, validated at startup
+- `DamageCalculator`: deflection, type mitigation, environmental resistance, stagger/bleed chances
+- `IChanceRoller`: the single source of randomness for every chance
+- Bleed: timed, stackable status, one tick per second of scaled time (pauses with the game)
+- Targets: `TargetHealth` with a world-space health bar; `Projectile` and `ProjectileTurret`
+- Combat log visibility: player damage always, other damage within 20 m (`LogRules`)
+- Sword swings use a `DamageSO` when assigned (animation-driven, untested until animations exist)
+
+### Phase 8 — Inventory & Equipment (PLANNED)
+- Equipment sets `RigidWeight` / `FlexWeight` and pushes `Equipment` modifiers
+- `sourceId = itemInstanceId`; on unequip, `RemoveModifiersFromSource`
+
+### Phase 9 — Enemies & Actors (PLANNED)
+- `ActorStatSO` for NPCs (aggression, hearing, vision, behaviour, personality, profession, interests)
+- Until then, targets have zero mitigation
+- Enemy AI is a dedicated future task
+
+### Phase 10 — Main Menu & Full Save/Load (PLANNED)
+- Separate `MainMenu` scene; `GameInitializer` stays in the persistent scene
+- Full round-trip: load a character and verify identical derived stats
 
 ---
 
 ## 3. Progress Summary — Where We Are
 
-This is a concise status board for re-orientation after a break.
+This is a status board for re-orientation after a break.
 
 | System | Status | Notes |
 |---|---|---|
-| Service Locator | ✅ Complete | |
-| GameEvent SO system | ✅ Complete | All events use this, no C# Action events |
-| GameInitializer Awake/Start split | ✅ Complete | |
-| SaveService / ISaveManager | ✅ Complete | Lazy (2s debounce) + Immediate |
-| PlayerSaveData schema | ✅ Complete | Stable. Migration history documented in §12 |
-| Physics ledge/slowfall fix | ✅ Complete | `GetMovementGroundNormal()` gating |
-| StatTypeEnum | ✅ Complete | |
-| StatModifier struct | ✅ Complete | GUID id, sourceId, type, category, duration |
-| ModifierType / ModifierCategory | ✅ Complete | |
-| StandardStatCalculator | ✅ Complete | Pure, stateless, plain C# |
-| StatsService refactor | ✅ Complete | Cache, reverse lookup, batched event |
-| PercentAdditive math fix | ✅ Complete | Additive sum, not compounding |
-| SetBaseStat() | ✅ Complete | |
-| ProgressionService attribute layer | ✅ Complete | Spend, refund, reset, reload |
-| ReloadAllBaseStats() in GameInitializer | ✅ Complete | Gap 1 fixed |
-| TalentStateService constructor/init split | ✅ Complete | Race-condition-safe |
-| TalentStateService receives IStatsService | ✅ Complete | Via Initialize(), not constructor |
-| TalentStateService.ResetAll() strips modifiers | ✅ Complete | Code is there, no modifiers pushed yet |
-| ApplyOrReplaceModifier replace-path bug | ✅ Fixed | Early return removed, shared tail runs for replace and add |
-| Gap 2: Talent modifiers → StatsService | ✅ Implemented | Verified in Unity: allocation and stacking. Save round-trip not yet verified |
-| Save file validation + repair prompt | ✅ Implemented | `SaveValidator`, `ModalDialog` via `IUIManager.ShowModal`, backup on new game |
-| Virtual cursor owns OS cursor | ✅ Implemented | `IsOsCursorOwned`; camera `LockCursor` is blocked while active |
-| Vitals HUD + environmental triggers + combat log | ✅ Implemented | Not yet verified in-editor (regen, triggers, log) |
-| DerivedStatResolver | ⬜ Not started | After Gap 2 |
-| Inventory / Equipment modifiers | ⬜ Not started | After DerivedStatResolver |
-| Main Menu scene | ⬜ Not started | After full save round-trip works |
+| Service Locator | ✅ Complete | `TryGet` for per-frame lookups that must not log |
+| GameEvent SO system | ✅ Complete | |
+| GameInitializer Awake/Start split | ✅ Complete | Validates the damage table at startup |
+| SaveService / ISaveManager | ✅ Complete | Lazy (2 s debounce) and immediate; skipped while the repair prompt is open |
+| PlayerSaveData schema | ✅ Complete | Attribute allocations now saved |
+| Save validation + repair prompt | ✅ Complete | Repairs broken talent pools; backup on new game |
+| Stat system | ✅ Complete | Append-only `StatTypeEnum` |
+| Progression / attributes | ✅ Complete | Pool derived from level |
+| Talent tree (data, effects, UI) | ✅ Complete | Verified in Unity: allocation, stacking, tree focus |
+| DerivedStatResolver | ✅ Complete | Verified in Unity: spend and persistence |
+| K menu + tab system | ✅ Complete | Talents and Player Stats tabs |
+| Virtual cursor owns OS cursor | ✅ Complete | Camera cannot unlock it while active |
+| Damage pipeline | 🟡 First pass | Built, compiled and tested on dummy and player; needs fuller playtest |
+| Stagger / bleed | 🟡 First pass | Bleed verified in play; stagger logs only (no interrupt yet) |
+| Target health + world bar | 🟡 First pass | Verified on the dummy |
+| Projectiles | 🟡 First pass | Verified against the player and the target |
+| Sword damage (DamageSO) | ⬜ Blocked | Needs attack animations |
+| Weight stats → armour | ⬜ Not started | Equipment sets the values |
+| Enemy stats (ActorStatSO) | ⬜ Not started | Targets have zero mitigation until then |
+| Inventory / equipment | ⬜ Not started | |
+| Main Menu scene | ⬜ Not started | |
 
 ---
 
 ## 4. Active Task — What We Are Doing Right Now
 
-**We are implementing Gap 2: making talent node allocations push `Permanent` modifiers into `StatsService`.**
+**Current focus: Phase 7, the damage and status pass, now committed.** The first pass is built and has been tested on the training dummy, the projectile turret, and the player.
 
-Until this is done, the talent tree is cosmetic. Allocating a node stores a point count internally in `TalentStateService` but has zero effect on any stat. Loading a save correctly restores allocation counts but the stat bonuses are not replayed.
+Open items on this phase, in rough order:
+1. Stagger has no effect yet beyond the log line (interrupt and energy drain are not built).
+2. Clamp of tree scrolling and counter-rotated labels are done; no further talent-screen work is open.
+3. Sword damage through `AttackEventHandler`'s `DamageSO` path needs attack animations to test.
+4. Weight stats are wired but stay at zero until equipment exists.
 
-### Why this was blocked
-The original `TalentStateService` had no reference to `IStatsService`. That has since been resolved — `IStatsService` is now injected via `Initialize(saveData, statsService)` in `GameInitializer.Start()`, which is guaranteed to run after all Awake registrations.
-
-### Step-by-step implementation plan for Gap 2
-
-**Step 1 — Fix the ApplyOrReplaceModifier bug FIRST (see §15)**
-The replace path has an early `return` that skips `_modifierToStatLookup` update and `RefreshDerivedStat`. Multi-point talent nodes will silently fail to update stats if this is not fixed first.
-
-**Step 2 — Create the TalentEffectSO strategy architecture (3 new files)**
-
-`ITalentEffectContext.cs` (plain C# interface):
-```csharp
-public interface ITalentEffectContext
-{
-    IStatsService StatsService { get; }
-    // Future: IAbilityService AbilityService { get; }
-}
-```
-
-`TalentEffectSO.cs` (abstract ScriptableObject):
-```csharp
-public abstract class TalentEffectSO : ScriptableObject
-{
-    public abstract void Apply(ITalentEffectContext context, string nodeId, int allocatedPoints);
-    public abstract void Remove(ITalentEffectContext context, string nodeId);
-}
-```
-
-`StatModifierTalentEffectSO.cs` (concrete, inspector-configurable):
-```csharp
-[CreateAssetMenu(menuName = "Sol/Talent System/Effects/Stat Modifier")]
-public class StatModifierTalentEffectSO : TalentEffectSO
-{
-    public StatTypeEnum targetStat;
-    public ModifierType modifierType;
-    public ModifierCategory category = ModifierCategory.Permanent;
-    public float valuePerPoint;
-
-    public override void Apply(ITalentEffectContext context, string nodeId, int points)
-    {
-        var mod = new StatModifier(
-            type: modifierType,
-            category: category,
-            statType: targetStat,
-            value: valuePerPoint * points,
-            sourceId: nodeId,
-            duration: -1f
-        );
-        context.StatsService.ApplyOrReplaceModifier(mod);
-    }
-
-    public override void Remove(ITalentEffectContext context, string nodeId)
-    {
-        context.StatsService.RemoveModifiersFromSource(nodeId);
-    }
-}
-```
-
-`PassiveTalentEffectSO.cs` (stub for conditional/reactive effects — e.g., "2 health per 10 armor"):
-```csharp
-[CreateAssetMenu(menuName = "Sol/Talent System/Effects/Passive (Stub)")]
-public class PassiveTalentEffectSO : TalentEffectSO
-{
-    public override void Apply(ITalentEffectContext ctx, string nodeId, int pts)
-        => Debug.Log($"[PassiveTalentEffectSO] Node {nodeId}: TODO register reactive rule.");
-    public override void Remove(ITalentEffectContext ctx, string nodeId)
-        => Debug.Log($"[PassiveTalentEffectSO] Node {nodeId}: TODO unregister reactive rule.");
-}
-```
-
-**Why `PassiveTalentEffectSO` is a stub and NOT a static modifier:**
-Conditional effects like *"Second Skin — gain 2 health per 10 armor value"* are reactive snapshots. If armor changes (equip/unequip), the health bonus must recalculate. Baking a static value at allocation time would go stale. These belong in `DerivedStatResolver` (Phase 6). The talent node marks the rule as active; the resolver owns the math.
-
-**Step 3 — Add `effects` list to TalentNodeDataSO**
-```csharp
-[Header("Effects")]
-public List<TalentEffectSO> effects;
-```
-
-**Step 4 — Wire TalentStateService**
-
-Add fields:
-```csharp
-private ITalentEffectContext _effectContext;
-```
-
-Extend `Initialize`:
-```csharp
-public void Initialize(PlayerSaveData saveData, IStatsService statsService)
-{
-    _statsService = statsService;
-    _effectContext = new TalentEffectContext { StatsService = statsService };
-    _allocatedPoints.Clear();
-
-    if (saveData?.talentAllocations != null)
-        foreach (var entry in saveData.talentAllocations)
-            if (entry.allocatedPoints > 0)
-                _allocatedPoints[entry.nodeId] = entry.allocatedPoints;
-
-    ValidateLoadedData();
-
-    // Replay Permanent modifiers for all loaded allocations
-    foreach (var nodeId in _allocatedPoints.Keys)
-        ApplyNodeEffects(nodeId);
-}
-```
-
-Update `TryAllocatePoint`:
-```csharp
-IncrementPointAllocation(nodeId);
-ApplyNodeEffects(nodeId);  // ADD
-RaiseStateChanged();
-```
-
-Update `TryRemovePoint`:
-```csharp
-DecrementPointAllocation(nodeId);
-if (GetAllocatedPoints(nodeId) <= 0)
-    RemoveNodeEffects(nodeId);   // fully strip
-else
-    ApplyNodeEffects(nodeId);    // re-apply scaled down value via ApplyOrReplace
-RaiseStateChanged();
-```
-
-Update `ResetAll`:
-```csharp
-foreach (var nodeId in _allocatedPoints.Keys.ToArray())
-    RemoveNodeEffects(nodeId);   // strip before clearing
-_allocatedPoints.Clear();
-RaiseStateChanged();
-```
-
-Add private helpers:
-```csharp
-void ApplyNodeEffects(string nodeId)
-{
-    var data = _treeGenerator.GetNodeData(nodeId);
-    int points = GetAllocatedPoints(nodeId);
-    if (data?.effects == null) return;
-    foreach (var effect in data.effects)
-        effect?.Apply(_effectContext, nodeId, points);
-}
-
-void RemoveNodeEffects(string nodeId)
-{
-    var data = _treeGenerator.GetNodeData(nodeId);
-    if (data?.effects == null) return;
-    foreach (var effect in data.effects)
-        effect?.Remove(_effectContext, nodeId);
-}
-
-private class TalentEffectContext : ITalentEffectContext
-{
-    public IStatsService StatsService { get; set; }
-}
-```
-
-**Step 5 — Verify the full chain**
-1. Create a test `StatModifierTalentEffectSO` asset: +5 SpellPower per point.
-2. Assign it to a test node's `effects` list.
-3. Allocate 1 point → `GetStat(SpellPower)` = base + 5.
-4. Allocate 2nd point → `GetStat(SpellPower)` = base + 10. *(Requires bug fix from Step 1.)*
-5. Remove 1 point → `GetStat(SpellPower)` = base + 5.
-6. Remove last point → `GetStat(SpellPower)` = base.
-7. Save → quit → load → `GetStat(SpellPower)` = base + 10. *(Round-trip test.)*
-
-Once round-trip passes, Gap 2 is complete and the save/load pipeline is validated end-to-end.
+Everything above the damage pass is complete. Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
 
 ---
 
@@ -396,7 +228,7 @@ void Start()
     _progressionService.Initialize(playerProgressionSO, playerStatSO, _statsService,
         saveData.level, saveData.totalTalentPoints, saveData.totalAttributePoints,
         saveData.attributeAllocations);
-    _progressionService.ReloadAllBaseStats(); // Gap 1 fix — must stay here
+    _progressionService.ReloadAllBaseStats(); // Must stay here: needed on load, see §15
 
     // 4. Calculate talent tree node positions (no UI)
     _talentTreeGenerator = ServiceLocator.Get<ITalentTreeGenerator>();
@@ -405,13 +237,13 @@ void Start()
     // 5. Hydrate talent allocations and inject StatsService
     var talentState = ServiceLocator.Get<ITalentStateService>() as TalentStateService;
     talentState?.Initialize(saveData, _statsService);
-    // Gap 2: Initialize will also replay Permanent modifiers once implemented
+    // Initialize also replays talent effects (Permanent modifiers) for loaded allocations
 
     // 6. Sync talent point counter from loaded allocations
     int derivedSpent = talentState?.GetTotalAllocatedPoints() ?? 0;
     _progressionService.SetSpentTalentPoints(derivedSpent);
 
-    // Future step 7: DerivedStatResolver.RecalculateAll()
+    // Step 7: DerivedStatResolver.RecalculateAll() (implemented, called after each attribute change)
     // Future step 8: Equipment system loads and pushes Equipment modifiers
 }
 ```
@@ -480,7 +312,7 @@ PlayerStatSO (design-time, immutable template)
     ↓ seeds raw defaults via Initialize()
 StatsService._baseValues (runtime base storage, per StatTypeEnum)
     ↓ overwritten by ProgressionService.ReloadAllBaseStats()
-    ↓ stacked by TalentStateService → ApplyOrReplaceModifier(Permanent) [Gap 2]
+    ↓ stacked by TalentStateService → ApplyOrReplaceModifier(Permanent) [implemented]
     ↓ stacked by Equipment system → ApplyOrReplaceModifier(Equipment) [Future]
     ↓ stacked by triggers/spells → ApplyOrReplaceModifier(Temporary/Environmental) [Runtime]
     ↓ calculated by StandardStatCalculator.Calculate(base, modifiers[])
@@ -782,14 +614,14 @@ public float offset;            // -2 to 2
 public TreeLayoutSO parentTree;
 public List<TalentNodeDataSO> prerequisites;
 
-// PENDING — add this for Gap 2:
+// Implemented: talent effects are applied and replayed on load
 public List<TalentEffectSO> effects;
 ```
 
 ### Prerequisite Logic
 Currently: ANY single prerequisite met = node is unlocked. Review and potentially change to ALL prerequisites before building out the actual talent tree content.
 
-### TalentEffectSO Strategy Pattern (Gap 2 — see §4 for implementation)
+### TalentEffectSO Strategy Pattern
 Each node holds a `List<TalentEffectSO>`. Each concrete `TalentEffectSO` knows how to `Apply` and `Remove` itself. `TalentStateService` calls these without knowing what the effect does. New effect types (ability unlocks, passive rules) are added by creating a new subclass and a new asset — no service code changes.
 
 ### Conditional / Reactive Effects
@@ -890,9 +722,9 @@ public interface ISaveManager
 1. StatsService.Initialize(playerStatSO, saveData)     → seeds raw SO defaults
 2. ProgressionService.Initialize(...)                  → loads allocation dictionaries
 3. ProgressionService.ReloadAllBaseStats()             → pushes attribute deltas via SetBaseStat
-4. [Future] DerivedStatResolver.RecalculateAll()       → Brawn→MeleeDamage etc.
+4. DerivedStatResolver.RecalculateAll()                → Brawn→MeleeDamage etc. (implemented)
 5. TalentStateService.Initialize(saveData, stats)      → loads allocations
-   + ApplyNodeEffects for each (Gap 2)                 → replays Permanent modifiers
+   + ApplyNodeEffects for each                         → replays Permanent modifiers
 6. [Future] Equipment system loads items               → pushes Equipment modifiers
 
 After step 6: GetStat() for all stats must be identical to pre-save values.
@@ -993,59 +825,35 @@ _progressionService.TryRefundAttributePoint(StatTypeEnum.Brawn);
 
 ## 15. Known Bugs & Watch-Outs
 
-### 🔴 BUG: ApplyOrReplaceModifier — Replace Path Skips Cache Refresh
-**File:** `StatsService.cs`
-**Impact:** Allocating a 2nd or 3rd point to a multi-point talent node silently fails to update the stat. The cache stays at the 1-point value forever until a different mutation triggers a refresh.
-**Root Cause:** Early `return modToStore.id` inside the replace branch skips both `_modifierToStatLookup[modToStore.id] = statType` and `RefreshDerivedStat(statType)`.
+### ✅ FIXED: ApplyOrReplaceModifier — replace path skipped cache refresh
+The early return in the replace branch skipped the reverse lookup and cache refresh, so a second talent point never updated the stat. Fixed by setting `wasReplaced` and letting both branches reach a shared tail. Kept here as a warning: any future early return in that method will reintroduce it.
 
-```csharp
-// CURRENT (BROKEN) — replace branch early returns before shared tail:
-if (existingIndex >= 0)
-{
-    modToStore.id = modifiers[existingIndex].id;
-    modifiers[existingIndex] = modToStore;
-    Debug.Log(...);
-    return modToStore.id; // ← BUG: skips lookup + cache refresh
-}
+### 🟡 WATCH-OUT: Partial respec and keys at zero
+When refunding an attribute to 0, keep the key in `_attributeAllocations` with value 0. Deleting the key makes `ReloadAllBaseStats()` skip that stat, so `StatsService` keeps the old raised base. Call `RebuildBaseStat(statType)` explicitly after a decrement.
 
-// FIX — remove early return, set wasReplaced flag, fall through to shared tail:
-if (existingIndex >= 0)
-{
-    modToStore.id = modifiers[existingIndex].id;
-    modifiers[existingIndex] = modToStore;
-    wasReplaced = true;
-    Debug.Log(...);
-}
-if (!wasReplaced)
-{
-    modifiers.Add(modToStore);
-    Debug.Log(...);
-}
-// SHARED — runs for both replace AND add:
-_modifierToStatLookup[modToStore.id] = statType;
-RefreshDerivedStat(statType);
-return modToStore.id;
-```
+### 🟡 WATCH-OUT: ReloadAllBaseStats must stay in the init sequence
+On a new game it iterates nothing and looks redundant, but on load it is essential. `ResolveDerived` is also called from it, so removing it breaks derived stats on load.
 
-**This must be fixed before Gap 2. It is the first thing to do on resume.**
-
-### 🟡 WATCH-OUT: ReloadAllBaseStats on empty dict (new game)
-On a fresh new game, `attributeAllocations` is empty. `ReloadAllBaseStats()` iterates nothing. This is **correct** — `StatsService.Initialize()` already seeded raw SO defaults. Do NOT remove `ReloadAllBaseStats()` from the init sequence thinking it's redundant; it is essential on load game.
-
-### 🟡 WATCH-OUT: Partial respec / key at zero
-If you refund an attribute down to 0 allocations, do NOT remove the key from `_attributeAllocations`. Keep the key with value 0. If the key is deleted, `ReloadAllBaseStats()` skips that stat, leaving `StatsService` stuck at the previously-raised base. Always call `RebuildBaseStat(statType)` explicitly after decrement instead of relying on the load-time iteration.
-
-### 🟡 WATCH-OUT: TalentStateService.ResetAll strips nothing until Gap 2
-The strip loop in `ResetAll()` is correct but has nothing to strip yet because no Permanent modifiers have ever been pushed. Once Gap 2 is complete and `ApplyNodeEffects` is running, this becomes meaningful and critical.
+### 🟡 WATCH-OUT: Talent effects sharing a sourceId
+Every effect on one node uses `sourceId = nodeId`. Two effects on the same node that hit the same stat and category overwrite each other. Single-effect nodes are fine. Fix (per-effect key, e.g. `nodeId + index`) before authoring multi-effect nodes.
 
 ### 🟡 WATCH-OUT: Prerequisite logic is ANY, not ALL
-`PrerequisitesMet()` returns `true` if ANY single prerequisite node is allocated. This may be too permissive. Review before building final talent tree content and change to ALL if the design requires it.
+`PrerequisitesMet()` passes if any one prerequisite is allocated. Confirm with the design bible before final tree content; change to ALL if required.
 
-### 🟡 WATCH-OUT: PercentAdditive is global, not per-category
-All percent modifiers across all categories sum into one pool before multiplication. There is no per-category compounding. This is intentional. If you ever want category-level compounding, use a new `IStatCalculator` implementation — do not change `StandardStatCalculator`.
+### 🟡 WATCH-OUT: Saved enums are stored as integers
+Confirmed by test: `JsonUtility` writes enums as their integer value (`"statType":4`). New members go only at the end of `StatTypeEnum`, `DamageType` and `DamageTag`. Never insert, reorder, or rename.
+
+### 🟡 WATCH-OUT: Trigger messages need a Rigidbody
+Unity routes `OnTriggerEnter/Stay/Exit` to the object that owns the collider's Rigidbody, or to the collider's own object if there is none. A trigger on a child, or a moving projectile, needs a Rigidbody (kinematic) on the object that should receive the message. `Projectile` adds its own in `Awake`.
+
+### 🟡 WATCH-OUT: Only one PlayerVitals
+`GameInitializer` finds the `PlayerVitals` on the player. It must not create one itself, or services will register the wrong instance.
+
+### 🟡 WATCH-OUT: Health bar positioning uses Screen.height
+`WorldHealthBar` converts a world point to a screen point and positions it in UI Toolkit pixels. Verify it stays aligned if the UI scales.
 
 ### 🟡 WATCH-OUT: DontDestroyOnLoad / duplicate scene load
-If a bug causes `PersistentGameScene` to load additively a second time, `GameInitializer.Start()` fires again and double-registers services. Add a static `_isInitialized` guard to `GameInitializer` if you suspect scene-loading bugs.
+If `PersistentGameScene` ever loads additively a second time, `GameInitializer.Start()` fires again and double-registers services. Add a static `_isInitialized` guard if you suspect scene-loading bugs.
 
 ---
 
@@ -1053,114 +861,72 @@ If a bug causes `PersistentGameScene` to load additively a second time, `GameIni
 
 | System | Task | Status |
 |---|---|---|
-| Infrastructure | Service Locator | ✅ |
+| Infrastructure | Service Locator (`Get`, and `TryGet` for per-frame lookups) | ✅ |
 | Infrastructure | SO GameEvent system | ✅ |
 | Infrastructure | Awake/Start split enforced | ✅ |
-| Infrastructure | `ISaveManager` (lazy + immediate) | ✅ |
-| Infrastructure | `PlayerSaveData` schema (stable) | ✅ |
+| Infrastructure | `ISaveManager` (lazy + immediate, skipped during repair prompt) | ✅ |
+| Infrastructure | `PlayerSaveData` schema (append-only enums) | ✅ |
 | Physics | Ledge/slowfall `HasLookAheadHit`, `GetMovementGroundNormal()` | ✅ |
 | Physics | `GravityController` reads `GravityMultiplier` from `StatsService` | ✅ |
-| Stat System | `StatTypeEnum` compile-time keys | ✅ |
-| Stat System | `StatModifier` struct (GUID, sourceId, duration) | ✅ |
-| Stat System | `ModifierType` (FlatAdditive / PercentAdditive) | ✅ |
-| Stat System | `ModifierCategory` (5 categories) | ✅ |
-| Stat System | `IStatCalculator` interface | ✅ |
-| Stat System | `StandardStatCalculator` (pure, stateless) | ✅ |
-| Stat System | `PercentAdditive` math fixed (additive sum) | ✅ |
-| Stat System | Derived stat cache `_derivedCache` | ✅ |
-| Stat System | Reverse modifier lookup `_modifierToStatLookup` | ✅ |
-| Stat System | Batched dirty event `_statsDirty` + `LateUpdate` | ✅ |
-| Stat System | `SetBaseStat()` on `IStatsService` | ✅ |
-| Stat System | `UpdateModifierDurations` — in-place, HashSet batch | ✅ |
-| Stat System | `RemoveModifiersFromSource` — HashSet deduplication | ✅ |
-| Stat System | `RemoveModifier` — O(1) via reverse lookup | ✅ |
-| Progression | Attribute point pool + `_totalAttributePoints` | ✅ |
-| Progression | `TrySpendAttributePoint` with `IsCoreAttribute` guard | ✅ |
-| Progression | `TryRefundAttributePoint` | ✅ |
-| Progression | `RebuildBaseStat` single-stat | ✅ |
-| Progression | `ReloadAllBaseStats` on load | ✅ |
-| Progression | `ResetAllAttributes` (clears + pushes defaults) | ✅ |
-| Progression | `ResetAllTalentPoints` | ✅ |
-| Progression | `GetDefaultAttributeValue` switch | ✅ |
-| Save System | `TalentAllocationEntry[]` (migrated from `string[]`) | ✅ |
-| Save System | `AttributeAllocationEntry[]` (migrated from individual ints) | ✅ |
-| Save System | `totalTalentPoints` / `totalAttributePoints` (not spent counters) | ✅ |
-| Talent System | `TalentTreeGenerator` / `TalentStateService` architecture | ✅ |
-| Talent System | Constructor/Initialize split (race-condition-safe) | ✅ |
-| Talent System | `TalentStateService` receives `IStatsService` via Initialize | ✅ |
-| Talent System | `ResetAll()` strips Permanent modifiers from StatsService | ✅ |
-| Talent System | `ValidateLoadedData()` removes corrupt allocations on load | ✅ |
-| Init | `GameInitializer` full Awake/Start orchestration | ✅ |
-| Init | Gap 1: `ReloadAllBaseStats()` after Progression.Initialize | ✅ |
+| Stat System | `StatTypeEnum`, `StatModifier`, `ModifierType`, `ModifierCategory` | ✅ |
+| Stat System | `StandardStatCalculator`, derived cache, reverse lookup, batched event | ✅ |
+| Stat System | `RigidWeight`, `FlexWeight`, `CovertMovement`, `Tinker`, stagger/bleed resistances | ✅ |
+| Progression | Attribute pool derived from level (saved value ignored on load) | ✅ |
+| Progression | Spend, refund, reset, reload, and `DerivedStatResolver` | ✅ |
+| Save System | Attribute allocations saved | ✅ |
+| Save System | `SaveValidator` + repair prompt for broken talent pools | ✅ |
+| Save System | Backup on new game (`save_default.backup.json`) | ✅ |
+| Talent System | `TalentEffectSO` strategy assets (stat modifier, passive stub) | ✅ |
+| Talent System | Effects applied, reduced, stripped on reset, replayed on load | ✅ |
+| Talent System | Tree focus (arrows, mouse-wheel tier scroll, eased rotation) | ✅ |
+| Talent System | Tree header, outlines in tree colour, counter-rotated labels | ✅ |
+| UI | K menu: full-screen, vertical tabs (`IMenuTab`, `MenuTabBar`) | ✅ |
+| UI | Player Stats tab (attributes, vitals, 4-column derived grid) | ✅ |
+| UI | HUD (vitals bars) and combat log, hidden while the menu is open | ✅ |
+| UI | Virtual cursor owns OS cursor; camera cannot unlock it while active | ✅ |
+| UI | Modal dialog via `IUIManager.ShowModal` | ✅ |
+| Damage | `DamageType` (append-only), `DamageTag`, `DamageSO`, `DamageInfo` | ✅ |
+| Damage | `IDamageReceiver` implemented by player, targets | ✅ |
+| Damage | `DamageTypeTableSO` as one shared table behind `IDamageTypeTable` | ✅ |
+| Damage | Startup validation of the table (missing and duplicate rows) | ✅ |
+| Damage | `DamageCalculator`: deflection, mitigation, environmental, status chances | ✅ |
+| Damage | `IChanceRoller`: single source of randomness | ✅ |
+| Damage | `StatusChanceCalculator` (subtractive armour rules, 5% floor) | ✅ |
+| Damage | Bleed: stackable, one tick per second of scaled time | ✅ |
+| Damage | Stagger: logged (no interrupt yet) | 🟡 |
+| Combat | `LogRules`: player always shown, others within 20 m | ✅ |
+| Combat | `TargetHealth` + `WorldHealthBar` on the training dummy | ✅ |
+| Combat | `Projectile` (adds its own kinematic Rigidbody) and `ProjectileTurret` | ✅ |
+| Combat | Sword swings use `DamageSO` when assigned | 🟡 (needs animations) |
+| Init | `GameInitializer` orchestration; `ReloadAllBaseStats` after Progression init | ✅ |
 
 ---
 
 ## 17. Remaining Roadmap & Next Steps
 
-### Immediate — Do These in Order
+### Where we are
+The character pipeline is working end to end: attributes, talents, derived stats, saves, the menu, and the first damage pass. What's left before the pipeline is complete is **Phase 7 (damage and status, finishing)** and **Phase 8 (equipment)**. Phases 9 and 10 come after.
 
-#### Step 1: Fix ApplyOrReplaceModifier bug (🔴 must do first)
-See §15 for exact fix. One method, remove the early return, add `wasReplaced` flag. No other changes needed. Verify that calling `ApplyOrReplaceModifier` twice with the same `sourceId` updates the cache correctly.
+### Phase 7 — Damage & Status: open items
+1. **Stagger effect.** Currently a log line only. Needs the interrupt (0.5 s), the knockback, and the 15 energy drain, per the armour doc.
+2. **Sword damage.** `AttackEventHandler` already uses a `DamageSO` when one is assigned. It needs attack animations to test, so it's blocked until they exist.
+3. **Remove temporary harnesses** once animations exist. The swing path itself stays.
 
-#### Step 2: Implement Gap 2 — Talent modifiers push into StatsService
-Full implementation plan in §4. Summary:
-1. Create `ITalentEffectContext`, `TalentEffectSO`, `StatModifierTalentEffectSO`, `PassiveTalentEffectSO`
-2. Add `List<TalentEffectSO> effects` to `TalentNodeDataSO`
-3. Wire `ApplyNodeEffects` / `RemoveNodeEffects` in `TalentStateService` at all mutation points
-4. Test one node with a static stat bonus end-to-end including save round-trip
+### Phase 8 — Inventory & Equipment
+1. Equipment sets `RigidWeight` and `FlexWeight` from the worn pieces, which already feed the stagger and bleed maths.
+2. Armour value, type multiplier and material efficiency feed `ArmorValue`, per the armour doc.
+3. `ModifierCategory.Equipment` modifiers, with `sourceId = itemInstanceId`, and removal on unequip.
+4. Inventory grid and item packing, per the design doc.
 
-#### Step 3: Save Round-Trip Validation
-After Gap 2, run the full test:
-- Spend 3 attribute points in Brawn
-- Allocate 2 points to a SpellPower talent node
-- Verify: `GetStat(Brawn)` = 13, `GetStat(SpellPower)` = base + 10
-- Save, quit, load
-- Verify: identical stat values post-load
+### After Phase 8
+- **Phase 9: Enemies & Actors.** `ActorStatSO` for NPCs, so targets get real mitigation. Enemy AI is a separate task.
+- **Phase 10: Main Menu.** Separate scene, New Game / Continue / Load, and a full character round-trip check.
 
-This validates the entire character pipeline end-to-end and unblocks the Main Menu.
+### Deferred to the design bible
+- Enemy AI, aggression, hearing and vision.
+- Trap and environmental damage tuning, and which traps use which types.
+- The "current effects" screen for active statuses.
+- Prerequisite rule (ANY vs ALL).
 
-### Next Major Systems (In Order)
+---
 
-#### Phase 6: DerivedStatResolver
-Plain C# class. Reads attribute base values and pushes `Permanent` modifiers with reserved sourceIds.
-
-```
-Brawn     → MeleeDamage    (+0.5 per point above default 10)
-Brawn     → CarryCapacity  (+2kg per point)
-Vigor     → MaxHealth      (+5 per point)
-Insight   → SpellPower     (+1 per point)
-Finesse   → CritMultiplier (+0.02 per point)
-Focus     → CritChance     (+0.005 per point)
-Willpower → MaxEnergy      (+5 per point)
-```
-
-Formula scalars stored in `PlayerStatSO` as designer-tunable floats. `RecalculateAll()` called:
-- After `ReloadAllBaseStats()` in `GameInitializer.Start()`
-- After `TrySpendAttributePoint()`
-- After `ResetAllAttributes()`
-
-Conditional talent effects (e.g., armor-based health bonus) also registered here, unlocked by `PassiveTalentEffectSO` marking the rule as active.
-
-#### Phase 7: Inventory & Equipment System
-Equipment uses the same `ApplyOrReplaceModifier` pattern:
-- `ModifierCategory.Equipment`
-- `sourceId = itemInstanceId` (per-instance, not per-type)
-- On equip → `ApplyOrReplaceModifier` per stat bonus
-- On unequip → `RemoveModifiersFromSource(itemInstanceId)`
-- On upgrade → `ApplyOrReplaceModifier` with same sourceId (replaces old)
-
-#### Phase 8: Main Menu Scene
-```
-MainMenu (scene, standalone, no player services)
-  MainMenuController
-    New Game  → SceneManager.LoadScene("PersistentGameScene", LoadSceneMode.Single)
-    Continue  → SaveService.SaveExists("default") check, then load scene
-    Load Game → (future: slot-based save browser)
-    Options   → settings panel
-    Quit      → Application.Quit()
-
-PersistentGameScene — loads on New Game / Continue
-  GameInitializer.Start() runs once, initializes the full pipeline
-```
-
-`GameInitializer` never lives in `MainMenu`. The Main Menu only needs a lightweight `SaveService` instance to check save existence for the Continue button. No stats, no talents, no progression in the Main Menu.

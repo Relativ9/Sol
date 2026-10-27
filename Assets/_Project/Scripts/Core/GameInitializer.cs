@@ -58,6 +58,7 @@ namespace Sol
             else
             {
                 ServiceLocator.RegisterService<IDamageTypeTable>(damageTypeTable);
+                ValidateDamageTypeTable(damageTypeTable);
             }
 
 
@@ -177,6 +178,33 @@ namespace Sol
             // and wire its UnityEvent to SaveManager.QueueSave().
         }
         
+        // Checks the damage type table once at startup: every DamageType needs exactly one row.
+        // A missing row silently skips mitigation for that type; a duplicate silently uses only the first.
+        void ValidateDamageTypeTable(DamageTypeTableSO table)
+        {
+            var missing = new System.Collections.Generic.List<string>();
+            foreach (DamageType type in table.MissingTypes())
+                missing.Add(type.ToString());
+
+            var counts = new System.Collections.Generic.Dictionary<DamageType, int>();
+            foreach (var entry in table.entries)
+            {
+                if (entry == null) continue;
+                counts[entry.type] = counts.TryGetValue(entry.type, out int n) ? n + 1 : 1;
+            }
+            var duplicated = new System.Collections.Generic.List<string>();
+            foreach (var kvp in counts)
+                if (kvp.Value > 1) duplicated.Add(kvp.Key.ToString());
+
+            if (missing.Count > 0)
+                Debug.LogError($"[{nameof(GameInitializer)}] DamageTypeTable has no row for: {string.Join(", ", missing)}. " +
+                               "Those types take unmitigated damage. Use 'Fill missing types with defaults' on the table.", table);
+
+            if (duplicated.Count > 0)
+                Debug.LogError($"[{nameof(GameInitializer)}] DamageTypeTable has more than one row for: {string.Join(", ", duplicated)}. " +
+                               "Only the first is used. Remove the extra rows.", table);
+        }
+
         [ContextMenu("Delete Save (Debug)")]
         public void DeleteSaveDebug()
         {
