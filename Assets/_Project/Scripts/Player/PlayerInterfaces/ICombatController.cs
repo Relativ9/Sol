@@ -8,6 +8,9 @@ namespace Sol
         bool IsWeaponDrawn();
         void HandleAttackInput();
         CombatState GetCurrentCombatState();
+
+        /// <summary>Cancels an attack in progress (e.g. when staggered). Safe to call when not attacking.</summary>
+        void CancelAttack();
     }
     
     public enum CombatState

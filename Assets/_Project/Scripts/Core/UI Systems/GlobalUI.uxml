@@ -24,7 +24,13 @@
                     </ui:VisualElement>
 
                     <!-- Player Stats tab content (built by PlayerStatsTab) -->
-                    <ui:VisualElement name="stats-tab-content" style="width: 100%; height: 100%; position: absolute; display: none;" />
+                    <ui:VisualElement name="stats-tab-content" style="flex-grow: 1; display: none;" />
+
+                    <!-- Inventory tab content (built by InventoryMenuTab) -->
+                    <ui:VisualElement name="inventory-tab-content" style="flex-grow: 1; display: none;" />
+
+                    <!-- Options tab content (built by OptionsMenuTab) -->
+                    <ui:VisualElement name="options-tab-content" style="flex-grow: 1; display: none;" />
 
                 </ui:VisualElement>
 

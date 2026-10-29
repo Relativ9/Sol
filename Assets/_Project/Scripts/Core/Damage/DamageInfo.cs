@@ -13,18 +13,35 @@ namespace Sol
         public readonly DamageTag Tags;
         public readonly float Amount;
 
-        // Where the hit came from. Used by the combat log to decide whether to show it.
+        // Used by the combat log to decide whether to show it.
         public readonly bool SourceIsPlayer;
-        public readonly Vector3 SourcePosition;
 
-        public DamageInfo(string sourceId, DamageType type, DamageTag tags, float amount, bool sourceIsPlayer = false, Vector3 sourcePosition = default)
+        // The attacker's root position (enemy body, shooter, player root). Knockback direction is computed from this,
+        // so it is never the position of a weapon or projectile.
+        public readonly Vector3 SourceOrigin;
+
+        // Where the hit landed (weapon tip, projectile position). Used for effects and as a fallback direction.
+        public readonly Vector3 HitPoint;
+
+        // The attacker's status contribution (effects and base chances). Default = the hit causes no statuses.
+        public readonly StatusAttack Statuses;
+
+        // The attacker's penetration, in points. Cancels up to the resistance cap of the receiver's defences.
+        public readonly float Penetration;
+
+        public DamageInfo(string sourceId, DamageType type, DamageTag tags, float amount, bool sourceIsPlayer = false,
+            Vector3 sourceOrigin = default, StatusAttack statuses = default, Vector3 hitPoint = default, float penetration = 0f)
         {
             SourceId = sourceId;
             Type = type;
             Tags = tags;
             Amount = amount;
             SourceIsPlayer = sourceIsPlayer;
-            SourcePosition = sourcePosition;
+            SourceOrigin = sourceOrigin;
+            Statuses = statuses;
+            Penetration = penetration;
+            // An unset hit point falls back to the origin, so it is always a usable position.
+            HitPoint = hitPoint == default ? sourceOrigin : hitPoint;
         }
     }
 }

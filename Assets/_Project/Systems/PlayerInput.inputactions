@@ -59,6 +59,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "7e746da6-3ffb-4d0c-8ab5-6bc93ea4d47c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Discard",
+                    "type": "Button",
+                    "id": "b5e2a8c1-6f3d-4a9e-8c7b-2d1f0e9a4b36",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -169,6 +187,28 @@
                     "processors": "",
                     "groups": ";Mouse&Keyboard",
                     "action": "ToggleWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "61306076-8568-4e2c-a1cc-fa63e83c529b",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Mouse&Keyboard",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c3f7d9e2-1a4b-4e8c-9f6d-7b2a5c0e8d41",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Mouse&Keyboard",
+                    "action": "Discard",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

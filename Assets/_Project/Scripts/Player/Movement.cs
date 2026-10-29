@@ -37,6 +37,7 @@ namespace Sol
         private IPlayerContext _context;
         private IStatsService _statsService;
         private IGroundChecker _groundChecker;
+        private IStatusController _status;
         private ICameraController _cameraController;
         private Rigidbody _rigidbody;
         
@@ -57,6 +58,7 @@ namespace Sol
             _context = context;
             _statsService = ServiceLocator.Get<IStatsService>();
             _groundChecker = context.GetService<IGroundChecker>();
+            _status = context.GetService<IStatusController>();
             _cameraController = context.GetService<ICameraController>();
             _rigidbody = GetComponent<Rigidbody>();
             
@@ -195,11 +197,29 @@ namespace Sol
         public void ProcessMovement()
         {
             if (_rigidbody == null) return;
+
+            // Consumed before the JumpPriority early return, so a knockback landing in a jump window is not lost.
+            // The knockback REPLACES horizontal velocity rather than adding to it, so every hit starts from the same
+            // speed whatever the player was doing. Vertical velocity is kept, so a hit does not launch the player.
+            if (_status != null && _status.TryConsumeImpulse(out Vector3 impulse))
+            {
+                Vector3 current = _rigidbody.linearVelocity;
+                _rigidbody.linearVelocity = new Vector3(impulse.x, current.y, impulse.z);
+            }
+
             if (_context.GetStateValue<bool>("JumpPriority", false)) return;
             UpdateGroundedTimeTracking();
+
+            // A movement lock blocks INPUT only. Friction (deceleration) and the ground/air logic still run,
+            // so a knocked-back player slows down the same way on every hit.
+            bool movementLocked = _status != null && _status.IsMovementLocked;
+
             if (_isGrounded && _isActive)
             {
-                ProcessGroundedMovement();
+                if (movementLocked)
+                    ApplyDeceleration();
+                else
+                    ProcessGroundedMovement();
                 ApplyGroundStickiness();
                 UpdateLookAheadProbe();
             }

@@ -24,6 +24,12 @@ namespace Sol
         /// Primary action (typically South button/Face Down on controllers, Left Click on mouse).
         /// </summary>
         bool WasPrimaryPressed();
+
+        /// <summary>True every frame the primary button stays down. Used for drag.</summary>
+        bool IsPrimaryHeld();
+
+        /// <summary>True on the frame the primary button is released.</summary>
+        bool WasPrimaryReleased();
     
         /// <summary>
         /// Secondary action (typically East button/Face Right on controllers, Right Click on mouse).

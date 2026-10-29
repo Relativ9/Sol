@@ -230,7 +230,7 @@ namespace Sol
                     if (contact.normal.y > 0.7f)
                     {
                         _currentDoubleJumpCount = 0;
-                        if (_debugJump) Debug.Log("Double jump count reset due to landing");
+                        //if (_debugJump) Debug.Log("Double jump count reset due to landing");
                         break;
                     }
                 }

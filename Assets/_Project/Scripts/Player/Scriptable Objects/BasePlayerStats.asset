@@ -34,10 +34,19 @@ MonoBehaviour:
   baseMaxEnergy: 100
   baseEnergyRegen: 10
   baseCarryCapacity: 40
-  baseInventorySpace: 10
+  baseInventorySpace: 100
   baseLootMultiplier: 1
-  baseHunger: 10
-  baseThirst: 10
+  baseHunger: 100
+  baseThirst: 100
+  brawnToMeleeDamage: 0.5
+  brawnToCarryCapacity: 2
+  finesseToProjectileDamage: 0.5
+  insightToSpellPower: 1
+  insightToCritMultiplier: 0.02
+  focusToCritChance: 0.5
+  finesseToPenetration: 1.5
+  vigorToMaxHealth: 5
+  willpowerToMaxEnergy: 5
   baseMeleeDamage: 1
   baseProjectileDamage: 1
   baseProjectileRange: 10
@@ -60,3 +69,12 @@ MonoBehaviour:
   baseKnowledgeChance: 0
   baseDeceptionChance: 0
   baseIntimidationChance: 0
+  baseCovertMovement: 0
+  baseTinker: 0
+  baseStaggerResistance: 0
+  baseBleedResistance: 0
+  baseRigidWeight: 40
+  baseFlexWeight: 15
+  basePlateCount: 0
+  baseFlexCount: 0
+  baseClothCount: 0

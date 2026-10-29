@@ -147,6 +147,24 @@ namespace Sol
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""7e746da6-3ffb-4d0c-8ab5-6bc93ea4d47c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Discard"",
+                    ""type"": ""Button"",
+                    ""id"": ""b5e2a8c1-6f3d-4a9e-8c7b-2d1f0e9a4b36"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -257,6 +275,28 @@ namespace Sol
                     ""processors"": """",
                     ""groups"": "";Mouse&Keyboard"",
                     ""action"": ""ToggleWeapon"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""61306076-8568-4e2c-a1cc-fa63e83c529b"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse&Keyboard"",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c3f7d9e2-1a4b-4e8c-9f6d-7b2a5c0e8d41"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Mouse&Keyboard"",
+                    ""action"": ""Discard"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -378,6 +418,8 @@ namespace Sol
             m_Main_Run = m_Main.FindAction("Run", throwIfNotFound: true);
             m_Main_Jump = m_Main.FindAction("Jump", throwIfNotFound: true);
             m_Main_ToggleWeapon = m_Main.FindAction("ToggleWeapon", throwIfNotFound: true);
+            m_Main_Interact = m_Main.FindAction("Interact", throwIfNotFound: true);
+            m_Main_Discard = m_Main.FindAction("Discard", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_OpenMenu = m_UI.FindAction("OpenMenu", throwIfNotFound: true);
@@ -471,6 +513,8 @@ namespace Sol
         private readonly InputAction m_Main_Run;
         private readonly InputAction m_Main_Jump;
         private readonly InputAction m_Main_ToggleWeapon;
+        private readonly InputAction m_Main_Interact;
+        private readonly InputAction m_Main_Discard;
         /// <summary>
         /// Provides access to input actions defined in input action map "Main".
         /// </summary>
@@ -506,6 +550,14 @@ namespace Sol
             /// Provides access to the underlying input action "Main/ToggleWeapon".
             /// </summary>
             public InputAction @ToggleWeapon => m_Wrapper.m_Main_ToggleWeapon;
+            /// <summary>
+            /// Provides access to the underlying input action "Main/Interact".
+            /// </summary>
+            public InputAction @Interact => m_Wrapper.m_Main_Interact;
+            /// <summary>
+            /// Provides access to the underlying input action "Main/Discard".
+            /// </summary>
+            public InputAction @Discard => m_Wrapper.m_Main_Discard;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -550,6 +602,12 @@ namespace Sol
                 @ToggleWeapon.started += instance.OnToggleWeapon;
                 @ToggleWeapon.performed += instance.OnToggleWeapon;
                 @ToggleWeapon.canceled += instance.OnToggleWeapon;
+                @Interact.started += instance.OnInteract;
+                @Interact.performed += instance.OnInteract;
+                @Interact.canceled += instance.OnInteract;
+                @Discard.started += instance.OnDiscard;
+                @Discard.performed += instance.OnDiscard;
+                @Discard.canceled += instance.OnDiscard;
             }
 
             /// <summary>
@@ -579,6 +637,12 @@ namespace Sol
                 @ToggleWeapon.started -= instance.OnToggleWeapon;
                 @ToggleWeapon.performed -= instance.OnToggleWeapon;
                 @ToggleWeapon.canceled -= instance.OnToggleWeapon;
+                @Interact.started -= instance.OnInteract;
+                @Interact.performed -= instance.OnInteract;
+                @Interact.canceled -= instance.OnInteract;
+                @Discard.started -= instance.OnDiscard;
+                @Discard.performed -= instance.OnDiscard;
+                @Discard.canceled -= instance.OnDiscard;
             }
 
             /// <summary>
@@ -803,6 +867,20 @@ namespace Sol
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnToggleWeapon(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Interact" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnInteract(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Discard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnDiscard(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

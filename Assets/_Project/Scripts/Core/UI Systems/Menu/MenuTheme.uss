@@ -1,0 +1,588 @@
+/* Shared look for every K menu tab. Warm, dark and parchment-like, with aged-brass accents.
+   Colours live here, so a tab never sets its own. Fonts are the project default: a custom font needs its own asset. */
+
+/* ---- Player Stats layout ------------------------------------------------------------------------------------------ */
+
+/* The outer wrapper carries the inset, so the scroll view and its content both sit inside the panel's padding. */
+.stats-root {
+    flex-grow: 1;
+    padding: 12px 24px 12px 16px;
+    min-width: 0;
+    min-height: 0;
+}
+
+.stats-scroll {
+    flex-grow: 1;
+}
+
+/* Scroll bars, for every scroll view in the menu. Everything is invisible except a single thin orange line for the thumb.
+   The track, the arrow buttons and their borders are all transparent with no size, so the thumb is the only thing drawn. */
+.unity-scroller {
+    background-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    width: 6px;
+    margin-left: 8px;
+}
+
+.unity-scroller .unity-scroller__tracker,
+.unity-scroller .unity-base-slider__tracker {
+    background-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.unity-scroller .unity-scroller__low-button,
+.unity-scroller .unity-scroller__high-button {
+    display: none;
+    width: 0;
+    height: 0;
+    background-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.unity-scroller .unity-base-slider__dragger,
+.unity-scroller .unity-scroller__dragger {
+    width: 2px;
+    margin-left: 2px;
+    background-color: rgb(232, 150, 40);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.unity-scroller .unity-base-slider__dragger:hover,
+.unity-scroller .unity-base-slider__dragger:active {
+    background-color: rgb(255, 180, 60);
+}
+
+/* Inventory tab root. A normal flex child of the tab area, so the panel's own padding and size define its bounds. */
+.inventory-root {
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 12px 24px 12px 16px;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* ---- Inventory layout ---------------------------------------------------------------------------------------------- */
+
+.inventory-header {
+    flex-direction: column;
+    margin-bottom: 8px;
+    min-height: 40px;
+}
+
+.inventory-status {
+    font-size: 12px;
+    color: rgb(230, 170, 100);
+    min-height: 18px;
+    white-space: normal;
+}
+
+/* Three columns share the width: slots take a fixed share, the grid takes the rest, details take a fixed share.
+   min-width 0 lets a column shrink below its content, so it scrolls rather than pushing its neighbours off the edge. */
+.inventory-body {
+    flex-direction: row;
+    flex-grow: 1;
+    min-height: 0;
+    min-width: 0;
+}
+
+.inventory-slots-column {
+    flex-basis: 30%;
+    flex-shrink: 0;
+    min-width: 200px;
+    flex-direction: column;
+    margin-right: 16px;
+}
+
+.inventory-grid-column {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    flex-direction: column;
+    margin-right: 16px;
+}
+
+.inventory-grid-scroll {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.inventory-details {
+    flex-basis: 26%;
+    flex-shrink: 0;
+    min-width: 200px;
+    padding: 10px 12px;
+    background-color: rgba(10, 8, 6, 0.7);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: rgba(168, 128, 64, 0.5);
+    border-bottom-color: rgba(168, 128, 64, 0.5);
+    border-left-color: rgba(168, 128, 64, 0.5);
+    border-right-color: rgba(168, 128, 64, 0.5);
+}
+
+/* Equipment slots: a flex grid of cells, so the silhouette scales with its column. A slot is placed in its own
+   row and column by the C# that builds it; sizes are percentages of the column. */
+/* The silhouette scrolls vertically inside its column, so a short panel never overlaps its slots. */
+.inventory-slot-scroll {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* The board is a relative box. Its size is set in code from the design grid, and slots are placed inside it. */
+.inventory-slot-board {
+    position: relative;
+}
+
+.inventory-slot-row {
+    flex-direction: row;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.inventory-slot {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin: 3px;
+    background-color: rgba(30, 24, 18, 0.9);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: rgba(168, 128, 64, 0.6);
+    border-bottom-color: rgba(168, 128, 64, 0.6);
+    border-left-color: rgba(168, 128, 64, 0.6);
+    border-right-color: rgba(168, 128, 64, 0.6);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+}
+
+.inventory-slot-filled {
+    background-color: rgba(60, 44, 28, 0.95);
+}
+
+/* Stored grid: cells are fixed-size squares, placed in rows. Item blocks sit over their footprint. */
+.inventory-grid {
+    position: relative;
+    flex-direction: column;
+}
+
+.inventory-grid-row {
+    flex-direction: row;
+}
+
+.inventory-cell {
+    width: 60px;
+    height: 60px;
+    margin: 1.5px;
+    background-color: rgba(28, 22, 16, 0.9);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: rgba(168, 128, 64, 0.35);
+    border-bottom-color: rgba(168, 128, 64, 0.35);
+    border-left-color: rgba(168, 128, 64, 0.35);
+    border-right-color: rgba(168, 128, 64, 0.35);
+}
+
+/* Vitals are separate chips that wrap, so a narrow panel never clips one. */
+.stats-vitals-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.stats-vital {
+    font-size: 13px;
+    color: rgb(245, 240, 228);
+    margin-right: 28px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+
+/* Derived categories flow left to right and wrap only when the panel runs out of width. Each category is sized to its
+   content, so Defense follows Offense on the same line, and Armour set follows Defense. */
+.stats-derived-flow {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* Five categories share a line as 19% each, with a small gap, so the row fills the panel width. Each category
+   shrinks with the panel and only wraps once it reaches its minimum width. */
+.stats-category {
+    flex-direction: column;
+    flex-basis: 19%;
+    flex-grow: 0;
+    flex-shrink: 1;
+    min-width: 170px;
+    margin-right: 8px;
+    margin-bottom: 12px;
+}
+
+.stats-category-title {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(214, 176, 108);
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(214, 176, 108, 0.3);
+}
+
+.stats-row {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 2px;
+    width: 100%;
+}
+
+.stats-attribute-list {
+    flex-direction: column;
+}
+
+.stats-attribute-row {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+    padding: 4px 6px;
+    background-color: rgba(30, 24, 18, 0.55);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.stats-attribute-name {
+    width: 110px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(230, 200, 130);
+}
+
+.stats-attribute-value {
+    width: 52px;
+    font-size: 14px;
+    color: rgb(245, 240, 228);
+    -unity-text-align: middle-right;
+}
+
+.stats-attribute-alloc {
+    width: 110px;
+    font-size: 12px;
+    color: rgb(170, 160, 140);
+    margin-left: 8px;
+}
+
+.stats-attribute-desc {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: rgb(150, 140, 122);
+    white-space: normal;
+    margin-left: 8px;
+}
+
+.menu-section {
+
+    flex-direction: column;
+    margin-top: 14px;
+    margin-bottom: 4px;
+    padding: 10px 12px;
+    background-color: rgba(10, 8, 6, 0.55);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-top-color: rgba(168, 128, 64, 0.55);
+    border-bottom-color: rgba(168, 128, 64, 0.55);
+    border-left-width: 0;
+    border-right-width: 0;
+}
+
+.menu-header {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(214, 176, 108);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(214, 176, 108, 0.35);
+}
+
+.menu-label {
+    font-size: 13px;
+    color: rgb(214, 210, 200);
+    white-space: normal;
+}
+
+.menu-label-muted {
+    font-size: 12px;
+    color: rgb(150, 140, 122);
+    white-space: normal;
+}
+
+.menu-value {
+    font-size: 13px;
+    color: rgb(245, 240, 228);
+    -unity-text-align: middle-right;
+}
+
+.menu-button {
+    background-color: rgba(44, 34, 24, 0.95);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: rgba(168, 128, 64, 0.8);
+    border-bottom-color: rgba(168, 128, 64, 0.8);
+    border-left-color: rgba(168, 128, 64, 0.8);
+    border-right-color: rgba(168, 128, 64, 0.8);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    color: rgb(235, 225, 200);
+    font-size: 12px;
+    padding: 2px 8px;
+    min-height: 22px;
+}
+
+.menu-button:hover {
+    background-color: rgba(78, 58, 36, 0.98);
+    border-top-color: rgb(214, 176, 108);
+    border-bottom-color: rgb(214, 176, 108);
+    border-left-color: rgb(214, 176, 108);
+    border-right-color: rgb(214, 176, 108);
+}
+
+.menu-button:disabled {
+    color: rgb(96, 88, 76);
+    background-color: rgba(26, 22, 18, 0.85);
+    border-top-color: rgba(96, 80, 56, 0.5);
+    border-bottom-color: rgba(96, 80, 56, 0.5);
+    border-left-color: rgba(96, 80, 56, 0.5);
+    border-right-color: rgba(96, 80, 56, 0.5);
+}
+
+/* Selection: a white outline, kept inside the element so it never shifts the layout. */
+.selection-outline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.menu-tooltip {
+    position: absolute;
+    font-size: 12px;
+    color: rgb(255, 242, 214);
+    background-color: rgba(8, 6, 4, 0.94);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: rgba(214, 176, 108, 0.7);
+    border-bottom-color: rgba(214, 176, 108, 0.7);
+    border-left-color: rgba(214, 176, 108, 0.7);
+    border-right-color: rgba(214, 176, 108, 0.7);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding: 3px 8px;
+    white-space: nowrap;
+}
+
+/* ==== Fantasy theme ==================================================================================================
+   Later rules override the look above without changing any layout. Palette: deep indigo-black stone, aged brass,
+   warm parchment text, and a single ember accent for active and filled things. Kept flat and crisp: no gradients or
+   shadows, which Unity's USS does not support, so depth comes from layered borders and inset tones. */
+
+/* Panels: deep stone, with an inset brass rule so each surface reads as carved rather than flat. */
+.inventory-details {
+    background-color: rgba(14, 12, 20, 0.92);
+    border-top-color: rgba(196, 150, 74, 0.7);
+    border-bottom-color: rgba(120, 88, 40, 0.5);
+    border-left-color: rgba(196, 150, 74, 0.7);
+    border-right-color: rgba(120, 88, 40, 0.5);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/* Headers: a bright brass rule over a faded one, as on an engraved plate. */
+.menu-header {
+    color: rgb(232, 196, 120);
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(196, 150, 74, 0.85);
+}
+
+.stats-category-title {
+    color: rgb(232, 196, 120);
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(196, 150, 74, 0.85);
+}
+
+.menu-section {
+    background-color: rgba(14, 12, 20, 0.6);
+    border-top-color: rgba(196, 150, 74, 0.6);
+    border-bottom-color: rgba(196, 150, 74, 0.6);
+}
+
+/* Equipment slots: a dark stone socket. Filled slots take a warm ember-lit tone, so worn gear reads at a glance. */
+.inventory-slot {
+    background-color: rgba(18, 16, 26, 0.95);
+    border-top-color: rgba(150, 112, 56, 0.85);
+    border-bottom-color: rgba(150, 112, 56, 0.85);
+    border-left-color: rgba(150, 112, 56, 0.85);
+    border-right-color: rgba(150, 112, 56, 0.85);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.inventory-slot-filled {
+    background-color: rgba(52, 34, 24, 0.97);
+    border-top-color: rgba(214, 150, 70, 0.95);
+    border-bottom-color: rgba(214, 150, 70, 0.95);
+    border-left-color: rgba(214, 150, 70, 0.95);
+    border-right-color: rgba(214, 150, 70, 0.95);
+}
+
+/* Stored grid cells: quiet stone, so the items are what stands out. */
+.inventory-cell {
+    background-color: rgba(18, 16, 26, 0.92);
+    border-top-color: rgba(120, 90, 50, 0.45);
+    border-bottom-color: rgba(120, 90, 50, 0.45);
+    border-left-color: rgba(120, 90, 50, 0.45);
+    border-right-color: rgba(120, 90, 50, 0.45);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+/* Buttons: beveled brass, brightening to ember on hover. */
+.menu-button {
+    background-color: rgba(34, 26, 40, 0.95);
+    color: rgb(240, 222, 178);
+    border-top-color: rgba(214, 170, 84, 0.9);
+    border-bottom-color: rgba(110, 80, 36, 0.9);
+    border-left-color: rgba(214, 170, 84, 0.9);
+    border-right-color: rgba(110, 80, 36, 0.9);
+}
+
+.menu-button:hover {
+    background-color: rgba(78, 48, 36, 0.98);
+    border-top-color: rgb(255, 196, 110);
+    border-bottom-color: rgb(255, 196, 110);
+    border-left-color: rgb(255, 196, 110);
+    border-right-color: rgb(255, 196, 110);
+}
+
+/* Details column: a header over the panel, sized like the other two columns, so the panel starts on their underline line. */
+.inventory-details-column {
+    flex-basis: 26%;
+    flex-shrink: 0;
+    min-width: 200px;
+    flex-direction: column;
+}
+
+.inventory-details-column .inventory-details {
+    flex-grow: 1;
+    margin-top: 0;
+}
+
+/* Corner labels on stored items: weight bottom-left, stack count bottom-right. Shown over the item's icon. */
+.item-corner-label {
+    position: absolute;
+    bottom: 2px;
+    font-size: 10px;
+    color: rgb(245, 238, 220);
+    background-color: rgba(8, 6, 4, 0.7);
+    padding: 0 3px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    pointer-events: none;
+}
+
+.item-corner-left {
+    left: 2px;
+}
+
+.item-corner-right {
+    right: 2px;
+}
+
+/* Split-a-stack panel. Floats over the tab, centred, with the menu's stone and brass. */
+.split-panel {
+    position: absolute;
+    left: 35%;
+    top: 35%;
+    width: 280px;
+    padding: 12px 14px;
+    background-color: rgba(14, 12, 20, 0.98);
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-color: rgba(196, 150, 74, 0.9);
+    border-bottom-color: rgba(120, 88, 40, 0.8);
+    border-left-color: rgba(196, 150, 74, 0.9);
+    border-right-color: rgba(120, 88, 40, 0.8);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.split-buttons {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 10px;
+}

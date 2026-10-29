@@ -11,7 +11,10 @@ namespace Sol
         [SerializeField] private UIDocument _document;
         [SerializeField] private VisualTreeAsset _nodeTemplate;
         [SerializeField] private VisualTreeAsset _tooltipTemplate;
-        [SerializeField] private GameEvent _onImmediateSaveRequest;
+        [Tooltip("Layout for the Player Stats tab (PlayerStatsTab.uxml).")]
+        [SerializeField] private VisualTreeAsset _statsLayout;
+        [Tooltip("Layout for the Inventory tab (InventoryTab.uxml).")]
+        [SerializeField] private VisualTreeAsset _inventoryLayout;
         
         private Dictionary<string, VisualElement> _panels = new();
         private IUIStateService _uiStateService;
@@ -28,6 +31,8 @@ namespace Sol
         private MenuTabBar _menuTabBar;
         private TalentMenuTab _talentTab;
         private PlayerStatsTab _statsTab;
+        private InventoryMenuTab _inventoryTab;
+        private OptionsMenuTab _optionsTab;
         
         void Awake()
         {
@@ -62,6 +67,27 @@ namespace Sol
             }
         }
         
+        // Options > Save. Writes through the save system with the reason it is given, never the file directly.
+        private bool RequestSaveFromMenu(SaveReason reason)
+        {
+            return ServiceLocator.TryGet<ISaveManager>()?.RequestSave(reason) ?? false;
+        }
+
+        // Options > Load. The chosen slot is recorded, then the active scene is reloaded. Startup reads the chosen slot, so the
+        // load takes effect exactly like a normal startup from that save.
+        private void RequestLoadRestart()
+        {
+            PendingLoad.Request(SaveCoordinator.ManualSlot);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        }
+
+        // Feedback from the options tab, shown in the combat log, which the player already reads.
+        private void ShowMenuStatus(string message)
+        {
+            ServiceLocator.TryGet<ICombatLog>()?.Add(message, CombatLogKind.Info);
+        }
+
         void CachePanelReferences()
         {
             var root = _document?.rootVisualElement;
@@ -73,9 +99,11 @@ namespace Sol
                 _panels[MenuPanelName] = menuRoot;
 
                 _talentTab = new TalentMenuTab(OnTalentTabShow, OnTalentTabHide);
-                _statsTab = new PlayerStatsTab();
+                _statsTab = new PlayerStatsTab(_statsLayout);
+                _inventoryTab = new InventoryMenuTab(_inventoryLayout);
+                _optionsTab = new OptionsMenuTab(RequestSaveFromMenu, RequestLoadRestart, ShowMenuStatus);
                 _menuTabBar = new MenuTabBar();
-                _menuTabBar.Build(menuRoot, new IMenuTab[] { _talentTab, _statsTab });
+                _menuTabBar.Build(menuRoot, new IMenuTab[] { _talentTab, _statsTab, _inventoryTab, _optionsTab });
             }
         }
 
@@ -169,7 +197,8 @@ namespace Sol
             if (element != null) element.style.display = display;
         }
 
-        // Talents tab: tears down the tree and saves. Bypasses debounce; the player expects points to stick.
+        // Talents tab: tears down the tree. Talent points are state, so they are written by the next quicksave or autosave,
+        // not by closing the tab.
         void OnTalentTabHide()
         {
             SetTalentOverlaysVisible(false);
@@ -183,7 +212,6 @@ namespace Sol
                 Destroy(controller);
             }
             _isTalentPanelInitialized = false;
-            ServiceLocator.Get<ISaveManager>()?.RequestImmediateSave();
         }
         
         public void ClosePanel(string panelName)
@@ -205,7 +233,7 @@ namespace Sol
                 panel.style.display = DisplayStyle.None;
                 SetHudVisible(true);
             }
-            _onImmediateSaveRequest.Raise();
+            // Closing a menu no longer saves. Changes are saved by quicksave, autosave, or Save and Quit.
         }
 
         // Modal dialogs use the same path as panels: the shared document gets the virtual cursor,
@@ -239,6 +267,75 @@ namespace Sol
         }
 
         private ModalDialog _modal;
+
+        // The virtual cursor never produces UI Toolkit wheel events, so tabs that scroll get their input here.
+        // Forwards wheel notches to the stats tab only while it is the selected tab, so a hidden tab never scrolls.
+        void Update()
+        {
+            if (_virtualCursor == null || _statsTab == null || _menuTabBar == null) return;
+            if (_menuTabBar.Selected != _statsTab) return;
+
+            int notches = _virtualCursor.GetScrollNotches();
+            if (notches != 0)
+                _statsTab.ScrollDerivedBy(notches);
+        }
+
+        // Drives an active inventory drag every frame, so R and the ghost work without mouse movement.
+        // The tab ignores the tick when no drag is active. The world pickup prompt is updated here too.
+        void LateUpdate()
+        {
+            if (_inventoryTab != null && _virtualCursor != null && _menuTabBar != null
+                && _menuTabBar.Selected == _inventoryTab)
+            {
+                _inventoryTab.Tick(_virtualCursor);
+            }
+
+            UpdatePickupPrompt();
+        }
+
+        // Shows the name of the item E would pick up, above the cursor. Hidden while the menu is open, since the menu
+        // covers the world and the HUD is hidden with it.
+        private void UpdatePickupPrompt()
+        {
+            if (_virtualCursor == null || _document == null) return;
+
+            bool menuOpen = IsPanelOpen(MenuPanelName);
+            if (menuOpen || _pickupPlayer == null)
+            {
+                _pickupPrompt?.Show(null, Vector2.zero);
+                return;
+            }
+
+            _pickupPrompt ??= CreatePickupPrompt();
+            if (_pickupPrompt == null) return;
+
+            WorldItem target = _pickupPlayer.CurrentTarget;
+            string name = target != null && target.Item != null ? target.Item.DisplayName : null;
+            // The virtual cursor is only active while a menu is open, so during play the label sits above screen centre.
+            UnityEngine.UIElements.IPanel panel = _document.rootVisualElement.panel;
+            if (panel == null) return;
+            Vector2 anchor = RuntimePanelUtils.ScreenToPanel(panel, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
+            _pickupPrompt.Show(name, anchor);
+        }
+
+        private PickupPrompt CreatePickupPrompt()
+        {
+            VisualElement root = _document?.rootVisualElement;
+            return root == null ? null : new PickupPrompt(root);
+        }
+
+        // The player's pickup component, found once. Null until the player's services are registered.
+        private IPlayerPickup _pickupPlayer
+        {
+            get
+            {
+                if (_cachedPickup == null) _cachedPickup = ServiceLocator.TryGet<IPlayerPickup>();
+                return _cachedPickup;
+            }
+        }
+
+        private IPlayerPickup _cachedPickup;
+        private PickupPrompt _pickupPrompt;
 
         public bool IsPanelOpen(string panelName)
         {

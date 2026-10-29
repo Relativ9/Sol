@@ -1,0 +1,29 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="MenuTheme.uss" />
+
+    <!-- Player Stats tab. A single scrolling column. Attributes, vitals and derived stats are sections, and the derived
+         sections flow in a wrapping row, so each category sits on the same line as the one before it when there is room. -->
+    <ui:VisualElement class="stats-root">
+    <ui:ScrollView name="stats-scroll" mode="Vertical" class="stats-scroll">
+
+        <ui:Label name="stats-points" class="menu-label" />
+
+        <ui:VisualElement class="menu-section">
+            <ui:Label text="Attributes" class="menu-header" />
+            <ui:VisualElement name="stats-attributes" class="stats-attribute-list" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="menu-section">
+            <ui:Label text="Vitals" class="menu-header" />
+            <ui:VisualElement name="stats-vitals" class="stats-vitals-row" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="menu-section">
+            <ui:Label text="Derived stats" class="menu-header" />
+            <!-- Category sections are added here by PlayerStatsTab, in a wrapping row. -->
+            <ui:VisualElement name="stats-derived" class="stats-derived-flow" />
+        </ui:VisualElement>
+
+    </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

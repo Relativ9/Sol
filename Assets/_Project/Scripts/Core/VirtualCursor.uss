@@ -2,6 +2,5 @@
     position: absolute;
     width: 32px;
     height: 32px;
-    background-image: resource("UI/cursor");
     display: flex;
 }

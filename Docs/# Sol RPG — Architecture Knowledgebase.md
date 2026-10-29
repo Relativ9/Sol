@@ -77,17 +77,30 @@ The roadmap from scratch to a working character pipeline, in the order it was bu
 - Player Stats tab (attributes with spend/refund, vitals, derived stats in a 4-column grid)
 - Menu hides the HUD while open
 
-### Phase 7 — Damage & Status (IN PROGRESS: first pass built, not yet fully playtested)
-- Damage is typed data: `DamageSO` builds `DamageInfo`, delivered via `IDamageReceiver`
+### Phase 7 — Damage & Status (DONE)
+- Damage is typed data: `DamageSO` (content only) builds `DamageInfo`, delivered via `IDamageReceiver`
 - One shared `DamageTypeTableSO` behind `IDamageTypeTable`, registered by `GameInitializer`, validated at startup
-- `DamageCalculator`: deflection, type mitigation, environmental resistance, stagger/bleed chances
+- Mitigation is one curve for every type, physical included: `100 / (100 + effective)`, with effective = resistance − penetration, capped at 400 points (80% maximum)
+- Status effects are data: `IStatusEffect`, `StatusEffectSO` base, and per-variant subclasses (`StaggerEffectSO`, `BleedEffectSO`)
+- `StatusController` (on the player) owns active statuses, locks, knockback and ticks; it only knows `IStatusEffect`
+- Stagger: 0.5 s movement and combat lock, 15 energy cost, knockback from the attacker's root, attack cancel
+- Status procs: attacker base chance from doctrine + attacker bonus, minus receiver resistance, floored at 5%, rolled once
 - `IChanceRoller`: the single source of randomness for every chance
 - Bleed: timed, stackable status, one tick per second of scaled time (pauses with the game)
 - Targets: `TargetHealth` with a world-space health bar; `Projectile` and `ProjectileTurret`
 - Combat log visibility: player damage always, other damage within 20 m (`LogRules`)
-- Sword swings use a `DamageSO` when assigned (animation-driven, untested until animations exist)
+- Player weapon hits use a `DamageSO` through `AttackEventHandler`, with the player's penetration
 
-### Phase 8 — Inventory & Equipment (PLANNED)
+### Phase 8 — Inventory & Equipment (IN PROGRESS: playtested for drag, persistence, slots and icons; weapon combat not yet built)
+- Equipment: `IEquipmentService` writes `Equipment` modifiers keyed by item instance ID; unequip removes them
+- Equipped armour feeds `RigidWeight`, `FlexWeight` and the plate, flex and cloth piece counts (resistance and deflection derive from these)
+- Inventory: `IInventoryService` owns a grid sized from `InventorySpace`; items have a footprint and rotation
+- Equipment silhouette: `EquipmentSilhouette` defines each slot's position and size in one place
+- Drag and drop: press to pick up, the nearest fitting spot (or matching slot) highlights, release commits exactly what was highlighted
+- Rotation: R during a drag only, 90 degrees clockwise, looping; saved with the item
+- Save: `InventorySaveEntry[]` (cells and rotation) and `EquippedSaveEntry[]` (slot name, item ID, instance ID); restored through `ItemRegistry`
+- `ItemMover` is the only class that moves items between grid and slots, so both sides stay all-or-nothing
+- Test harness: `InventoryDebugTools` fills the grid from a test-item list on play
 - Equipment sets `RigidWeight` / `FlexWeight` and pushes `Equipment` modifiers
 - `sourceId = itemInstanceId`; on unequip, `RemoveModifiersFromSource`
 
@@ -120,29 +133,34 @@ This is a status board for re-orientation after a break.
 | DerivedStatResolver | ✅ Complete | Verified in Unity: spend and persistence |
 | K menu + tab system | ✅ Complete | Talents and Player Stats tabs |
 | Virtual cursor owns OS cursor | ✅ Complete | Camera cannot unlock it while active |
-| Damage pipeline | 🟡 First pass | Built, compiled and tested on dummy and player; needs fuller playtest |
-| Stagger / bleed | 🟡 First pass | Bleed verified in play; stagger logs only (no interrupt yet) |
-| Target health + world bar | 🟡 First pass | Verified on the dummy |
-| Projectiles | 🟡 First pass | Verified against the player and the target |
-| Sword damage (DamageSO) | ⬜ Blocked | Needs attack animations |
-| Weight stats → armour | ⬜ Not started | Equipment sets the values |
+| Damage pipeline | ✅ Complete | Mitigation curve, penetration, caps, doctrine chances |
+| Stagger / bleed | ✅ Complete | Verified in play: energy cost, lock, knockback, bleed ticks |
+| Status controller | ✅ Complete | `StatusController` with `IStatusEffect` and effect SO variants |
+| Target health + world bar | ✅ Complete | Verified on the dummy |
+| Projectiles | ✅ Complete | Verified against the player and the target |
+| Player weapon hits (DamageSO) | 🟡 Partial | Wired and penetration applied; needs attack animations to test swings |
+| Weight and plate/flex/cloth counts | 🟡 Partial | Derived into resistances and deflection; equipment does not set them yet |
+| Armour stat screen | ✅ Complete | Caps shown as `x/400`; piece counts shown as `n/5` |
 | Enemy stats (ActorStatSO) | ⬜ Not started | Targets have zero mitigation until then |
-| Inventory / equipment | ⬜ Not started | |
+| Inventory / equipment | 🟡 First draft | Grid, silhouette, drag and drop, rotation, save and restore. Not playtested yet |
+| Equipment and inventory save | 🟡 First draft | Restored through `ItemRegistry` on load; re-equip rebuilds stat modifiers |
+| Weapons equipping | ⬜ Not started | `EquipmentService` only takes armour today |
+| Two-handed rule | ⬜ Not started | Equipping a two-hander must fail if the offhand is occupied |
 | Main Menu scene | ⬜ Not started | |
 
 ---
 
 ## 4. Active Task — What We Are Doing Right Now
 
-**Current focus: Phase 7, the damage and status pass, now committed.** The first pass is built and has been tested on the training dummy, the projectile turret, and the player.
+**Current focus: Phase 8, Inventory & Equipment (first draft built).** Phase 7 is closed. Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play. The Phase 8 draft needs a playtest before it's treated as done.
 
-Open items on this phase, in rough order:
-1. Stagger has no effect yet beyond the log line (interrupt and energy drain are not built).
-2. Clamp of tree scrolling and counter-rotated labels are done; no further talent-screen work is open.
-3. Sword damage through `AttackEventHandler`'s `DamageSO` path needs attack animations to test.
-4. Weight stats are wired but stay at zero until equipment exists.
+Open items, carried into Phase 8:
+1. Equipment must set the plate, flex and cloth counts and the armour weights, through `Equipment` modifiers (see §17).
+2. Player weapon swings need attack animations to be fully tested.
+3. The temporary harnesses come out once animations exist. The swing path itself stays.
+4. Set bonuses for full plate, flex and cloth are defined in the armour doc but not built. They belong with the set system.
 
-Everything above the damage pass is complete. Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
+Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
 
 ---
 
@@ -353,8 +371,36 @@ public enum StatTypeEnum
     SonicResistance, SoulResistance, ReflectChance,
     EnvironmentalResistance, ParryAndBlockTime, ClueRange,
     CharmChance, KnowledgeChance, DeceptionChance, IntimidationChance,
+
+    // Appended (saved enums store integers, so these go only at the end)
+    CovertMovement, Tinker,
+    StaggerResistance, BleedResistance,
+    RigidWeight, FlexWeight,            // kg. Feed resistance through DerivedStatResolver.
+    StaggerChance, BleedChance,         // Attacker side: added points to the doctrine chance.
+    Penetration,                        // Attacker side: cancels resistance, capped at 400.
+    PlateCount, FlexCount, ClothCount,  // Piece counts, 0-5. Plate also feeds deflection.
 }
 ```
+
+### Units convention (applies to every chance and resistance stat)
+- **Points.** A value of `5` means 5%. Designers write whole numbers. Nothing in data is a fraction.
+- **Chance stats** (`DeflectionChance`, `CritChance`, `StaggerResistance`, `BleedResistance`, `StaggerChance`, `BleedChance`) are converted to a fraction once, at the point of use (`÷ 100`).
+- **Mitigation stats** (resistances, `ArmorValue`, `Penetration`) feed the curve in points.
+- **Multiplier and weight stats** keep their own units (`CritMultiplier` as `x`, `RigidWeight` in kg).
+
+### Mitigation curve and caps
+- One curve for every damage type, physical included: `final = amount × 100 / (100 + effective)`.
+- `effective = clamp(resistance − penetration, 0, 400)`. The cap is 400 points, which is 80% mitigation at most.
+- `StatCaps` (in `Core/Stats`) lists the capped stats: penetration and every resistance (magic, elemental, environmental, stagger, bleed). The cap is applied to the stacked total in `StatsService`, so every source is capped together.
+- `ArmorValue` is not capped for display. It is a plain number on the curve.
+- The stats screen shows capped stats as `value/400` and piece counts as `n/5`.
+
+### Derived armour values (via `DerivedStatResolver`)
+- `StaggerResistance = RigidWeight × 0.2` points per kg (plate).
+- `BleedResistance = FlexWeight × 0.333` points per kg (flex).
+- `DeflectionChance = min(PlateCount, 5) × 3` points. Deflection comes only from plate. No attribute feeds it.
+- `Penetration` gets `Finesse × 1.5` points per point above default, plus equipment and talent sources.
+- Every derived value is an `Equipment` modifier with a reserved `sourceId`, replaced on every recalculation.
 
 ### ModifierType
 ```csharp
@@ -730,6 +776,38 @@ public interface ISaveManager
 After step 6: GetStat() for all stats must be identical to pre-save values.
 ```
 
+### Item Instance IDs (verified)
+Every item in the game has an `ItemInstanceId`: one identity that follows it from the world into the inventory, and back if it is dropped. It is not always a world pickup. Quest rewards and container loot are data objects with an instance ID created when they are generated, and they only become a `WorldItem` when dropped.
+
+- **Placed items** (in a scene or prefab) hold the ID in `WorldItem._itemInstanceId`. It is generated automatically the first time the scene is saved (`ItemInstanceIdAssigner`), and regenerated only when it is empty or duplicated. A set, unique ID is never changed, since it is saved.
+- **Pickup** stores the item in the inventory under the world item's own ID. The world record and the inventory therefore refer to the same item.
+- **Drop** keeps the item's inventory ID, so picking it up again matches the same record.
+- **Despawn on load:** `WorldItem.ApplySavedState` destroys any placed item whose ID is in `pickedUpItemInstanceIds` or is already in the saved inventory or equipment. It runs after inventory and equipment are restored.
+- **Save keys:** `pickedUpItemInstanceIds` (placed items taken) and `droppedItemInstances` (dropped items lying in the world, with position). Stored items and worn items already carry the same ID in `inventory` and `equipped`.
+- **Existing saves** written before the `ItemInstanceId` rename hold random inventory IDs that cannot match their placed copies. Delete the save to test cleanly.
+
+### Material Tiers (verified)
+`MaterialTier` (Iron, Steel, HardenedSteel, Titanium, AethericWeave) sits on `ItemDataSO`. `Efficiency()` gives 0.8, 1.0, 1.2, 1.6 and 2.0 (armour design doc section 5). Armour value per piece is `Weight x Type Multiplier x MaterialEfficiency`, where plate is 4, flex 3 and cloth 1.
+
+### Equipment Slots (verified)
+Slots: Head, Face, Neck, Torso, Hands, Legs, Feet, RingLeft, RingRight, MainHand, Offhand and Gauntlets. The silhouette is 5 cells wide and 9 high. Equipment slots are drawn at 3x the grid cell. Any item that lists a slot in `validSlots` can go in it. Equipped items can be dragged to another empty slot they fit (`ItemMover.TryMoveBetweenSlots`, all or nothing).
+
+Weapons and off-hand items are `EquipmentDataSO` and equip through the same service as armour. Only `WearableDataSO` contributes to the armour totals.
+
+### Stat Modifiers Authored on Items (verified)
+`EquipmentDataSO.statModifiers` is a list of `StatModifierDefinition` with `statName` typed as `StatTypeEnum`, so designers choose from a dropdown. Each applies as an `Equipment` modifier keyed by the item's instance ID. `ModifierCategory` on these entries is stored but ignored; every one is applied as Equipment.
+
+### Armour Totals (verified)
+Armour weight and piece counts are written as **base** values, because `DerivedStatResolver` reads base values, not modifiers. `ArmorValue` is the character's starting base plus the equipped armour total, so repeated equips do not compound. Plate drives stagger resistance and deflection; flex drives bleed resistance.
+
+### Inventory UI (verified)
+- **Selection:** pressing an item selects it. Selection and hover are separate.
+- **Hover:** the details panel shows the hovered item, or the selection when nothing is hovered.
+- **Details panel:** name, material and efficiency, weight, footprint, slots it fits, armour value and description.
+- **Tooltip:** hovering an item shows "X to discard" above it.
+- **Discard:** the X key removes the focused item. The tab reads X directly through `Keyboard.current` each frame, the same way it reads R for rotation. The `Discard` action in `PlayerInput` is defined but not yet routed, so it does nothing on its own. It is destroyed, not returned to the world.
+- **Icons:** cropped to fill the cell (`ScaleAndCrop`), not stretched. Items with no icon show their name.
+
 ---
 
 ## 13. Physics & Movement System
@@ -840,6 +918,18 @@ Every effect on one node uses `sourceId = nodeId`. Two effects on the same node 
 ### 🟡 WATCH-OUT: Prerequisite logic is ANY, not ALL
 `PrerequisitesMet()` passes if any one prerequisite is allocated. Confirm with the design bible before final tree content; change to ALL if required.
 
+### 🟡 WATCH-OUT: Chance and resistance values are points, not fractions
+A value of `5` means 5%. Entering `0.05` in the Inspector gives 0.05%, and a value like `50` gives 50%, which makes a proc certain. `StatusChanceCalculator` logs a warning and clamps any chance that ends outside 0 to 1, so a typo is visible. Convert at the point of use only, never in data or in two places.
+
+### 🟡 WATCH-OUT: Nested ScrollViews do not scroll
+A `ScrollView` inside another `ScrollView` takes the outer's height and gets clipped by `overflow: hidden`. Pin the outer container with absolute edges and make only one list scroll.
+
+### 🟡 WATCH-OUT: The virtual cursor sends no UI Toolkit wheel events
+A `ScrollView` never receives wheel input from the virtual cursor. Any scrolling tab must poll `IVirtualCursor.GetScrollNotches()` each frame, from a MonoBehaviour that owns the tab, and only while that tab is selected. The talent tree and the stats tab both do this. Wheel up scrolls up.
+
+### 🟡 WATCH-OUT: Grouping by consecutive rows splits a group
+Grouping a list by the previous row's name creates a second column when another group sits between two rows. Group by name with a dictionary.
+
 ### 🟡 WATCH-OUT: Saved enums are stored as integers
 Confirmed by test: `JsonUtility` writes enums as their integer value (`"statType":4`). New members go only at the end of `StatTypeEnum`, `DamageType` and `DamageTag`. Never insert, reorder, or rename.
 
@@ -893,7 +983,21 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 | Damage | `IChanceRoller`: single source of randomness | ✅ |
 | Damage | `StatusChanceCalculator` (subtractive armour rules, 5% floor) | ✅ |
 | Damage | Bleed: stackable, one tick per second of scaled time | ✅ |
-| Damage | Stagger: logged (no interrupt yet) | 🟡 |
+| Damage | Stagger: 0.5 s lock, 15 energy, knockback from attacker root, attack cancel | ✅ |
+| Damage | `IStatusEffect` + `StatusEffectSO` base, `StaggerEffectSO`, `BleedEffectSO` | ✅ |
+| Damage | `StatusController` owns statuses, locks, knockback, ticks | ✅ |
+| Damage | Mitigation curve `100 / (100 + x)` for every type, with penetration | ✅ |
+| Damage | `StatCaps`: 400-point cap on penetration and resistances, applied to the stacked total | ✅ |
+| Damage | `StatusAttack`: attacker base chance and effect carried on `DamageInfo` | ✅ |
+| Damage | Doctrine chances (stagger 20 + 15 blunt, bleed 25 + 20 blade/piercing) | ✅ |
+| Damage | Status resistance derived from weight; receiver rule subtractive, 5% floor | ✅ |
+| Damage | Enemy stat block: `ActorStatSO` + `ActorStats` + `EnemyStats` | ✅ |
+| Damage | Knockback from attacker root, not weapon; hit point kept for effects | ✅ |
+| Damage | Deflection derived from plate count (3 per piece, max 5) | ✅ |
+| Stats | `Penetration` from Finesse (1.5 per point), plus equipment and talents | ✅ |
+| Stats | Plate, flex and cloth piece counts, shown as `n/5` | ✅ |
+| Items | `ItemDataSO.Weight` serialised for every item | ✅ |
+| UI | Player Stats: scrollable derived list, one Defense column, `x/400` caps | ✅ |
 | Combat | `LogRules`: player always shown, others within 20 m | ✅ |
 | Combat | `TargetHealth` + `WorldHealthBar` on the training dummy | ✅ |
 | Combat | `Projectile` (adds its own kinematic Rigidbody) and `ProjectileTurret` | ✅ |
@@ -905,18 +1009,27 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 ## 17. Remaining Roadmap & Next Steps
 
 ### Where we are
-The character pipeline is working end to end: attributes, talents, derived stats, saves, the menu, and the first damage pass. What's left before the pipeline is complete is **Phase 7 (damage and status, finishing)** and **Phase 8 (equipment)**. Phases 9 and 10 come after.
+The character pipeline is working end to end, and Phase 7 (damage and status) is closed. Phase 8 (inventory and equipment) has a first draft built and needs a playtest. What's left after it is Phases 9 and 10.
 
-### Phase 7 — Damage & Status: open items
-1. **Stagger effect.** Currently a log line only. Needs the interrupt (0.5 s), the knockback, and the 15 energy drain, per the armour doc.
-2. **Sword damage.** `AttackEventHandler` already uses a `DamageSO` when one is assigned. It needs attack animations to test, so it's blocked until they exist.
-3. **Remove temporary harnesses** once animations exist. The swing path itself stays.
+### Phase 7 — Damage & Status: closed
+- Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play.
+- The remaining Phase 7 work is carried into Phase 8. Player weapon swings need attack animations to be fully tested.
+- Temporary harnesses are removed once animations exist. The swing path itself stays.
 
-### Phase 8 — Inventory & Equipment
-1. Equipment sets `RigidWeight` and `FlexWeight` from the worn pieces, which already feed the stagger and bleed maths.
-2. Armour value, type multiplier and material efficiency feed `ArmorValue`, per the armour doc.
-3. `ModifierCategory.Equipment` modifiers, with `sourceId = itemInstanceId`, and removal on unequip.
-4. Inventory grid and item packing, per the design doc.
+### Phase 8 — Inventory & Equipment (first draft built)
+
+**Built:** equipment stats (8a) and the grid inventory (8b), including save and restore.
+
+**Still open, in rough order:**
+1. **Playtest the draft.** Drag and drop, rotation, the silhouette, and a save-and-reload round trip (equip, store, rotate, reload, check the same items, cells, rotations and stats).
+2. **Dragging equipped items back to the grid.** Currently only the Unequip button does this.
+3. **Weapons equipping**, and the two-handed rule (equipping a two-hander fails if the offhand is occupied).
+4. **Carried weight to `CarryCapacity`.** The grid already sums stored weight; equipped weight needs adding to the total, and encumbrance is a later polish.
+5. **Armour value and material efficiency** feeding `ArmorValue`, per the armour doc. Not wired yet.
+6. **Real pickups** replace the debug harness, and each item asset must be added to `GameInitializer.itemDatabase` or it cannot be restored.
+
+**Not in Phase 8**
+- Set bonuses for full plate, flex and cloth (dodge, spell power, mobility). They need the set system and the talent layer.
 
 ### After Phase 8
 - **Phase 9: Enemies & Actors.** `ActorStatSO` for NPCs, so targets get real mitigation. Enemy AI is a separate task.

@@ -138,7 +138,7 @@ namespace Sol
         
             if (_debugDraw)
             {
-                Debug.Log($"GroundChecker: Hit ground: {hitGround}, Distance: {_distanceToGround}");
+                // Debug.Log($"GroundChecker: Hit ground: {hitGround}, Distance: {_distanceToGround}");
             }
         
             // Update grounded state with buffer time

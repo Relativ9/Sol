@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="MenuTheme.uss" />
+
+    <!-- Inventory tab. A header row, then three columns side by side: equipment slots, the stored grid, and the details panel.
+         Every column is a flex child, so the panel's size and padding decide the bounds, and each column takes its share. -->
+    <ui:VisualElement name="inventory-root" class="inventory-root">
+
+        <ui:VisualElement class="inventory-header">
+            <ui:Label name="inventory-weight" class="menu-label" />
+            <ui:Label name="inventory-status" class="inventory-status" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="inventory-body">
+
+            <ui:VisualElement name="inventory-slots-column" class="inventory-slots-column">
+                <ui:Label text="Equipped" class="menu-header" />
+                <ui:ScrollView name="inventory-slots" mode="Vertical" class="inventory-slot-scroll">
+                    <ui:VisualElement name="inventory-slot-board" class="inventory-slot-board" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="inventory-grid-column" class="inventory-grid-column">
+                <ui:Label text="Stored" class="menu-header" />
+                <ui:ScrollView name="inventory-grid-scroll" mode="VerticalAndHorizontal" class="inventory-grid-scroll">
+                    <ui:VisualElement name="inventory-grid" class="inventory-grid" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+            <!-- The details column carries a header of its own, so its panel starts exactly where the Equipped and Stored
+                 underlines end. Its title is the same height as theirs, so the panel sits on the same line. -->
+            <ui:VisualElement name="inventory-details-column" class="inventory-details-column">
+                <ui:Label text="Details" class="menu-header" />
+                <ui:VisualElement name="inventory-details" class="inventory-details" />
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

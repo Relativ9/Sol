@@ -26,11 +26,15 @@ namespace Sol
         private AnimationEventDispatcher _eventDispatcher;
         private AudioSource _audioSource;
         private ICombatController _combatController;
+        private IStatusController _status;
+        private IStatsService _stats;
         
         public void Initialize(IPlayerContext context)
         {
             _context = context;
             _combatController = context.GetService<ICombatController>();
+            _status = context.GetService<IStatusController>();
+            _stats = ServiceLocator.TryGet<IStatsService>();
             
             // Find the animator component
             Animator animator = GetComponentInChildren<Animator>();
@@ -102,6 +106,9 @@ namespace Sol
         
         private void OnAttackImpact()
         {
+            // A staggered player cannot land a hit: the swing is cancelled, not resolved.
+            if (_status != null && _status.IsCombatLocked) return;
+
             // Spawn slash effect
             if (_slashEffectPrefab != null && _slashEffectSpawn != null)
             {
@@ -145,7 +152,10 @@ namespace Sol
                     if (receiver != null)
                     {
                         // The player's own swing: always logged, regardless of distance.
-                        receiver.ReceiveHit(_attackDamageSO.Build(gameObject.name, 0f, true, transform.position));
+                        // Origin is the player's root; the hit point is the swing's contact with the target.
+                        // Penetration comes from the player's stats (Finesse, equipment, talents). Points, as with every stat.
+                        receiver.ReceiveHit(_attackDamageSO.Build(gameObject.name, 0f, true, transform.root.position,
+                            hit.transform.position, penetration: _stats != null ? _stats.GetStat(StatTypeEnum.Penetration) : 0f));
                         if (_impactSound != null && _audioSource != null) _audioSource.PlayOneShot(_impactSound);
                         hitSomething = true;
                         if (_debugAttacks) Debug.Log($"Hit {hit.name} with {_attackDamageSO.name}");

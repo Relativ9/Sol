@@ -5,14 +5,26 @@ using UnityEngine.UIElements;
 namespace Sol
 {
     /// <summary>
-    /// Player Stats tab of the K menu. Shows the six attributes (with spend/refund), derived stats,
-    /// vitals and point pools. Reads through services; the only writes are the attribute buttons,
-    /// which call the existing ProgressionService methods.
+    /// Player Stats tab of the K menu. The layout comes from PlayerStatsTab.uxml and MenuTheme.uss. This class fills the
+    /// named containers: attributes with spend and refund, vitals, and derived stats as flowing category sections.
+    /// Only Attribute and Derived stats are shown (see StatRoles). Tuning stats never appear here.
+    /// The only writes are the attribute buttons, which call ProgressionService.
     /// </summary>
     public class PlayerStatsTab : IMenuTab
     {
         public string Title => "Player Stats";
         public string ContentName => "stats-tab-content";
+
+        // The layout is a serialized asset, handed in by UIManager (the same way its other templates are supplied).
+        private readonly VisualTreeAsset _layout;
+
+        public PlayerStatsTab(VisualTreeAsset layout)
+        {
+            _layout = layout;
+        }
+
+        // Cap for the armour set count. A full set is 5 pieces, shown as n/5 and never as a stat cap.
+        private const int MaxArmourPieces = 5;
 
         private static readonly StatTypeEnum[] Attributes =
         {
@@ -31,7 +43,8 @@ namespace Sol
             { StatTypeEnum.Willpower, "Maximum energy, global cooldown, spell cost, charm" }
         };
 
-        // Derived stats shown on the tab, grouped. Format: F = number with N decimals, P = percent, X = multiplier.
+        // Derived stats shown on the tab, grouped in order. Format: F = decimals, P = percent, X = multiplier, N = n/5.
+        // Every row is filtered through StatRoles.IsVisible before it is shown, so a Tuning stat can never appear here.
         private static readonly (string Group, StatTypeEnum Stat, string Label, string Format)[] DerivedRows =
         {
             ("Offense", StatTypeEnum.MeleeDamage, "Melee damage", "F1"),
@@ -40,10 +53,21 @@ namespace Sol
             ("Offense", StatTypeEnum.SpellPower, "Spell power", "F1"),
             ("Offense", StatTypeEnum.CritChance, "Crit chance", "P"),
             ("Offense", StatTypeEnum.CritMultiplier, "Crit multiplier", "X"),
+            ("Offense", StatTypeEnum.Penetration, "Penetration", "F1"),
             ("Defense", StatTypeEnum.ArmorValue, "Armor", "F0"),
             ("Defense", StatTypeEnum.DeflectionChance, "Deflection", "P"),
             ("Defense", StatTypeEnum.MagicResistance, "Magic resistance", "F0"),
+            ("Defense", StatTypeEnum.FireResistance, "Fire resistance", "F0"),
+            ("Defense", StatTypeEnum.IceResistance, "Ice resistance", "F0"),
+            ("Defense", StatTypeEnum.VoidResistance, "Void resistance", "F0"),
+            ("Defense", StatTypeEnum.SonicResistance, "Sonic resistance", "F0"),
+            ("Defense", StatTypeEnum.SoulResistance, "Soul resistance", "F0"),
+            ("Defense", StatTypeEnum.StaggerResistance, "Stagger resistance", "P"),
+            ("Defense", StatTypeEnum.BleedResistance, "Bleed resistance", "P"),
             ("Defense", StatTypeEnum.EnvironmentalResistance, "Environmental resistance", "F0"),
+            ("Armour set", StatTypeEnum.PlateCount, "Plate pieces", "N"),
+            ("Armour set", StatTypeEnum.FlexCount, "Flex pieces", "N"),
+            ("Armour set", StatTypeEnum.ClothCount, "Cloth pieces", "N"),
             ("Survival", StatTypeEnum.MaxHealth, "Max health", "F0"),
             ("Survival", StatTypeEnum.HealthRegen, "Health regen /s", "F1"),
             ("Survival", StatTypeEnum.MaxEnergy, "Max energy", "F0"),
@@ -51,8 +75,6 @@ namespace Sol
             ("Utility", StatTypeEnum.CarryCapacity, "Carry capacity (kg)", "F0"),
             ("Utility", StatTypeEnum.InventorySpace, "Inventory space", "F0"),
             ("Utility", StatTypeEnum.LootMultiplier, "Loot multiplier", "X"),
-            ("Movement", StatTypeEnum.MoveSpeed, "Move speed", "F2"),
-            ("Movement", StatTypeEnum.RunMultiplier, "Run multiplier", "X"),
         };
 
         private IStatsService _stats;
@@ -60,7 +82,14 @@ namespace Sol
         private IPlayerVitals _vitals;
 
         private Label _pointsLabel;
-        private Label _vitalsLabel;
+        private VisualElement _vitalsRow;
+        private readonly Label[] _vitalLabels = new Label[4];
+        private ScrollView _scroll;
+        private VisualElement _attributeList;
+        private VisualElement _derivedFlow;
+
+        private const float ScrollStepPixels = 40f;
+
         private readonly Dictionary<StatTypeEnum, Label> _attributeValueLabels = new();
         private readonly Dictionary<StatTypeEnum, Label> _attributeAllocLabels = new();
         private readonly Dictionary<StatTypeEnum, Button> _spendButtons = new();
@@ -74,101 +103,99 @@ namespace Sol
             _progression = ServiceLocator.Get<IProgressionService>();
             _vitals = ServiceLocator.TryGet<IPlayerVitals>();
 
-            var scroll = new ScrollView { name = "stats-scroll" };
-            scroll.style.flexGrow = 1f;
-            content.Add(scroll);
-
-            _pointsLabel = Text("", 18, new Color(1f, 0.85f, 0.5f), bold: true);
-            scroll.Add(_pointsLabel);
-
-            scroll.Add(Header("Attributes"));
-            foreach (StatTypeEnum attr in Attributes)
-                scroll.Add(BuildAttributeRow(attr));
-
-            scroll.Add(Header("Vitals"));
-            _vitalsLabel = Text("", 14, new Color(0.92f, 0.92f, 0.92f));
-            scroll.Add(_vitalsLabel);
-
-            // Derived stats get their own scroll area that fills the remaining height,
-            // so a long list scrolls without moving the attributes and vitals above it.
-            scroll.Add(Header("Derived Stats"));
-            var derivedScroll = new ScrollView(ScrollViewMode.Vertical) { name = "derived-scroll" };
-            derivedScroll.style.flexGrow = 1f;
-            derivedScroll.style.minHeight = 120f;
-            scroll.Add(derivedScroll);
-            BuildDerivedGrid(derivedScroll);
-        }
-
-        // Lays derived stats out in columns, grouped by category. Columns wrap to use the panel width.
-        private void BuildDerivedGrid(VisualElement parent)
-        {
-            var grid = new VisualElement { name = "derived-grid" };
-            grid.style.flexDirection = FlexDirection.Row;
-            grid.style.flexWrap = Wrap.Wrap;
-            grid.style.width = Length.Percent(100f);
-            parent.Add(grid);
-
-            string currentGroup = null;
-            VisualElement group = null;
-            foreach (var row in DerivedRows)
+            // The layout is authored in UXML. Cloning it fills this tab's content element, and the stylesheet applies.
+            if (_layout == null)
             {
-                if (row.Group != currentGroup)
-                {
-                    currentGroup = row.Group;
-                    group = new VisualElement();
-                    // Four columns across; the grid wraps extra groups onto new rows below.
-                    group.style.width = Length.Percent(100f / DerivedColumnsPerRow);
-                    group.style.marginRight = 24f;
-                    group.style.marginBottom = 12f;
-                    group.Add(Text(currentGroup, 14, new Color(0.8f, 0.6f, 0.3f), bold: true));
-                    grid.Add(group);
-                }
-
-                var label = Text("", 13, new Color(0.9f, 0.9f, 0.9f));
-                _derivedLabels.Add((row.Stat, label));
-                group.Add(WithLabelPrefix(row.Label, label));
+                Debug.LogError($"[{nameof(PlayerStatsTab)}] No layout assigned on UIManager. The stats tab cannot be built.");
+                return;
             }
-        }
+            _layout.CloneTree(content);
 
-        // Number of category columns per row. Extra categories wrap onto new rows, so the list grows downward.
-        private const int DerivedColumnsPerRow = 4;
+            _scroll = content.Q<ScrollView>("stats-scroll");
+            _pointsLabel = content.Q<Label>("stats-points");
+            _vitalsRow = content.Q("stats-vitals");
+            for (int i = 0; i < _vitalLabels.Length; i++)
+            {
+                _vitalLabels[i] = Text("", "stats-vital");
+                _vitalsRow.Add(_vitalLabels[i]);
+            }
+            _attributeList = content.Q("stats-attributes");
+            _derivedFlow = content.Q("stats-derived");
+
+            BuildAttributes();
+            BuildDerived();
+        }
 
         public void OnShow() => Refresh();
 
         public void OnHide() { }
 
+        // The virtual cursor sends no wheel events, so UIManager forwards its scroll notches here while this tab is open.
+        // Inverted to match the talent tree: wheel up moves the list up, wheel down moves it down.
+        public void ScrollDerivedBy(int notches)
+        {
+            if (_scroll == null || notches == 0) return;
+            Vector2 offset = _scroll.scrollOffset;
+            offset.y = Mathf.Max(0f, offset.y - notches * ScrollStepPixels);
+            _scroll.scrollOffset = offset;
+        }
 
+        private void BuildAttributes()
+        {
+            foreach (StatTypeEnum attr in Attributes)
+            {
+                // Only Attribute-role stats may be spent on. Checked here, so a role change is caught in this tab.
+                if (!StatRoles.IsAttribute(attr)) continue;
+                _attributeList.Add(BuildAttributeRow(attr));
+            }
+        }
+
+        // Each derived category is its own section in a wrapping row, so Defense sits beside Offense and Armour set
+        // beside Defense while there is room, and wraps only when the panel runs out of width.
+        private void BuildDerived()
+        {
+            var sections = new Dictionary<string, VisualElement>();
+            foreach (var row in DerivedRows)
+            {
+                if (!StatRoles.IsVisible(row.Stat)) continue;
+
+                if (!sections.TryGetValue(row.Group, out VisualElement section))
+                {
+                    section = new VisualElement();
+                    section.AddToClassList("stats-category");
+                    section.Add(Text(row.Group, "stats-category-title"));
+                    sections[row.Group] = section;
+                    _derivedFlow.Add(section);
+                }
+
+                var value = Text("", "menu-value");
+                _derivedLabels.Add((row.Stat, value));
+                section.Add(StatRow(row.Label, value));
+            }
+        }
 
         private VisualElement BuildAttributeRow(StatTypeEnum attr)
         {
             var row = new VisualElement();
-            row.style.flexDirection = FlexDirection.Row;
-            row.style.alignItems = Align.Center;
-            row.style.marginBottom = 6f;
+            row.AddToClassList("stats-attribute-row");
 
-            var name = Text(attr.ToString(), 15, new Color(1f, 0.9f, 0.6f), bold: true);
-            name.style.width = 110f;
+            var name = Text(attr.ToString(), "stats-attribute-name");
 
-            var value = Text("", 15, new Color(0.95f, 0.95f, 0.95f));
-            value.style.width = 60f;
+            var value = Text("", "stats-attribute-value");
             _attributeValueLabels[attr] = value;
 
-            var alloc = Text("", 12, new Color(0.7f, 0.7f, 0.7f));
-            alloc.style.width = 110f;
-            _attributeAllocLabels[attr] = alloc;
-
             var minus = new Button(() => OnRefund(attr)) { text = "-" };
-            StyleSmallButton(minus);
+            minus.AddToClassList("menu-button");
             _refundButtons[attr] = minus;
 
             var plus = new Button(() => OnSpend(attr)) { text = "+" };
-            StyleSmallButton(plus);
+            plus.AddToClassList("menu-button");
             _spendButtons[attr] = plus;
 
-            var desc = Text(AttributeDescriptions[attr], 12, new Color(0.7f, 0.7f, 0.7f));
-            desc.style.flexGrow = 1f;
-            desc.style.marginLeft = 10f;
-            desc.style.whiteSpace = WhiteSpace.Normal;
+            var alloc = Text("", "stats-attribute-alloc");
+            _attributeAllocLabels[attr] = alloc;
+
+            var desc = Text(AttributeDescriptions[attr], "stats-attribute-desc");
 
             row.Add(name);
             row.Add(value);
@@ -179,24 +206,19 @@ namespace Sol
             return row;
         }
 
+        // Attribute changes are state. They are written by the next quicksave or autosave, not here.
         private void OnSpend(StatTypeEnum attr)
         {
             _progression.TrySpendAttributePoint(attr);
-            RefreshAndSave();
+            Refresh();
         }
 
         private void OnRefund(StatTypeEnum attr)
         {
             _progression.TryRefundAttributePoint(attr);
-            RefreshAndSave();
-        }
-
-        // Attribute changes must persist, like talent changes do.
-        private void RefreshAndSave()
-        {
-            ServiceLocator.Get<ISaveManager>()?.RequestLazySave();
             Refresh();
         }
+
         private void Refresh()
         {
             if (_stats == null || _progression == null) return;
@@ -207,6 +229,7 @@ namespace Sol
 
             foreach (StatTypeEnum attr in Attributes)
             {
+                if (!_attributeValueLabels.ContainsKey(attr)) continue;
                 int allocated = _progression.GetAllocatedAttributePoints(attr);
                 _attributeValueLabels[attr].text = _stats.GetBaseStat(attr).ToString("0");
                 _attributeAllocLabels[attr].text = $"+{allocated} allocated";
@@ -214,16 +237,24 @@ namespace Sol
                 _refundButtons[attr].SetEnabled(allocated > 0);
             }
 
-            _vitalsLabel.text = _vitals != null && _vitals.IsInitialized
-                ? $"Health {_vitals.CurrentHealth:0} / {_vitals.MaxHealth:0}    " +
-                  $"Energy {_vitals.CurrentEnergy:0} / {_vitals.MaxEnergy:0}    " +
-                  $"Hunger {_vitals.CurrentHunger:0} / {_vitals.MaxHunger:0}    " +
-                  $"Thirst {_vitals.CurrentThirst:0} / {_vitals.MaxThirst:0}"
-                : "Vitals not initialized.";
+            if (_vitals != null && _vitals.IsInitialized)
+            {
+                _vitalLabels[0].text = $"Health {_vitals.CurrentHealth:0} / {_vitals.MaxHealth:0}";
+                _vitalLabels[1].text = $"Energy {_vitals.CurrentEnergy:0} / {_vitals.MaxEnergy:0}";
+                _vitalLabels[2].text = $"Hunger {_vitals.CurrentHunger:0} / {_vitals.MaxHunger:0}";
+                _vitalLabels[3].text = $"Thirst {_vitals.CurrentThirst:0} / {_vitals.MaxThirst:0}";
+            }
+            else
+            {
+                _vitalLabels[0].text = "Vitals not initialized.";
+                for (int i = 1; i < _vitalLabels.Length; i++) _vitalLabels[i].text = "";
+            }
 
             foreach (var entry in _derivedLabels)
             {
-                entry.Value.text = FormatDerived(entry.Stat, _stats.GetStat(entry.Stat));
+                entry.Value.text = StatCaps.IsCapped(entry.Stat)
+                    ? $"{_stats.GetStat(entry.Stat):0}/{StatCaps.ResistanceCap:0}"
+                    : FormatDerived(entry.Stat, _stats.GetStat(entry.Stat));
             }
         }
 
@@ -234,7 +265,8 @@ namespace Sol
                 if (row.Stat != stat) continue;
                 return row.Format switch
                 {
-                    "P" => $"{value * 100f:0.0}%",
+                    "P" => $"{value:0.0}%", // Chance stats are stored as points (5 = 5%), so no scaling here.
+                    "N" => $"{value:0}/{MaxArmourPieces}",
                     "X" => $"{value:0.00}x",
                     "F0" => $"{value:0}",
                     "F1" => $"{value:0.0}",
@@ -245,45 +277,24 @@ namespace Sol
             return $"{value:0.##}";
         }
 
-        // Label + value shown side by side in one row.
-        private static VisualElement WithLabelPrefix(string text, Label value)
+        // A label and its value, side by side. The label takes the free width, and the value keeps its size.
+        private static VisualElement StatRow(string text, Label value)
         {
             var row = new VisualElement();
-            row.style.flexDirection = FlexDirection.Row;
-            row.style.marginBottom = 2f;
-
-            var name = Text(text, 13, new Color(0.75f, 0.75f, 0.75f));
-            name.style.width = 230f;
+            row.AddToClassList("stats-row");
+            var name = Text(text, "menu-label");
+            name.style.flexGrow = 1f;
+            name.style.flexShrink = 1f;
             row.Add(name);
             row.Add(value);
             return row;
         }
 
-        private static Label Header(string text)
-        {
-            var label = Text(text, 16, new Color(0.85f, 0.7f, 0.4f), bold: true);
-            label.style.marginTop = 14f;
-            label.style.marginBottom = 6f;
-            return label;
-        }
-
-        private static Label Text(string text, int size, Color color, bool bold = false)
+        private static Label Text(string text, string className)
         {
             var label = new Label(text);
-            label.style.fontSize = size;
-            label.style.color = color;
-            if (bold) label.style.unityFontStyleAndWeight = FontStyle.Bold;
+            label.AddToClassList(className);
             return label;
-        }
-
-        private static void StyleSmallButton(Button button)
-        {
-            button.style.width = 26f;
-            button.style.height = 24f;
-            button.style.marginLeft = 4f;
-            button.style.marginRight = 4f;
         }
     }
 }
-
-

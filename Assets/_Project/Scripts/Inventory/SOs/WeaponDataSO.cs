@@ -8,6 +8,10 @@ namespace Sol
         [Header("Weapon Properties")] 
         public WeaponType weaponType;
         public WeaponSize weaponSize;
+
+        // Stored footprint comes from the weapon's type and size, not from the asset's footprint fields.
+        public override int GridWidth { get { EquipmentSilhouette.WeaponFootprint(weaponType, weaponSize, out int w, out _); return w; } }
+        public override int GridHeight { get { EquipmentSilhouette.WeaponFootprint(weaponType, weaponSize, out _, out int h); return h; } }
         private float _maxDurability = 100f;
         
         [Header("Visuals")]

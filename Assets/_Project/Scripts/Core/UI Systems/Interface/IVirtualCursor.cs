@@ -31,6 +31,9 @@ namespace Sol
         /// </summary>
         void SetEnabled(bool enabled);
 
+        /// <summary>The cursor's current position in active panel space. Read every frame by drag interactions.</summary>
+        Vector2 PanelPosition { get; }
+
         /// <summary>
         /// True while the virtual cursor is active and owns the OS cursor (hidden and locked).
         /// Other systems (e.g. the camera) must not change Cursor.visible/lockState while this is true.

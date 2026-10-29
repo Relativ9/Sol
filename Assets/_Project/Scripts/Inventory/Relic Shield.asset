@@ -12,10 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2919c2bdd3b99127bafe16a6ea4dec77, type: 3}
   m_Name: Relic Shield
   m_EditorClassIdentifier: Sol_Scripts::Sol.OffhandDataSO
-  validSlots: 0b000000
+  _itemId: relic-shield
+  _displayName: Relic Sheild
+  _description: A shild made from a relic
+  _itemCategory: 1
+  _weight: 6
+  _maxStackSize: 1
+  _rotatable: 1
+  _materialTier: 1
+  _icon: {fileID: 21300000, guid: 6dbc5b215dd38a83384d9422fe80e623, type: 3}
+  _worldPrefab: {fileID: 2653889707063351348, guid: cb31a63feffcb8c71835f36867519519, type: 3}
+  validSlots:
+  - 11
   statModifiers:
-  - statName: 
+  - statName: ArmorValue
     modifierType: 0
-    modifierCategory: 1
-    value: 0
+    value: 30
   _offhandType: 0

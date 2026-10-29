@@ -10,9 +10,6 @@ namespace Sol
     public class PlayerVitals : MonoBehaviour, IPlayerVitals, IDamageReceiver
     {
 
-        // Timed statuses (bleed). Owned here because they remove this component's health.
-        private readonly StatusService _statuses = new StatusService();
-
         [Header("Hunger / Thirst (placeholder tuning)")]
         [Tooltip("Units lost per second. 0 = no decay until the design is finalised.")]
         [SerializeField] private float _hungerDecayPerSecond = 0f;
@@ -53,7 +50,6 @@ namespace Sol
             float dt = Time.deltaTime;
             _health += _stats.GetStat(StatTypeEnum.HealthRegen) * dt;
             _energy += _stats.GetStat(StatTypeEnum.EnergyRegen) * dt;
-            TickStatuses();
             _hunger -= _hungerDecayPerSecond * dt;
             _thirst -= _thirstDecayPerSecond * dt;
             Clamp();
@@ -102,7 +98,7 @@ namespace Sol
 
         /// <summary>
         /// Runs a hit through the calculator, applies the health loss, and reports the result to the combat log.
-        /// Status rolls (stagger, bleed) are returned to the caller via the log for now; the status system comes next.
+        /// Status procs (stagger, bleed) are handed to StatusController after the damage is applied.
         /// </summary>
         public void ReceiveHit(DamageInfo info)
         {
@@ -131,30 +127,8 @@ namespace Sol
             ServiceLocator.TryGet<ICombatLog>()?.Add(
                 $"{info.SourceId}: -{result.FinalAmount:0.#} Health ({info.Type})", CombatLogKind.Damage);
 
-            // Status procs. Each is a chance through the shared roller, so every roll is in one place.
-            if (roller.Roll(result.StaggerChance))
-            {
-                ServiceLocator.TryGet<ICombatLog>()?.Add($"{info.SourceId}: Staggered!", CombatLogKind.Warning);
-            }
-
-            if (roller.Roll(result.BleedChance))
-            {
-                _statuses.ApplyBleed(info.SourceId, info.Amount);
-                ServiceLocator.TryGet<ICombatLog>()?.Add($"{info.SourceId}: Bleeding", CombatLogKind.Warning);
-            }
-        }
-
-        // Advances statuses by scaled game time, so ticks stop while the game is paused (timeScale 0).
-        // Each bleed tick is logged as it fires, so the log and the health loss come from the same event.
-        void TickStatuses()
-        {
-            float lost = _statuses.Advance(Time.deltaTime);
-            if (lost > 0f)
-            {
-                _health -= lost;
-                Clamp();
-                ServiceLocator.TryGet<ICombatLog>()?.Add($"Bleeding: -{lost:0.#} Health", CombatLogKind.Damage);
-            }
+            // Status procs go to StatusController, which owns the status rules and their effect assets.
+            ServiceLocator.TryGet<IStatusController>()?.RollHitProcs(result, info, roller);
         }
 
         // Only logs when a source is given, so per-frame drains and regen don't flood the log.

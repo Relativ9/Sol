@@ -49,8 +49,10 @@ namespace Sol
         public float insightToSpellPower = 1f;
         [Tooltip("Insight → CritMultiplier, per point above default. Design cap is 3.")]
         public float insightToCritMultiplier = 0.02f;
-        [Tooltip("Focus → CritChance, per point above default.")]
-        public float focusToCritChance = 0.005f;
+        [Tooltip("Focus → CritChance, in points per point above default (0.5 = +0.5%).")]
+        public float focusToCritChance = 0.5f;
+        [Tooltip("Finesse → Penetration, in points per point above default. Capped with resistance at 400 points.")]
+        public float finesseToPenetration = 1.5f;
         [Tooltip("Vigor → MaxHealth, per point above default.")]
         public float vigorToMaxHealth = 5f;
         [Tooltip("Willpower → MaxEnergy, per point above default.")]
@@ -64,7 +66,7 @@ namespace Sol
         public float baseArmorValue = 0f; //Armor lowers all physical damage and with the right talents give extra bonus protection (deflect, reflect etc).
         public float baseCritChance = 0f; //Crit chance is the chance you have to crit on an armored weakpoint (such as a head with a helmet) with projectiles or direct melee damage AOE and indirect target spells have a 0.5 x critChance modifier, unarmored weakpoints are guaranteed crits. 
         public float baseCritMultiplier = 1.2f; //Very difficult to increase, capped at 3f.
-        public float baseDeflectionChance = 0f; //chance you have of deflecting incoming physical attacks (including physical projectiles), is only increased by plate armor.
+        public float baseDeflectionChance = 0f; //points (5 = 5%). Chance to deflect incoming physical attacks, including physical projectiles. Only plate armour increases it.
         public float baseMagicResistance = 0f;
         public float baseFireResistance = 0f;
         public float baseIceResistance = 0f;
@@ -85,6 +87,9 @@ namespace Sol
         public float baseBleedResistance = 0f; //from flexible armour (flex weight x 0.333%)
         public float baseRigidWeight = 0f; //kg of plate equipped. Set by equipment later.
         public float baseFlexWeight = 0f; //kg of flexible armour equipped. Set by equipment later.
+        public float basePlateCount = 0f; //plate pieces equipped (0-5). Each adds 3 points of deflection. Set by equipment later.
+        public float baseFlexCount = 0f; //flex pieces equipped (0-5). Counts toward a full set. Set by equipment later.
+        public float baseClothCount = 0f; //cloth pieces equipped (0-5). Counts toward a full set. Set by equipment later.
 
         // [Header("Camera")]
         // public float baseFOV = 60f;

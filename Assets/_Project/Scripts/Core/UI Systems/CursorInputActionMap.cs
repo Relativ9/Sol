@@ -93,6 +93,17 @@ public class CursorInputActionMap : ICursorInput, IDisposable
         return _primaryAction?.WasPressedThisFrame() ?? false;
     }
 
+    // Held state, for drag. True every frame the primary button stays down.
+    public bool IsPrimaryHeld()
+    {
+        return _primaryAction?.IsPressed() ?? false;
+    }
+
+    public bool WasPrimaryReleased()
+    {
+        return _primaryAction?.WasReleasedThisFrame() ?? false;
+    }
+
     public bool WasSecondaryPressed()
     {
         return _secondaryAction?.WasPressedThisFrame() ?? false;

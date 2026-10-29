@@ -36,9 +36,9 @@ namespace Sol
     public enum OffhandType
     {
         Shield,
+        TowerShield,
         Focus,
-        Torch,
-        SecondaryWeapon
+        Torch
     }
 
     public enum EquipmentSlot
@@ -54,7 +54,9 @@ namespace Sol
         RingLeft,
         RingRight,
         MainHand,
-        Offhand
+        Offhand,
+        // Gauntlets replaced the old left-arm slot. Equipment is saved by slot name, so a renamed slot is skipped on load.
+        Gauntlets
     }
 
     public enum SlotStatus
@@ -68,6 +70,33 @@ namespace Sol
     {
         Armor,
         Accessory
+    }
+
+    // Material tiers from the armour design doc (section 5). Appended, so existing values keep their numbers.
+    public enum MaterialTier
+    {
+        Iron,
+        Steel,
+        HardenedSteel,
+        Titanium,
+        AethericWeave
+    }
+
+    public static class MaterialTierExtensions
+    {
+        // Material efficiency multiplies armour value: Weight x Type Multiplier x Efficiency.
+        public static float Efficiency(this MaterialTier tier)
+        {
+            return tier switch
+            {
+                MaterialTier.Iron => 0.8f,
+                MaterialTier.Steel => 1.0f,
+                MaterialTier.HardenedSteel => 1.2f,
+                MaterialTier.Titanium => 1.6f,
+                MaterialTier.AethericWeave => 2.0f,
+                _ => 1.0f,
+            };
+        }
     }
 
 }

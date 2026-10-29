@@ -31,6 +31,9 @@ namespace Sol
         private IJumping _jumpingComponent;
         private IGravityController _gravityController;
         
+        [Tooltip("Layers the aim ray can hit. Leave Environment out so walls and terrain do not block aiming.")]
+        [SerializeField] private LayerMask _aimMask = ~0;
+
         [SerializeField] private Vector3 _debugVelDisplay;
         [SerializeField] private Vector2 _debugLookDisplay;
 
@@ -42,9 +45,18 @@ namespace Sol
             RegisterService<IGroundChecker>(GetComponent<GroundChecker>());
             RegisterService<IAnimationController>(GetComponent<PlayerAnimationController>());
             RegisterService<ICameraController>(GetComponent<CameraController>());
+
+            // Aiming: one shared ray for pickup, archery and spells. It reads the view from the camera when it casts, so it
+            // always follows the current camera. The Environment layer is left out of the aim mask, so walls do not stop aim.
+            // Registered globally, not only on the player, so pickup and combat reach it through ServiceLocator.
+            ServiceLocator.RegisterService<IAimService>(new AimService(
+                () => GetService<ICameraController>()?.GetCameraTransform(),
+                _aimMask));
             
             // Register Combet interfaces
             RegisterService<ICombatController>(GetComponent<CombatStateController>());
+            RegisterService<IStatusController>(GetComponent<StatusController>());
+            RegisterService<IPlayerPickup>(GetComponent<PlayerPickup>());
             //RegisterService<IWeaponService>(GetComponent<WeaponService>());
             
             AnimationEventDispatcher eventDispatcher = GetComponent<AnimationEventDispatcher>();
@@ -256,6 +268,28 @@ namespace Sol
                     Debug.LogWarning("Toggle weapon input received but no combat controller found!");
                 }
             }
+        }
+
+        // Pickup on the Interact input (E). Only acts when pressed, not held or released.
+        public void OnPickup(InputAction.CallbackContext context)
+        {
+            // Logs every phase, so the console shows whether E reaches the game at all.
+            Debug.Log($"[Pickup] Interact input: phase={context.phase}");
+
+            if (_timeManager.IsPaused)
+            {
+                Debug.Log("[Pickup] Ignored: game is paused.");
+                return;
+            }
+            if (!context.started) return;
+
+            IPlayerPickup pickup = GetService<IPlayerPickup>();
+            if (pickup == null)
+            {
+                Debug.LogWarning("[Pickup] No pickup component is registered. Add PlayerPickup to the player object.");
+                return;
+            }
+            pickup.TryPickUp();
         }
 
         public void OnAttack(InputAction.CallbackContext context)

@@ -86,6 +86,9 @@ namespace Sol
             _baseValues[StatTypeEnum.BleedResistance] = statSO.baseBleedResistance;
             _baseValues[StatTypeEnum.RigidWeight] = statSO.baseRigidWeight;
             _baseValues[StatTypeEnum.FlexWeight] = statSO.baseFlexWeight;
+            _baseValues[StatTypeEnum.PlateCount] = statSO.basePlateCount;
+            _baseValues[StatTypeEnum.FlexCount] = statSO.baseFlexCount;
+            _baseValues[StatTypeEnum.ClothCount] = statSO.baseClothCount;
 
             foreach (StatTypeEnum stat in System.Enum.GetValues(typeof(StatTypeEnum)))
             {
@@ -248,9 +251,31 @@ namespace Sol
             // return finalValue;
         }
 
-        public void SetBaseStat(StatTypeEnum statType, float baseValue)
+        // Progression is the only writer of attributes. Anything else is refused, so a wrong call is visible, not silent.
+        public void SetAttributeBase(StatTypeEnum statType, float value)
         {
-            _baseValues[statType] = baseValue;
+            if (!StatRoles.IsAttribute(statType))
+            {
+                Debug.LogError($"[{nameof(StatsService)}] {statType} is a {StatRoles.RoleOf(statType)} stat, not an attribute. It was not set.");
+                return;
+            }
+            WriteBase(statType, value);
+        }
+
+        // Equipment and the derivation are the only writers of derived totals.
+        public void SetDerivedBase(StatTypeEnum statType, float value)
+        {
+            if (!StatRoles.IsDerived(statType))
+            {
+                Debug.LogError($"[{nameof(StatsService)}] {statType} is a {StatRoles.RoleOf(statType)} stat, not a derived stat. It was not set.");
+                return;
+            }
+            WriteBase(statType, value);
+        }
+
+        private void WriteBase(StatTypeEnum statType, float value)
+        {
+            _baseValues[statType] = value;
             RefreshDerivedStat(statType);
         }
 
@@ -262,7 +287,8 @@ namespace Sol
                 .SelectMany(kvp => kvp.Value)
                 .Where(m => m.category != ModifierCategory.Base)
                 .ToArray();
-            float newValue = _calculator.Calculate(statType, baseValue, mods);
+            // Caps apply to the stacked total from every source, so the stats screen and every consumer see the same value.
+            float newValue = StatCaps.Apply(statType, _calculator.Calculate(statType, baseValue, mods));
             float oldValue = _derivedCache.GetValueOrDefault(statType, baseValue);
             if (!Mathf.Approximately(oldValue, newValue))
             {
@@ -394,8 +420,16 @@ namespace Sol
                 foreach (var categoryEntry in statEntry.Value)
                 {
                     List<StatModifier> modifiers = categoryEntry.Value;
-                    int removedCount = modifiers.RemoveAll(m => m.sourceId == sourceId);
-                    if (removedCount > 0) changed = true;
+
+                    // Collect IDs first, so the reverse lookup can be cleaned up. Without this, every
+                    // equip/unequip cycle leaves stale IDs behind in _modifierToStatLookup.
+                    for (int i = modifiers.Count - 1; i >= 0; i--)
+                    {
+                        if (modifiers[i].sourceId != sourceId) continue;
+                        _modifierToStatLookup.Remove(modifiers[i].id);
+                        modifiers.RemoveAt(i);
+                        changed = true;
+                    }
                 }
 
                 if (changed)

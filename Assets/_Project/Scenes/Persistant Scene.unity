@@ -1651,7 +1651,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 309453129}
-  - component: {fileID: 309453130}
   m_Layer: 0
   m_Name: CameraFollow
   m_TagString: Untagged
@@ -1674,18 +1673,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 955429714}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &309453130
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 309453128}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d581465821a61f67e9e73f61d088d68e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Sol_Scripts::CameraFollowObject
 --- !u!1 &315526942
 GameObject:
   m_ObjectHideFlags: 0
@@ -6828,7 +6815,7 @@ MonoBehaviour:
   _cursorSpeed: 800
   _mouseSensitivity: 1
   _cursorStyleSheet: {fileID: 7433441132597879392, guid: a0e414667bf519b6a9a1234c9952d07c, type: 3}
-  _cursorTexture: {fileID: 2800000, guid: b750c8e4c3b4eea1387f299a50387a92, type: 3}
+  _cursorTexture: {fileID: 2800000, guid: 1a4934f54e7b2007fbea2a8d60ec01df, type: 3}
 --- !u!1 &446571575
 GameObject:
   m_ObjectHideFlags: 0
@@ -9263,6 +9250,75 @@ RectTransform:
   m_AnchoredPosition: {x: 1000, y: -600}
   m_SizeDelta: {x: 400, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1001 &1386127818
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -15.033648
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3483043
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.7670486
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2632239119404050839, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5045876931230186202, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: m_Name
+      value: RustyArmor
+      objectReference: {fileID: 0}
+    - target: {fileID: 6679457856496439199, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: _glowColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6679457856496439199, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: _glowColor.g
+      value: 0.14877313
+      objectReference: {fileID: 0}
+    - target: {fileID: 6679457856496439199, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
+      propertyPath: _glowColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6468271d49f3b31adaba27e809a671c1, type: 3}
 --- !u!4 &1409547730 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2803318976240490062, guid: 35e2f2183fde55a44b6b1d497e9ebe8d, type: 3}
@@ -15602,6 +15658,8 @@ MonoBehaviour:
   _document: {fileID: 1561581042}
   _nodeTemplate: {fileID: 9197481963319205126, guid: 2b39f5ba8afc51833b5cd891c4d4d9e3, type: 3}
   _tooltipTemplate: {fileID: 9197481963319205126, guid: aa0e1ebaaba47e3bb98810e5a4fa13bc, type: 3}
+  _statsLayout: {fileID: 9197481963319205126, guid: 99a7dbb36da0e932e82aa80b82bd51bc, type: 3}
+  _inventoryLayout: {fileID: 9197481963319205126, guid: f4b731c46c4735d56af927407dec9307, type: 3}
   _onImmediateSaveRequest: {fileID: 11400000, guid: 8b10a637d48705140a1709cacdfc74a6, type: 2}
 --- !u!114 &1826156586
 MonoBehaviour:
@@ -15693,6 +15751,14 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 4098a8a0-c407-40e2-9918-e677e1f16ca0
     m_ActionName: 'UI/Right Click[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 7e746da6-3ffb-4d0c-8ab5-6bc93ea4d47c
+    m_ActionName: 'Main/Interact[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b5e2a8c1-6f3d-4a9e-8c7b-2d1f0e9a4b36
+    m_ActionName: 'Main/Discard[/Keyboard/x]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: UI
@@ -16073,6 +16139,12 @@ MonoBehaviour:
   playerStatSO: {fileID: 11400000, guid: 6b8b5e174e3a426469cb0623ee87618d, type: 2}
   playerProgressionSO: {fileID: 11400000, guid: 12a3532e67962fc32a80cf3889e877dd, type: 2}
   damageTypeTable: {fileID: 11400000, guid: 294c5f93bc510e9a087be9c0aac70be4, type: 2}
+  itemDatabase:
+  - {fileID: 11400000, guid: 3c8f457fb0a8c2faebb02c45a9114c33, type: 2}
+  - {fileID: 11400000, guid: bd498b9a38ab33883aafe05c279f92a5, type: 2}
+  - {fileID: 11400000, guid: fe43b2a6f3f072a1eb0f811078592ce1, type: 2}
+  - {fileID: 11400000, guid: b18cc801b94d161eab323a1f460476d3, type: 2}
+  - {fileID: 11400000, guid: f0a9fd7c1bcf8a94b96b6ce405fefa02, type: 2}
   _statsService: {fileID: 707063840}
   _forceNewGame: 0
 --- !u!4 &1962008662 stripped
@@ -16778,6 +16850,8 @@ GameObject:
   - component: {fileID: 2100861487}
   - component: {fileID: 2100861490}
   - component: {fileID: 2100861491}
+  - component: {fileID: 2100861492}
+  - component: {fileID: 2100861493}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -16855,6 +16929,9 @@ MonoBehaviour:
   _runInputDetected: 0
   _jumpInputDetected: 0
   _attackInputDetected: 0
+  _aimMask:
+    serializedVersion: 2
+    m_Bits: 127
   _debugVelDisplay: {x: 0, y: 0, z: 0}
   _debugLookDisplay: {x: 0, y: 0}
 --- !u!114 &2100861476
@@ -16994,6 +17071,38 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 4098a8a0-c407-40e2-9918-e677e1f16ca0
     m_ActionName: 'UI/Right Click[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2100861493}
+        m_TargetAssemblyTypeName: Sol.PlayerPickup, Sol_Scripts
+        m_MethodName: TryPickUp
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 7e746da6-3ffb-4d0c-8ab5-6bc93ea4d47c
+    m_ActionName: 'Main/Interact[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2100861468}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b5e2a8c1-6f3d-4a9e-8c7b-2d1f0e9a4b36
+    m_ActionName: 'Main/Discard[/Keyboard/x]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Main
@@ -17260,6 +17369,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Sol_Scripts::Sol.PlayerVitals
   _hungerDecayPerSecond: 0.2
   _thirstDecayPerSecond: 0.3
+--- !u!114 &2100861492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100861468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367c0d6778cf73655aedbc185ab66b0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.StatusController
+--- !u!114 &2100861493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100861468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb21e0a173de41486ba02df5cbf69ca0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Sol_Scripts::Sol.PlayerPickup
+  _reach: 1.6
+  _viewCone: 0.811
+  _debugPickup: 0
+  _dropOffset: {x: 0, y: 0.2, z: 0.6}
 --- !u!1 &2117785315
 GameObject:
   m_ObjectHideFlags: 0
@@ -17651,3 +17788,4 @@ SceneRoots:
   - {fileID: 578510089}
   - {fileID: 1564531028}
   - {fileID: 1808101699}
+  - {fileID: 1386127818}

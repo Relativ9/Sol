@@ -52,7 +52,7 @@ namespace Sol
 
             // Entry is a discrete hit. Staying inside re-hits once per cooldown, handled in Update.
             _nextHitTime = Time.time + _cooldown;
-            _receiverInside.ReceiveHit(_damage.Build(SourceId));
+            _receiverInside.ReceiveHit(BuildHit());
         }
 
         void OnTriggerExit(Collider other)
@@ -67,7 +67,27 @@ namespace Sol
             if (Time.time < _nextHitTime) return;
 
             _nextHitTime = Time.time + _cooldown;
-            _receiverInside.ReceiveHit(_damage.Build(SourceId));
+            _receiverInside.ReceiveHit(BuildHit());
+        }
+
+        // The enemy's stat sheet supplies the status chances, so enchantments and traits on the enemy apply here.
+        // Without an EnemyStats on this object or a parent, the DamageSO's own chances are used.
+        // Knockback origin is the enemy's ROOT (its body), not this trigger: the trigger is the weapon head,
+        // so using it made every push point toward the enemy's front. The hit point is the trigger.
+        private DamageInfo BuildHit()
+        {
+            Vector3 origin = EnemyStats.RootPosition(transform);
+            Vector3 hitPoint = transform.position;
+
+            // The enemy's stats only add bonuses. The base chance is doctrine, computed inside DamageSO.Build.
+            ActorStats stats = EnemyStats.Find(transform);
+            if (stats == null)
+                return _damage.Build(SourceId, 0f, false, origin, hitPoint);
+
+            return _damage.Build(SourceId, 0f, false, origin, hitPoint,
+                stats.GetStat(StatTypeEnum.StaggerChance),
+                stats.GetStat(StatTypeEnum.BleedChance),
+                stats.GetStat(StatTypeEnum.Penetration));
         }
     }
 }

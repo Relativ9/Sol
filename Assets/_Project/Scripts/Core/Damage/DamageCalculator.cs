@@ -9,12 +9,24 @@ namespace Sol
     /// </summary>
     public static class DamageCalculator
     {
-        // Diminishing-returns constant from the armour design doc. Damage can never be fully negated.
-        public const float MitigationConstant = 200f;
+        // Mitigation curve: final = amount * 100 / (100 + effective). Resistance and penetration are points
+        // (5 = 5%). Effective resistance is capped at 400 points, which is 80% mitigation at most, so no defence
+        // is ever pointless and no hit is ever fully negated. Penetration uses the same cap, so it can cancel
+        // at most 80% of a defence.
+        public const float CurveConstant = 100f;
+        public const float ResistanceCap = StatCaps.ResistanceCap;
 
-        public static float Mitigate(float amount, float resistance)
+        /// <summary>The resistance that actually applies after penetration, clamped to 0 through the cap.</summary>
+        public static float EffectiveResistance(float resistance, float penetration)
         {
-            return amount * MitigationConstant / (MitigationConstant + Mathf.Max(0f, resistance));
+            return Mathf.Clamp(resistance - penetration, 0f, ResistanceCap);
+        }
+
+        /// <summary>Applies the curve to an amount. One function for every damage type, physical included.</summary>
+        public static float Mitigate(float amount, float resistance, float penetration)
+        {
+            float effective = EffectiveResistance(resistance, penetration);
+            return amount * CurveConstant / (CurveConstant + effective);
         }
 
         /// <param name="info">The hit.</param>
@@ -25,30 +37,36 @@ namespace Sol
         {
             bool isPhysical = info.Type == DamageType.Physical;
 
-            // Deflection: physical only, rolled before any damage is applied.
-            if (isPhysical && roller.Roll(stat(StatTypeEnum.DeflectionChance)))
+            // Deflection: physical only, rolled before any damage is applied. Chance stats are percentage points.
+            if (isPhysical && roller.Roll(stat(StatTypeEnum.DeflectionChance) / 100f))
                 return new DamageResult(0f, deflected: true, unmappedType: false, 0f, 0f);
+
+            // Penetration is the attacker's, and it applies to every type, physical included.
+            float penetration = info.Penetration;
 
             float amount = info.Amount;
             bool unmapped = false;
             IDamageTypeTable table = ServiceLocator.TryGet<IDamageTypeTable>();
             if (table != null && table.TryGetResistanceStat(info.Type, out StatTypeEnum resistance))
-                amount = Mitigate(amount, stat(resistance));
+                amount = Mitigate(amount, stat(resistance), penetration);
             else
                 unmapped = true;
 
             if ((info.Tags & DamageTag.Environmental) != 0)
-                amount = Mitigate(amount, stat(StatTypeEnum.EnvironmentalResistance));
+                amount = Mitigate(amount, stat(StatTypeEnum.EnvironmentalResistance), penetration);
 
-            // Status chances use the doc's subtractive rules, driven by armour weight.
-            // Bleed also requires damage > 0 after mitigation (doc 4.2).
+            // Status chances: the attacker brings a base chance (info.Statuses), and the receiver's armour reduces it.
+            // Subtractive, with a floor, as in the doc. Bleed also requires damage > 0 after mitigation (doc 4.2).
+            // A hit with no status effect (StaggerEffect == null) cannot stagger, so its chance stays zero.
             float stagger = 0f;
-            if (isPhysical && (info.Tags & DamageTag.Blunt) != 0)
-                stagger = StatusChanceCalculator.Stagger(stat(StatTypeEnum.RigidWeight), blunt: true);
+            if (isPhysical && info.Statuses.StaggerEffect != null)
+                stagger = StatusChanceCalculator.ReduceByResistance(
+                    info.Statuses.StaggerBaseChance, stat(StatTypeEnum.StaggerResistance));
 
             float bleed = 0f;
-            if (isPhysical && amount > 0f && (info.Tags & (DamageTag.Blade | DamageTag.Piercing)) != 0)
-                bleed = StatusChanceCalculator.Bleed(stat(StatTypeEnum.FlexWeight), bladedOrPiercing: true);
+            if (isPhysical && amount > 0f && info.Statuses.BleedEffect != null)
+                bleed = StatusChanceCalculator.ReduceByResistance(
+                    info.Statuses.BleedBaseChance, stat(StatTypeEnum.BleedResistance));
 
             return new DamageResult(amount, deflected: false, unmapped, stagger, bleed);
         }

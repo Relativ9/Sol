@@ -59,11 +59,16 @@ namespace Sol
         public int GetTotalTalentPoints() => _totalTalentPoints;
         public int GetAvailableTalentPoints() => _totalTalentPoints - _spentTalentPoints;
 
+        public void RecalculateDerived()
+        {
+            _derivedResolver?.RecalculateAll();
+        }
+
         public void RebuildBaseStat(StatTypeEnum statType)
         {
             float defaultValue = GetDefaultAttributeValue(statType);
             int allocatedValue = _attributeAllocations.GetValueOrDefault(statType);
-            _statsService.SetBaseStat(statType, defaultValue + allocatedValue);
+            _statsService.SetAttributeBase(statType, defaultValue + allocatedValue);
             _derivedResolver?.RecalculateAll();
         }
 
@@ -176,7 +181,7 @@ namespace Sol
             foreach (StatTypeEnum coreStat in GetCoreAttributes())
             {
                 float defaultValue = GetDefaultAttributeValue(coreStat);
-                _statsService.SetBaseStat(coreStat, defaultValue);
+                _statsService.SetAttributeBase(coreStat, defaultValue);
             }
             _derivedResolver?.RecalculateAll();
             Debug.Log($"[{nameof(ProgressionService)}] Attributes reset. Available points: {GetAvailableAttributePoints()}/{_totalAttributePoints}");

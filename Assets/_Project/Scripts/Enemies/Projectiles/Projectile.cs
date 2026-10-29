@@ -33,10 +33,16 @@ namespace Sol
             _body.interpolation = RigidbodyInterpolation.Interpolate;
         }
 
-        public void Launch(DamageSO damage, string sourceId)
+        private ActorStats _shooterStats;
+        private Vector3 _shooterOrigin;
+
+        /// <param name="shooterOrigin">The shooter's root position. Knockback pushes away from this, not from the projectile.</param>
+        public void Launch(DamageSO damage, string sourceId, ActorStats shooterStats, Vector3 shooterOrigin)
         {
             _damage = damage;
             _sourceId = sourceId;
+            _shooterStats = shooterStats;
+            _shooterOrigin = shooterOrigin;
             Destroy(gameObject, _lifetime);
         }
 
@@ -58,7 +64,16 @@ namespace Sol
 
             bool fromPlayer = false; // Turrets and enemies are never the player.
             string source = string.IsNullOrEmpty(_sourceName) ? (_sourceId ?? name) : _sourceName;
-            receiver.ReceiveHit(_damage.Build(source, 0f, fromPlayer, transform.position));
+
+            // A projectile fired by an enemy adds that enemy's stat bonuses. A turret (no EnemyStats) has none.
+            ActorStats stats = _shooterStats;
+            Vector3 hitPoint = transform.position;
+            DamageInfo hit = stats == null
+                ? _damage.Build(source, 0f, fromPlayer, _shooterOrigin, hitPoint)
+                : _damage.Build(source, 0f, fromPlayer, _shooterOrigin, hitPoint,
+                    stats.GetStat(StatTypeEnum.StaggerChance), stats.GetStat(StatTypeEnum.BleedChance),
+                    stats.GetStat(StatTypeEnum.Penetration));
+            receiver.ReceiveHit(hit);
 
             _spent = true;
             Destroy(gameObject);

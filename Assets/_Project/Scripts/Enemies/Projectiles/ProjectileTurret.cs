@@ -29,7 +29,8 @@ namespace Sol
             _nextShotTime = Time.time + _interval;
             Transform origin = _muzzle != null ? _muzzle : transform;
             Projectile shot = Instantiate(_projectilePrefab, origin.position, origin.rotation);
-            shot.Launch(_damage, _sourceName);
+            // The shooter's origin is the turret's root, not the muzzle, so the push is away from the turret body.
+            shot.Launch(_damage, _sourceName, EnemyStats.Find(transform), EnemyStats.RootPosition(transform));
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Sol
 {
@@ -29,8 +30,57 @@ namespace Sol
             Apply(StatTypeEnum.Insight, StatTypeEnum.SpellPower, _defaults.insightToSpellPower, "Derived_Insight_SpellPower");
             Apply(StatTypeEnum.Insight, StatTypeEnum.CritMultiplier, _defaults.insightToCritMultiplier, "Derived_Insight_CritMultiplier");
             Apply(StatTypeEnum.Focus, StatTypeEnum.CritChance, _defaults.focusToCritChance, "Derived_Focus_CritChance");
+            Apply(StatTypeEnum.Finesse, StatTypeEnum.Penetration, _defaults.finesseToPenetration, "Derived_Finesse_Penetration");
+
+            // Status resistance comes from armour weight (doctrine, doc 4.1 and 4.2). Points per kg.
+            // Weight is the equipment input; resistance is the single value the receiver reads.
+            SetFromWeight(StatTypeEnum.RigidWeight, StatTypeEnum.StaggerResistance, RigidPointsPerKg, "Derived_RigidWeight_StaggerResistance");
+            SetFromWeight(StatTypeEnum.FlexWeight, StatTypeEnum.BleedResistance, FlexPointsPerKg, "Derived_FlexWeight_BleedResistance");
+
+            // Deflection comes only from plate armour: each equipped plate piece adds points, up to the set maximum.
+            SetDeflectionFromPlate();
             Apply(StatTypeEnum.Vigor, StatTypeEnum.MaxHealth, _defaults.vigorToMaxHealth, "Derived_Vigor_MaxHealth");
             Apply(StatTypeEnum.Willpower, StatTypeEnum.MaxEnergy, _defaults.willpowerToMaxEnergy, "Derived_Willpower_MaxEnergy");
+        }
+
+        // Doctrine: plate gives 0.2 points of stagger resistance per kg; flexible armour gives 0.333 points of bleed resistance per kg.
+        public const float RigidPointsPerKg = 0.2f;
+        public const float FlexPointsPerKg = 0.333f;
+
+        // Deflection doctrine: each plate piece gives 3 points, to a maximum of 5 pieces (15 points).
+        public const float DeflectionPerPlatePiece = 3f;
+        public const int MaxPlatePieces = 5;
+        private const string DeflectionSourceId = "Derived_Plate_Deflection";
+
+        private void SetDeflectionFromPlate()
+        {
+            _stats.RemoveModifiersFromSource(DeflectionSourceId);
+            int pieces = Mathf.Clamp(Mathf.RoundToInt(_stats.GetBaseStat(StatTypeEnum.PlateCount)), 0, MaxPlatePieces);
+            if (pieces <= 0) return;
+
+            _stats.ApplyOrReplaceModifier(new StatModifier(
+                type: ModifierType.FlatAdditive,
+                category: ModifierCategory.Equipment,
+                statType: StatTypeEnum.DeflectionChance,
+                value: pieces * DeflectionPerPlatePiece,
+                sourceId: DeflectionSourceId,
+                duration: -1f));
+        }
+
+        // Equipment weight becomes a derived resistance. Re-derived on every recalculation, so swapping armour replaces it.
+        private void SetFromWeight(StatTypeEnum weight, StatTypeEnum resistance, float pointsPerKg, string sourceId)
+        {
+            _stats.RemoveModifiersFromSource(sourceId);
+            float kg = _stats.GetBaseStat(weight);
+            if (kg <= 0f) return;
+
+            _stats.ApplyOrReplaceModifier(new StatModifier(
+                type: ModifierType.FlatAdditive,
+                category: ModifierCategory.Equipment,
+                statType: resistance,
+                value: kg * pointsPerKg,
+                sourceId: sourceId,
+                duration: -1f));
         }
 
         // Bonus is based on points above the default. GetBaseStat avoids feeding derived modifiers back into the attribute.

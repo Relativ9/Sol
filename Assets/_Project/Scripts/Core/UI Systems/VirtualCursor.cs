@@ -31,10 +31,12 @@ public class VirtualCursor : IVirtualCursor
     private VisualElement _lastHoveredElement; // For tracking enter/leave
     private bool _isEnabled = true;
     private StyleSheet _cursorStyleSheet;
+    private Texture2D _cursorTexture; // Set in the controller's Inspector. Null means the default box.
     
     // Constants
     private const float CURSOR_SIZE = 32f;
-    private const float CURSOR_OFFSET = 16f; // Half size to center on point
+    // The pointer is the image's top-left corner, so the image is placed with no offset.
+    private const float CURSOR_OFFSET = 0f;
     private const float MOUSE_DETECTION_THRESHOLD = 0.1f;
 
     /// <summary>
@@ -43,13 +45,14 @@ public class VirtualCursor : IVirtualCursor
     /// </summary>
     /// <param name="input">Input abstraction (Input System, touch, or mock)</param>
     /// <param name="speed">Movement speed in pixels per second</param>
-    public VirtualCursor(ICursorInput input, StyleSheet cursorStyleSheet, 
+    public VirtualCursor(ICursorInput input, StyleSheet cursorStyleSheet, Texture2D cursorTexture,
         float speed = 800f, float mouseSensitivity = 1f)
     {
         _input = input;
         _speed = speed;
         _mouseSensitivity = mouseSensitivity;
         _cursorStyleSheet = cursorStyleSheet;
+        _cursorTexture = cursorTexture;
         _currentPosition = new Vector2(Screen.width / 2f, Screen.height / 2f);
     }
 
@@ -159,7 +162,7 @@ public class VirtualCursor : IVirtualCursor
     {
         if (!_isEnabled || _activeDocument == null)
         {
-            Debug.Log($"[VirtualCursor] Skipping - enabled={_isEnabled} doc={_activeDocument?.name}");
+            // Debug.Log($"[VirtualCursor] Skipping - enabled={_isEnabled} doc={_activeDocument?.name}");
             return;
         }
 
@@ -180,11 +183,17 @@ public class VirtualCursor : IVirtualCursor
     /// </summary>
     private VisualElement CreateCursorVisual()
     {
-        return new VisualElement
+        var cursor = new VisualElement
         {
             name = "virtual-cursor",
             pickingMode = PickingMode.Ignore // Still set in code - it's behaviour not appearance
         };
+
+        // The image comes from the controller's Inspector field, applied here. Null keeps the stylesheet's default box.
+        if (_cursorTexture != null)
+            cursor.style.backgroundImage = new StyleBackground(_cursorTexture);
+
+        return cursor;
     }
 
     /// <summary>
@@ -239,6 +248,9 @@ public class VirtualCursor : IVirtualCursor
     /// Accounts for PanelSettings scale mode (Constant Pixel Size vs Scale With Screen Size).
     /// </summary>
     /// <returns>Position in panel space (0,0 at top-left of document)</returns>
+    /// <inheritdoc />
+    public Vector2 PanelPosition => GetPanelPosition();
+
     private Vector2 GetPanelPosition()
     {
         if (_activeDocument?.rootVisualElement?.panel == null)
@@ -288,19 +300,58 @@ public class VirtualCursor : IVirtualCursor
     private void HandleClicks()
     {
         Vector2 panelPos = GetPanelPosition();
-        VisualElement target = PickElement(_activeDocument.rootVisualElement, panelPos);
 
-        if (target == null) return;
-
-        // Primary action (typically Allocate Point in your talent tree)
+        // Primary button: a real press, hold and release, so drag can work.
+        // Press sends PointerDown to the element under the cursor and remembers it. While held, PointerMove
+        // goes to the press element every frame. Release sends PointerUp to the element under the cursor. UI
+        // Toolkit raises ClickEvent when the press and release land on the same element, so plain clicks work
+        // as before (talent tree, buttons).
         if (_input.WasPrimaryPressed())
         {
-            SynthesizeClick(target, panelPos, 0);
+            VisualElement pressTarget = PickElement(_activeDocument.rootVisualElement, panelPos);
+            if (pressTarget != null)
+            {
+                _pressedElement = pressTarget;
+                SendPointerEvent(pressTarget, panelPos, EventType.MouseDown, 0, isDown: true);
+            }
         }
-        // Secondary action (typically Refund Point)
-        else if (_input.WasSecondaryPressed())
+        else if (_pressedElement != null && _input.IsPrimaryHeld())
         {
-            SynthesizeClick(target, panelPos, 1);
+            SendPointerMove(_pressedElement, panelPos);
+        }
+        else if (_pressedElement != null && _input.WasPrimaryReleased())
+        {
+            VisualElement releaseTarget = PickElement(_activeDocument.rootVisualElement, panelPos) ?? _pressedElement;
+            SendPointerEvent(releaseTarget, panelPos, EventType.MouseUp, 0, isDown: false);
+            _pressedElement = null;
+        }
+
+        // Secondary action (typically Refund Point). Still a single click; drag is primary only.
+        if (_input.WasSecondaryPressed())
+        {
+            VisualElement target = PickElement(_activeDocument.rootVisualElement, panelPos);
+            if (target != null) SynthesizeClick(target, panelPos, 1);
+        }
+    }
+
+    // The element the primary button was pressed on. Drag events go here until release.
+    private VisualElement _pressedElement;
+
+    // Sends a pointer down or up event with the given button. Pooled events are disposed after sending.
+    private void SendPointerEvent(VisualElement target, Vector2 position, EventType type, int button, bool isDown)
+    {
+        var raw = new Event { type = type, mousePosition = position, button = button };
+        if (isDown)
+        {
+            var evt = PointerDownEvent.GetPooled(raw);
+            target.SendEvent(evt);
+            evt.Dispose();
+        }
+        else
+        {
+            var evt = PointerUpEvent.GetPooled(raw);
+            target.SendEvent(evt);
+            evt.Dispose();
         }
     }
 

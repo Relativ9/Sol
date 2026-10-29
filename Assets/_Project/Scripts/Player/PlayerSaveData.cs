@@ -7,6 +7,30 @@ namespace Sol
         public int allocatedPoints;
     }
 
+    // One worn item. instanceId is the stat-modifier source ID, so it must survive a save unchanged.
+    [System.Serializable]
+    public struct EquippedSaveEntry
+    {
+        public string slot;        // EquipmentSlot name, e.g. "Torso". A name, not an int, so reordering the enum cannot misplace items.
+        public string itemId;      // ItemDataSO.ItemId, resolved through ItemRegistry on load.
+        public string instanceId;
+    }
+
+    // One stored item on the grid.
+    [System.Serializable]
+    public struct InventorySaveEntry
+    {
+        public string itemId;
+        public string instanceId;
+        public int x;
+        public int y;
+        public bool rotated;
+        // The stack this individual belongs to. Its cell is held by the lead, so each individual names the lead. A lone
+        // item, or a save written before stacking, has no lead and stands alone. Each individual keeps its own
+        // instanceId, so a dagger is always one specific dagger.
+        public string stackLeadId;
+    }
+
     [System.Serializable]
     public class AttributeAllocationEntry
     {
@@ -44,20 +68,15 @@ namespace Sol
         public float currentHealth;
         public float currentEnergy;
 
-        // Equipment (instance IDs, resolved against ItemInstance registry on load)
-        public string equippedHeadId;
-        public string equippedFaceId;
-        public string equippedNeckId;
-        public string equippedTorsoId;
-        public string equippedHandsId;
-        public string equippedLegsId;
-        public string equippedFeetId;
-        public string equippedRingLeftId;
-        public string equippedRingRightId;
-        public string equippedMainHandId;
-        public string equippedOffhandId;
+        // Equipped items, one entry per occupied slot. Item identity is the item's ItemId, resolved on load through
+        // ItemRegistry. Stat effects are never saved: they are rebuilt by re-equipping on load.
+        public EquippedSaveEntry[] equipped = System.Array.Empty<EquippedSaveEntry>();
 
-        // Inventory contents (to be expanded when ItemInstance is designed)
-        public string[] inventoryInstanceIds;
+        // Stored items on the grid, with their cells. Layout is saved, because it cannot be rebuilt from a list.
+        public InventorySaveEntry[] inventory = System.Array.Empty<InventorySaveEntry>();
+
+        // World state: placed items already picked up (so they do not respawn), and dropped items lying in the world.
+        public string[] pickedUpItemInstanceIds = System.Array.Empty<string>();
+        public WorldDropEntry[] droppedItemInstances = System.Array.Empty<WorldDropEntry>();
     }
 }

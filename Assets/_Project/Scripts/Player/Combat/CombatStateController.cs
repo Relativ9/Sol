@@ -27,6 +27,7 @@ namespace Sol
         // Dependencies
         private IPlayerContext _context;
         private IAnimationController _animationController;
+        private IStatusController _status;
         //private IWeaponService _weaponService;
         private AnimationEventDispatcher _eventDispatcher;
         
@@ -48,6 +49,7 @@ namespace Sol
             _context = context;
             
             _animationController = context.GetService<IAnimationController>();
+            _status = context.GetService<IStatusController>();
             //_weaponService = context.GetService<IWeaponService>();
             
             if (_animationController == null)
@@ -207,6 +209,12 @@ public bool IsWeaponDrawn()
 
 public void HandleAttackInput()
 {
+    // A combat lock (e.g. stagger) blocks new attacks until it ends.
+    if (_status != null && _status.IsCombatLocked)
+    {
+        return;
+    }
+
     // Check if any animation is playing that would prevent attacking
     if (_isAttackAnimationPlaying || _isSheatheAnimationPlaying || _isUnsheatheAnimationPlaying)
     {
@@ -435,6 +443,21 @@ private void SetCombatState(CombatState newState)
     if (_debugCombat)
     {
         Debug.Log($"Combat state changed to: {newState}");
+    }
+}
+
+// Cancels an attack in progress (e.g. when staggered). Safe to call when not attacking.
+public void CancelAttack()
+{
+    if (!_isAttacking && !_isAttackAnimationPlaying) return;
+
+    _isAttacking = false;
+    _isAttackAnimationPlaying = false;
+    _context.SetStateValue("IsAttacking", false);
+
+    if (_debugCombat)
+    {
+        Debug.Log("Attack cancelled");
     }
 }
 

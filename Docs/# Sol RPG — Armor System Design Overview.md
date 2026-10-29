@@ -13,17 +13,29 @@ The armor system rejects traditional "Light vs. Heavy" binaries in favor of a *
 
 ---
 
-## 2. Damage Mitigation Formula
+All armor uses diminishing returns, so damage can never be fully negated and the most any defence can do is 80%.
 
-All armor uses diminishing returns to ensure damage can never be fully negated.
+**Step 1: Armor value.** Armor Value = Weight (kg) × Type Multiplier × Material Efficiency.
 
-Armor Value = Weight (kg) × Type Multiplier × Material Efficiency
+**Step 2: Effective resistance.** Effective Resistance = the resistance for the damage type, minus the attacker's Penetration, kept between 0 and 400 points.
 
-Damage Taken = Raw Damage × (200/200+Armor Value)
+**Step 3: Damage taken.** Damage Taken = Raw Damage × 100 / (100 + Effective Resistance).
 
-**Base Constant:** 200 (higher values = more granular scaling, prevents early-game invulnerability)
+**Points:** resistance and penetration are entered as points, where 5 = 5%. The same curve applies to every damage type, physical included.
+
+**Cap:** 400 points, which is 80% mitigation at most. Penetration is capped at the same 400, so it can cancel at most 80% of a defence.
+
+**Elemental and magic resistance:** elemental resistance (fire, ice, void, sonic, soul) is strong but only works against its own element. Magic resistance is weaker but general, and it counts for half its value toward each elemental type. Physical damage uses Armor Value alone.
+
+**Penetration:** an attacker stat that cancels resistance. It comes from Finesse, equipment and talents, and it is capped with resistance.
+
+**Display:** capped stats show as `value/400` on the stats screen. Armor value is a plain number.
 
 ---
+
+## 2. Damage Mitigation Formula
+
+
 
 ## 3. Armor Classifications
 
@@ -34,11 +46,11 @@ _Solid plates, scales, laminates, or solid chitin/ceramic matrices that resist d
 Like Flex, Plate armor can be heavy or light (though usually never quite as light as lightest flex armor), the main difference is the increased armor value (4x weight instead of 3x) and the ability to deflect hits. For this increased protection however, you have to sacrifice some mobility and the armor cannot be folded up to take less space in the inventory. In addition to this plate armor provides Stagger Resistence, instead of Bleed resistence which Flex armor provides.
 
 - **Type Multiplier:** 4× Weight
-- **Base Deflection:** 15% (roll before damage calculation; negates hit entirely)
+- **Deflection:** 3% per equipped plate piece, up to 15% for a full set of five (see section 6)
 - **Energy Penalty:** +20% sprint cost, +10% jump cost, +50% climbing cost
 - **Noise Penalty:** +40% enemy detection radius (loud clanking)
 - **Inventory:** Occupies full grid space; cannot be packed or compressed
-- **Status Mitigation:** Contributes to **Stagger Resistance** (Rigid Weight × 0.2%)
+- **Status Mitigation:** Contributes **Stagger Resistance** at 0.2 points per kg of plate (rigid weight x 0.2)
 - **Vulnerability:** Susceptible to **Bleed** (no native bleed resistance)
 
 ### 3.2 Flex (Flexible)
@@ -52,7 +64,7 @@ Flex armor can be heavy or light (though usually never quite as heavy as the hea
 - **Energy Penalty:** None;
 - **Noise Penalty:** +10% enemy detection radius (jingles/creaks)
 - **Inventory:** Can be **Packed** (rolled/folded), reducing grid space by 50%; requires 3 seconds to unpack
-- **Status Mitigation:** Contributes to **Bleed Resistance** (Flexible Weight × 0.333%)
+- **Status Mitigation:** Contributes **Bleed Resistance** at 0.333 points per kg of flex (flexible weight x 0.333)
 - **Vulnerability:** Susceptible to **Stagger** (no native stagger resistance)
 
 ### 3.3 Cloth (Unarmored Protection)
@@ -73,39 +85,54 @@ Mostly intended as aesthetic (base clothes) while it does technically provide so
 
 ## 4. Status Effects & Cross-Vulnerability
 
-**Critical Rule:** Both Plate and Flex wearers can suffer **both** Stagger and Bleed. Armor type determines which status you resist, not which you suffer.
+**Critical rule:** both plate and flex wearers can suffer **both** stagger and bleed. Armor type decides which one you resist, not which one you can suffer.
+
+**How a status chance is worked out, for every status:**
+
+1. The **attacker** sets a base chance. It comes from the weapon's damage type and tags (the doctrine below), plus the attacker's own bonuses from stats, enchantments and talents.
+2. The **receiver** subtracts its own status resistance from that chance. The resistance is points, so 5 points = 5 percentage points off.
+3. The result is never below **5%**.
+4. The status is rolled **once**, with the chance from step 3.
+
+A hit with no status effect (for example, a weapon with no stagger effect) can never cause that status, whatever the armor.
 
 ### 4.1 Stagger (Concussive Interrupt)
 
-**Effect:** 0.5-second interrupt/knockback; cancels actions; drains 15 Energy.
+**Effect:** 0.5-second movement and combat lock, a knockback away from the attacker, and a 15 energy drain. It cancels any attack in progress.
 
-**Proc Chance:**  
-Stagger %=max⁡(5%, [20%+Weapon Bonus]−(Rigid Weight (kg)×0.2%))Stagger %=max(5%, [20%+Weapon Bonus]−(Rigid Weight (kg)×0.2%))
+**Base chance:** 20%, plus **15%** if the hit is physical and blunt (blunt and polearm weapons). Total 35% against an unarmored target.
 
-- **Base:** 20%
-- **Weapon Bonus:** Blunt/Polearm weapons add +15% (Total 35% vs unarmored)
-- **Floor:** 5% (achieved at **75kg Rigid Weight**)
-- **Mitigation Source:** Only **Rigid Weight** (Plate pieces) count
+**Resistance:** plate armor gives **Stagger Resistance** at **0.2 points per kg** of plate. Flex and cloth give none.
 
-**Cross-Vulnerability:** Flex armor contributes **0kg** to Rigid Weight. A 60kg mail wearer has **20% stagger chance** against a mace (no reduction).
+**Example:** a 60 kg mail wearer has no stagger resistance, so a mace has its full 35% chance. A 75 kg plate wearer has 75 × 0.2 = 15 points of resistance, so the mace's 35% drops to 20%.
+
+**Cross-vulnerability:** flex armor adds nothing to stagger resistance, so a flex wearer is always fully exposed to stagger.
 
 ### 4.2 Bleed (Penetration Trauma)
 
-**Effect:** Damage-over-Time equal to **30% of Raw Weapon Damage** over 5 seconds (6% per second).
+**Effect:** damage over time equal to **30% of the raw weapon damage**, spread over 5 seconds, one tick per second. Each tick deals 6% of the raw damage. Bleed stacks per source, and a new bleed from the same source refreshes its duration.
 
-**Proc Condition:** Must deal damage > 0 after armor mitigation.
+**Proc condition:** the hit must deal more than zero damage after mitigation.
 
-**Proc Chance:**  
-Bleed %=max⁡(5%, [25%+Weapon Bonus]−(Flexible Weight (kg)×0.333%))Bleed %=max(5%, [25%+Weapon Bonus]−(Flexible Weight (kg)×0.333%))
+**Base chance:** 25%, plus **20%** if the hit is physical and blade or piercing. Total 45% against an unarmored target.
 
-- **Base:** 25%
-- **Weapon Bonus:** Bladed/Piercing weapons add +20% (Total 45% vs unarmored)
-- **Floor:** 5% (achieved at **60kg Flexible Weight**)
-- **Mitigation Source:** Only **Flexible Weight** (Flex pieces) count
+**Resistance:** flex armor gives **Bleed Resistance** at **0.333 points per kg** of flex. Plate and cloth give none.
 
-**Cross-Vulnerability:** Plate armor contributes **0kg** to Flexible Weight. A 75kg plate knight has **25% bleed chance** against a sword (no reduction).
+**Example:** a 60 kg flex wearer has 60 × 0.333 = 20 points of bleed resistance, so a sword's 45% drops to 25%.
+
+**Cross-vulnerability:** plate armor adds nothing to bleed resistance, so a plate wearer is always fully exposed to bleed.
+
+### 4.3 Doctrine summary
+
+| Status | Base | Weapon bonus | Resistance from | Points per kg | Floor |
+|---|---|---|---|---|---|
+| Stagger | 20% | +15% if physical blunt | Plate (rigid weight) | 0.2 | 5% |
+| Bleed | 25% | +20% if physical blade or piercing | Flex (flexible weight) | 0.333 | 5% |
+
+Both are subtractive, not multiplicative, and both are rolled once per hit.
 
 ---
+
 
 ## 5. Material Efficiency Tiers
 
@@ -125,15 +152,18 @@ Material efficiency represents technological/magical advancement, allowing endga
 
 ## 6. Deflection System (Plate Only)
 
-Rigid armor possesses a chance to completely negate an attack before damage calculation.
+Plate armor can deflect an attack entirely. A deflected hit does no damage and applies no status effects.
 
-- **Base Chance:** 15%
-- **Mechanic:** Roll on hit; if successful, damage = 0, no status effects applied
-- **Visual:** Metallic sparks, blade skidding, arrow ricochet
-- **Talent Scaling:** Can be increased to maximum 35%
-- **Limitation:** Does not prevent Stagger or Bleed on failed deflection rolls
+- **Source:** each equipped plate piece adds **3%** deflection. A full set of five plate pieces gives **15%**, the maximum before talents.
+- **Flex and cloth never deflect.** Only plate contributes.
+- **Derivation:** Deflection = number of plate pieces (up to 5) × 3%. It is derived from equipment. No attribute feeds it.
+- **Mechanic:** roll on each physical hit. If it succeeds, damage is zero and no status effect is applied.
+- **Visual:** metallic sparks, blade skidding, arrow ricochet.
+- **Talent scaling:** talents may raise deflection above 15%. The ceiling is not yet decided.
+- **Limitation:** a failed deflection roll does not stop stagger or bleed. Only a successful deflection does.
 
 ---
+
 
 ## 7. Weapon Counter-Synergy
 
@@ -190,7 +220,7 @@ _Professional adventurer gear, specialization emerges._
 |**Ceramic Plate**|6kg|Ceramic (1.4)|Plate (4×)|34|14.5%|18.8%|25%|
 |**Heavy Steel Plate**|22kg|Steel (1.0)|Plate (4×)|88|30.6%|15.6%|25%|
 
-*Mitigation vs 50 damage hit using 50×(200/(200+�����))50×(200/(200+Armor)).
+*Mitigation vs a 50 damage hit, using the curve in section 2 with no penetration: Damage taken = 50 x 100 / (100 + Armor Value). Shown in the table as a percentage reduction.
 
 ### 9.3 Late Era (Exotic Materials)
 

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d3e3328e54de85d8b39238f26c23e0, type: 3}
+  m_Name: Test Cloth Boots
+  m_EditorClassIdentifier: Sol_Scripts::Sol.WearableDataSO
+  _itemId: test-cloth-boots
+  _displayName: Test Cloth Boots
+  _description: Test item. Cloth feet.
+  _itemCategory: 2
+  _weight: 1
+  _maxStackSize: 1
+  _rotatable: 1
+  _icon: {fileID: 0}
+  validSlots:
+  - 7
+  statModifiers: []
+  _wearableCategory: 0
+  _armorType: 2
+  _maxDurability: 100
