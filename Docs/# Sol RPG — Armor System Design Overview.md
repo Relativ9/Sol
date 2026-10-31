@@ -17,6 +17,8 @@ All armor uses diminishing returns, so damage can never be fully negated and the
 
 **Step 1: Armor value.** Armor Value = Weight (kg) × Type Multiplier × Material Efficiency.
 
+**How it reaches the character.** Armor value is a contribution, not a base. `ArmorValue` keeps its starting value from the stat asset (the character's own armour, `baseArmorValue`, which is 0 by default). The equipped armour total is added on top through `SetSourceContribution` under `Equipment_ArmourTotals`, so it is recalculated from the equipped pieces on every change and nothing compounds. Weight and piece counts use the same path, and resistances read them through `GetStat`.
+
 **Step 2: Effective resistance.** Effective Resistance = the resistance for the damage type, minus the attacker's Penetration, kept between 0 and 400 points.
 
 **Step 3: Damage taken.** Damage Taken = Raw Damage × 100 / (100 + Effective Resistance).

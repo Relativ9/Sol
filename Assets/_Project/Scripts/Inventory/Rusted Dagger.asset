@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayName: Rusted Dagger
   _description: A rusted dagger, too bad tentis shots don't exist in Sol
   _itemCategory: 0
-  _weight: 1
+  _weight: 0.2
   _maxStackSize: 3
   _rotatable: 1
   _materialTier: 0

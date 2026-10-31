@@ -12,5 +12,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e3132df3646cd77e8ac7496fa4707ba, type: 3}
   m_Name: ItemTypeRegistry
   m_EditorClassIdentifier: Sol_Scripts::Sol.ItemTypeRegistry
-  _nextIndex: 1
-  _entries: []
+  _nextIndex: 12
+  _entries:
+  - itemId: relic-shield
+    itemIndex: 1
+    retired: 0
+  - itemId: rusted-dagger
+    itemIndex: 2
+    retired: 0
+  - itemId: rusty-armor
+    itemIndex: 3
+    retired: 0
+  - itemId: shiny-armor
+    itemIndex: 4
+    retired: 0
+  - itemId: shiny-dagger
+    itemIndex: 5
+    retired: 0
+  - itemId: test-cloth-boots
+    itemIndex: 6
+    retired: 0
+  - itemId: test-club
+    itemIndex: 7
+    retired: 0
+  - itemId: test-flex-sleeve
+    itemIndex: 8
+    retired: 0
+  - itemId: test-plate-helm
+    itemIndex: 9
+    retired: 0
+  - itemId: test-plate-tunic
+    itemIndex: 10
+    retired: 0
+  - itemId: test-two-handed-sword
+    itemIndex: 11
+    retired: 0

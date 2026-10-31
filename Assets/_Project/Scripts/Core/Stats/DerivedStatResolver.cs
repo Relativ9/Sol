@@ -24,8 +24,15 @@ namespace Sol
         {
             if (_stats == null || _defaults == null) return;
 
+            // Multipliers never fall below their design value. This is a minimum, not a base: totals above it are unchanged.
+            _stats.SetDerivedFloor(StatTypeEnum.CritMultiplier, _defaults.minCritMultiplier);
+            _stats.SetDerivedFloor(StatTypeEnum.RunMultiplier, _defaults.minRunMultiplier);
+            Apply(StatTypeEnum.Brawn, StatTypeEnum.JumpForce, _defaults.brawnToJumpForce, "Derived_Brawn_JumpForce");
+            ApplyFallDamageReduction();
+
             Apply(StatTypeEnum.Brawn, StatTypeEnum.MeleeDamage, _defaults.brawnToMeleeDamage, "Derived_Brawn_MeleeDamage");
             Apply(StatTypeEnum.Brawn, StatTypeEnum.CarryCapacity, _defaults.brawnToCarryCapacity, "Derived_Brawn_CarryCapacity");
+            Apply(StatTypeEnum.Brawn, StatTypeEnum.LiftStrength, _defaults.brawnToLiftStrength, "Derived_Brawn_LiftStrength");
             Apply(StatTypeEnum.Finesse, StatTypeEnum.ProjectileDamage, _defaults.finesseToProjectileDamage, "Derived_Finesse_ProjectileDamage");
             Apply(StatTypeEnum.Insight, StatTypeEnum.SpellPower, _defaults.insightToSpellPower, "Derived_Insight_SpellPower");
             Apply(StatTypeEnum.Insight, StatTypeEnum.CritMultiplier, _defaults.insightToCritMultiplier, "Derived_Insight_CritMultiplier");
@@ -41,6 +48,21 @@ namespace Sol
             SetDeflectionFromPlate();
             Apply(StatTypeEnum.Vigor, StatTypeEnum.MaxHealth, _defaults.vigorToMaxHealth, "Derived_Vigor_MaxHealth");
             Apply(StatTypeEnum.Willpower, StatTypeEnum.MaxEnergy, _defaults.willpowerToMaxEnergy, "Derived_Willpower_MaxEnergy");
+            Apply(StatTypeEnum.Vigor, StatTypeEnum.EnergyRegen, _defaults.vigorToEnergyRegen, "Derived_Vigor_EnergyRegen");
+            Apply(StatTypeEnum.Focus, StatTypeEnum.HealthRegen, _defaults.focusToHealthRegen, "Derived_Focus_HealthRegen");
+            Apply(StatTypeEnum.Vigor, StatTypeEnum.Hunger, _defaults.vigorToHunger, "Derived_Vigor_Hunger");
+            Apply(StatTypeEnum.Vigor, StatTypeEnum.Thirst, _defaults.vigorToThirst, "Derived_Vigor_Thirst");
+            Apply(StatTypeEnum.Focus, StatTypeEnum.ProjectileRange, _defaults.focusToProjectileRange, "Derived_Focus_ProjectileRange");
+            Apply(StatTypeEnum.Insight, StatTypeEnum.MagicResistance, _defaults.insightToMagicResistance, "Derived_Insight_MagicResistance");
+            Apply(StatTypeEnum.Vigor, StatTypeEnum.EnvironmentalResistance, _defaults.vigorToEnvironmentalResistance, "Derived_Vigor_EnvironmentalResistance");
+            Apply(StatTypeEnum.Focus, StatTypeEnum.ParryAndBlockTime, _defaults.focusToParryAndBlockTime, "Derived_Focus_ParryAndBlockTime");
+            Apply(StatTypeEnum.Focus, StatTypeEnum.ClueRange, _defaults.focusToClueRange, "Derived_Focus_ClueRange");
+            Apply(StatTypeEnum.Willpower, StatTypeEnum.CharmChance, _defaults.willpowerToCharmChance, "Derived_Willpower_CharmChance");
+            Apply(StatTypeEnum.Insight, StatTypeEnum.KnowledgeChance, _defaults.insightToKnowledgeChance, "Derived_Insight_KnowledgeChance");
+            Apply(StatTypeEnum.Finesse, StatTypeEnum.DeceptionChance, _defaults.finesseToDeceptionChance, "Derived_Finesse_DeceptionChance");
+            Apply(StatTypeEnum.Brawn, StatTypeEnum.IntimidationChance, _defaults.brawnToIntimidationChance, "Derived_Brawn_IntimidationChance");
+            Apply(StatTypeEnum.Finesse, StatTypeEnum.CovertMovement, _defaults.finesseToCovertMovement, "Derived_Finesse_CovertMovement");
+            Apply(StatTypeEnum.Finesse, StatTypeEnum.Tinker, _defaults.finesseToTinker, "Derived_Finesse_Tinker");
         }
 
         // Doctrine: plate gives 0.2 points of stagger resistance per kg; flexible armour gives 0.333 points of bleed resistance per kg.
@@ -55,7 +77,7 @@ namespace Sol
         private void SetDeflectionFromPlate()
         {
             _stats.RemoveModifiersFromSource(DeflectionSourceId);
-            int pieces = Mathf.Clamp(Mathf.RoundToInt(_stats.GetBaseStat(StatTypeEnum.PlateCount)), 0, MaxPlatePieces);
+            int pieces = Mathf.Clamp(Mathf.RoundToInt(_stats.GetStat(StatTypeEnum.PlateCount)), 0, MaxPlatePieces);
             if (pieces <= 0) return;
 
             _stats.ApplyOrReplaceModifier(new StatModifier(
@@ -71,7 +93,7 @@ namespace Sol
         private void SetFromWeight(StatTypeEnum weight, StatTypeEnum resistance, float pointsPerKg, string sourceId)
         {
             _stats.RemoveModifiersFromSource(sourceId);
-            float kg = _stats.GetBaseStat(weight);
+            float kg = _stats.GetStat(weight);
             if (kg <= 0f) return;
 
             _stats.ApplyOrReplaceModifier(new StatModifier(
@@ -83,37 +105,45 @@ namespace Sol
                 duration: -1f));
         }
 
-        // Bonus is based on points above the default. GetBaseStat avoids feeding derived modifiers back into the attribute.
+        // FallDamageMultiplier starts at 1 and goes DOWN as Finesse rises: 1 - Finesse × rate, never below 0.
+        // Derived stats have no SO base, so the starting 1 is part of this rule, not a stored value.
+        private const float FallDamageStart = 1f;
+        private const string FallDamageSourceId = "Derived_Finesse_FallDamageMultiplier";
+
+        private void ApplyFallDamageReduction()
+        {
+            float reduction = _stats.GetBaseStat(StatTypeEnum.Finesse) * _defaults.finesseToFallDamageReduction;
+            float total = Mathf.Max(0f, FallDamageStart - reduction);
+
+            _stats.RemoveModifiersFromSource(FallDamageSourceId);
+            _stats.ApplyOrReplaceModifier(new StatModifier(
+                type: ModifierType.FlatAdditive,
+                category: ModifierCategory.Permanent,
+                statType: StatTypeEnum.FallDamageMultiplier,
+                value: total,
+                sourceId: FallDamageSourceId,
+                duration: -1f));
+        }
+
+        // The calculation rule for every attribute-derived stat. The bonus is the attribute's full current value times the rate.
+        // The starting points in the stat asset are part of that value: they are the points a player begins with, not a
+        // baseline that is subtracted. A stat deriving at 1x1 from Brawn is therefore Brawn itself, so 10 Brawn gives 10 and
+        // 9000 gives 9000. Derived stats start from zero, so a modifier that is removed cannot leave a stale value behind.
         private void Apply(StatTypeEnum attribute, StatTypeEnum target, float perPoint, string sourceId)
         {
-            float defaultValue = GetDefault(attribute);
-            float points = _stats.GetBaseStat(attribute) - defaultValue;
+            float value = _stats.GetBaseStat(attribute) * perPoint;
 
-            // Zero or negative points (refunded below default) must still clear the old bonus.
+            // Each derivation has its own source, so it is cleared and rewritten on every recalculation.
             _stats.RemoveModifiersFromSource(sourceId);
-            if (points == 0f) return;
+            if (value == 0f) return;
 
             _stats.ApplyOrReplaceModifier(new StatModifier(
                 type: ModifierType.FlatAdditive,
                 category: ModifierCategory.Permanent,
                 statType: target,
-                value: points * perPoint,
+                value: value,
                 sourceId: sourceId,
                 duration: -1f));
-        }
-
-        private float GetDefault(StatTypeEnum attribute)
-        {
-            return attribute switch
-            {
-                StatTypeEnum.Brawn => _defaults.brawn,
-                StatTypeEnum.Finesse => _defaults.finesse,
-                StatTypeEnum.Insight => _defaults.insight,
-                StatTypeEnum.Focus => _defaults.focus,
-                StatTypeEnum.Vigor => _defaults.vigor,
-                StatTypeEnum.Willpower => _defaults.willpower,
-                _ => 0f
-            };
         }
     }
 }

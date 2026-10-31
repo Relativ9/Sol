@@ -154,7 +154,7 @@ namespace Sol
                     ""id"": ""7e746da6-3ffb-4d0c-8ab5-6bc93ea4d47c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""initialStateCheck"": false
                 },
                 {
@@ -164,6 +164,15 @@ namespace Sol
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Grab"",
+                    ""type"": ""Button"",
+                    ""id"": ""f24f9873-1ad7-4662-b0b0-f6ff846adc4e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -282,7 +291,7 @@ namespace Sol
                     ""name"": """",
                     ""id"": ""61306076-8568-4e2c-a1cc-fa63e83c529b"",
                     ""path"": ""<Keyboard>/e"",
-                    ""interactions"": """",
+                    ""interactions"": ""Tap"",
                     ""processors"": """",
                     ""groups"": "";Mouse&Keyboard"",
                     ""action"": ""Interact"",
@@ -297,6 +306,17 @@ namespace Sol
                     ""processors"": """",
                     ""groups"": "";Mouse&Keyboard"",
                     ""action"": ""Discard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3e708126-0358-4b7e-a113-be102c368081"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": ""Hold(duration=0.21)"",
+                    ""processors"": """",
+                    ""groups"": "";Mouse&Keyboard"",
+                    ""action"": ""Grab"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -420,6 +440,7 @@ namespace Sol
             m_Main_ToggleWeapon = m_Main.FindAction("ToggleWeapon", throwIfNotFound: true);
             m_Main_Interact = m_Main.FindAction("Interact", throwIfNotFound: true);
             m_Main_Discard = m_Main.FindAction("Discard", throwIfNotFound: true);
+            m_Main_Grab = m_Main.FindAction("Grab", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_OpenMenu = m_UI.FindAction("OpenMenu", throwIfNotFound: true);
@@ -515,6 +536,7 @@ namespace Sol
         private readonly InputAction m_Main_ToggleWeapon;
         private readonly InputAction m_Main_Interact;
         private readonly InputAction m_Main_Discard;
+        private readonly InputAction m_Main_Grab;
         /// <summary>
         /// Provides access to input actions defined in input action map "Main".
         /// </summary>
@@ -558,6 +580,10 @@ namespace Sol
             /// Provides access to the underlying input action "Main/Discard".
             /// </summary>
             public InputAction @Discard => m_Wrapper.m_Main_Discard;
+            /// <summary>
+            /// Provides access to the underlying input action "Main/Grab".
+            /// </summary>
+            public InputAction @Grab => m_Wrapper.m_Main_Grab;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -608,6 +634,9 @@ namespace Sol
                 @Discard.started += instance.OnDiscard;
                 @Discard.performed += instance.OnDiscard;
                 @Discard.canceled += instance.OnDiscard;
+                @Grab.started += instance.OnGrab;
+                @Grab.performed += instance.OnGrab;
+                @Grab.canceled += instance.OnGrab;
             }
 
             /// <summary>
@@ -643,6 +672,9 @@ namespace Sol
                 @Discard.started -= instance.OnDiscard;
                 @Discard.performed -= instance.OnDiscard;
                 @Discard.canceled -= instance.OnDiscard;
+                @Grab.started -= instance.OnGrab;
+                @Grab.performed -= instance.OnGrab;
+                @Grab.canceled -= instance.OnGrab;
             }
 
             /// <summary>
@@ -881,6 +913,13 @@ namespace Sol
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnDiscard(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Grab" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnGrab(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

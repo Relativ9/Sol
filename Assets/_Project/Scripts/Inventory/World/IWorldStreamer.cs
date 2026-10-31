@@ -11,5 +11,11 @@ namespace Sol
 
         /// <summary>Removes a placed item from its cell's list.</summary>
         void Unregister(WorldItem item);
+
+        /// <summary>Keeps a cell loaded while something in it needs to stay live, such as a moving body. Pins are counted.</summary>
+        void Pin(CellKey key);
+
+        /// <summary>Releases one pin on a cell. The cell is released only when its last pin is removed and it is outside the ring.</summary>
+        void Unpin(CellKey key);
     }
 }

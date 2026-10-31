@@ -29,6 +29,26 @@ namespace Sol.Editor
             if (touchedItems) RetireDeleted();
         }
 
+        /// <summary>
+        /// Indexes every item asset already in the project. The indexer normally runs only when an item is imported, so
+        /// items that were in the project before it existed would otherwise never get an index. Safe to run again.
+        /// </summary>
+        [UnityEditor.MenuItem("Sol/World/Index All Item Types")]
+        public static void IndexAllItems()
+        {
+            var live = new List<string>();
+            foreach (string guid in AssetDatabase.FindAssets("t:ItemDataSO"))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var item = AssetDatabase.LoadAssetAtPath<ItemDataSO>(path);
+                if (item == null) continue;
+                RegisterItem(item, path);
+                if (!string.IsNullOrEmpty(item.ItemId)) live.Add(item.ItemId);
+            }
+            RetireDeleted();
+            UnityEngine.Debug.Log($"[{nameof(ItemTypeIndexer)}] Indexed {live.Count} item type(s).");
+        }
+
         // Registers an item's ItemId. An item with no ItemId is reported and skipped, since an index for it would name nothing.
         private static void RegisterItem(ItemDataSO item, string path)
         {

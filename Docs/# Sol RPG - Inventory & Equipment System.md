@@ -23,7 +23,7 @@ These decisions are locked in and are the contract the future inventory system m
 
 ### 2.1 Equipment bonuses are modifiers, never base stats
 
-Attribute growth (Brawn from level-ups) mutates base values through `StatsService.SetBaseStat()`. Equipment bonuses are **removable effects** and must use:
+Attribute growth (Brawn from level-ups) sets attribute base values through `StatsService.SetAttributeBase()`. Equipment bonuses are **removable effects** and must use:
 
 ```csharp
 ModifierCategory.Equipment

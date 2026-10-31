@@ -59,7 +59,7 @@ namespace Sol
         public int GetTotalTalentPoints() => _totalTalentPoints;
         public int GetAvailableTalentPoints() => _totalTalentPoints - _spentTalentPoints;
 
-        public void RecalculateDerived()
+        public void RecalculateAttributeRules()
         {
             _derivedResolver?.RecalculateAll();
         }

@@ -14,7 +14,7 @@ namespace Sol
         void ReloadAllBaseStats();
 
         /// <summary>Re-derives attribute, weight and armour-derived stats. Called after equipment changes.</summary>
-        void RecalculateDerived();
+        void RecalculateAttributeRules();
 
         // Attributes (core six). Used by the Player Stats tab.
         bool TrySpendAttributePoint(StatTypeEnum statType);

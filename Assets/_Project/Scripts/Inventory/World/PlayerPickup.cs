@@ -22,8 +22,50 @@ namespace Sol
         [Tooltip("Where a dropped item is placed, relative to the player.")]
         [SerializeField] private Vector3 _dropOffset = new Vector3(0f, 0.2f, 0.6f);
 
+        [Tooltip("Metres in front of the view that a grabbed item is held at.")]
+        [SerializeField] private float _carryDistance = 1f;
+
+        [Tooltip("The fastest a grabbed item can be moved, in metres per second.")]
+        [SerializeField] private float _carryMaxSpeed = 6f;
+
+        // The base pull of a grabbed item toward its target. Lift Strength multiplies it, so the gain is never set by hand.
+        // Private: a designer tunes the stats, not this number.
+        private const float CarryGain = 2f;
+
+        // How much of each point of Lift Strength reaches the carry. 0.2 means a lift of 10 carries as strongly as a lift of 2
+        // at one-to-one, so lift is a steady input rather than a direct multiplier on the pull.
+        private const float CarryRatio = 0.2f;
+
+
+        [Tooltip("The most acceleration a base-strength carrier can give a held item, in m/s². Heavier items need more force " +
+                 "to reach this, so a weak carrier cannot lift a heavy item quickly.")]
+        [SerializeField] private float _carryMaxAcceleration = 30f;
+
         private IInventoryService _inventory;
-        private IWorldItemService _world;
+        private IWorldCellWriter _writer;
+        private IWorldMotionTracker _motion;
+        private IStatsService _stats;
+
+        // The hold state and the carrier. Both are plain C#; this component only feeds them the view and the physics.
+        private ItemGrabber _grabber;
+        private ItemCarrier _carrier;
+        private Transform _view;
+
+        // A taken placed item is recorded in its home cell. A taken dropped pile has its record removed from its cell.
+        private void RecordWorldChange(WorldItem target)
+        {
+            _writer ??= ServiceLocator.TryGet<IWorldCellWriter>();
+            if (_writer == null) return;
+
+            if (target.IsDropped)
+            {
+                if (System.Guid.TryParse(target.ItemInstanceId, out System.Guid guid)) _writer.RecordDroppedRemoved(guid);
+            }
+            else
+            {
+                _writer.RecordPlacedTaken(target.ItemInstanceId, target.HomePosition, target.Generation);
+            }
+        }
         public void Initialize(IPlayerContext context)
         {
             // Services are resolved lazily in the methods, because they are registered after the player starts.
@@ -38,7 +80,39 @@ namespace Sol
 
         void Update()
         {
-            SetTarget(FindTarget());
+            if (_grabber == null) _grabber = new ItemGrabber(_carryDistance);
+            if (_carrier == null) _carrier = new ItemCarrier(_carryMaxSpeed, CarryGain, _carryMaxAcceleration);
+
+            // While an item is carried, it is the target and the glow stays on it. Otherwise the target is what the view holds.
+            if (_grabber.IsGrabbing) SetTarget(null);
+            else SetTarget(FindTarget());
+        }
+
+        // The carry is driven by Lift Strength, a derived stat that comes from Brawn. The grab reads it through the interface
+        // and owns no balance numbers of its own. Without a stats service it falls back to 1, the base lift.
+        private float LiftStrength()
+        {
+            if (_stats == null) return CarryRatio;
+            return Mathf.Max(_stats.GetStat(StatTypeEnum.LiftStrength) * CarryRatio, 0.25f);
+        }
+
+        // Physics steps move a carried item, since the carry is a velocity that physics then resolves against the world.
+        void FixedUpdate()
+        {
+            if (_grabber == null || !_grabber.IsGrabbing) return;
+
+            // A carried item destroyed mid-carry (for example by a trigger) ends the grab, so nothing is steered at null.
+            // The item is gone, so there is no exclusion left to clear on it.
+            if (_grabber.Carried == null)
+            {
+                _grabber.Cancel();
+                return;
+            }
+            if (_view == null) Resolve();
+            if (_view == null) return;
+
+            Vector3 target = _view.position + _view.forward.normalized * _carryDistance;
+            _carrier.Steer(_grabber.Carried.GetComponent<Rigidbody>(), target, LiftStrength());
         }
 
         // Moves the target, switching the glow off on the old one and on for the new one. Only the changed items are
@@ -54,6 +128,44 @@ namespace Sol
 
             if (next != null && next.TryGetComponent(out WorldItemHighlight glow))
                 glow.SetTargeted(true);
+        }
+
+
+
+        /// <summary>
+        /// The Grab action's hold completed. The item under the view is picked up into the carry, not looted.
+        /// </summary>
+        public void BeginGrab()
+        {
+            Resolve();
+            if (_grabber == null) _grabber = new ItemGrabber(_carryDistance);
+
+            // The Input System has already decided this is a hold (the Grab action's Hold interaction). The item under the view
+            // is the one carried. Nothing is picked up.
+            WorldItem target = FindTarget();
+            if (!_grabber.Begin(target)) return;
+
+            // The carried item leaves the world's record and the glow. Its physics is steered from FixedUpdate.
+            _motion?.SetCarried(target, true);
+
+            // The carried item passes through the player's body only while held. It collides normally otherwise.
+            target.SetPlayerCollisionIgnored(true);
+        }
+
+        /// <summary>
+        /// The Grab action was released, or cancelled. Ends the carry and leaves the item where it is. The tracker then records
+        /// the final pose, so the drop is saved.
+        /// </summary>
+        public void EndGrab()
+        {
+            if (_grabber == null || !_grabber.IsGrabbing) return;
+
+            WorldItem released = _grabber.End();
+            if (released != null)
+            {
+                _motion?.SetCarried(released, false);
+                released.SetPlayerCollisionIgnored(false);
+            }
         }
 
         /// <summary>Called by PlayerController on the pickup input. Picks up the current target, if any.</summary>
@@ -91,9 +203,8 @@ namespace Sol
                 if (!_inventory.TryStore(instanceId, item)) return;
             }
 
-            // Stored. Now the world forgets it. Placed items are marked picked up; dropped items are removed.
-            if (target.IsDropped) _world.RemoveDropped(instanceId);
-            else _world.MarkPickedUp(instanceId);
+            // Stored. The world records it: a placed item is marked taken in its home cell, and a dropped pile's record is removed.
+            RecordWorldChange(target);
 
             target.MarkTaken();
             Destroy(target.gameObject);
@@ -125,7 +236,9 @@ namespace Sol
             var worldItem = spawned.GetComponent<WorldItem>();
             if (worldItem != null) worldItem.Assign(item, instanceId, true);
 
-            _world.AddDropped(instanceId, item.ItemId, position, spawned.transform.rotation);
+            // The pile's record goes to the cell it lies in. The pile keeps its GUID, so a later pickup removes this exact record.
+            ServiceLocator.TryGet<IWorldCellWriter>()?.RecordDropped(
+                System.Guid.Parse(instanceId), item.ItemId, position, spawned.transform.rotation, generation: 0);
             ServiceLocator.TryGet<ICombatLog>()?.Add($"Dropped {item.DisplayName}", CombatLogKind.Info);
             return true;
         }
@@ -155,10 +268,22 @@ namespace Sol
             ServiceLocator.RegisterService<IPlayerPickup>(this);
         }
 
+        // Stats are fetched here, after every Awake has registered, as the KB's Start rule requires.
+        void Start()
+        {
+            _stats = ServiceLocator.TryGet<IStatsService>();
+
+        }
+
         private void Resolve()
         {
             _inventory ??= ServiceLocator.TryGet<IInventoryService>();
-            _world ??= ServiceLocator.TryGet<IWorldItemService>();
+            _writer ??= ServiceLocator.TryGet<IWorldCellWriter>();
+            _motion ??= ServiceLocator.TryGet<IWorldMotionTracker>();
+
+            // The view the carried item is held in front of. The camera's transform, through its interface.
+            if (_view == null)
+                _view = ServiceLocator.TryGet<ICameraController>()?.GetCameraTransform();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Sol
     /// is in, so every object has one owner by position. A taken placed item is recorded as Taken in its home cell. Plain C#: it
     /// takes positions and indices, not GameObjects, so it can be tested without a scene.
     /// </summary>
-    public class WorldCellWriter
+    public class WorldCellWriter : IWorldCellWriter
     {
         private readonly CellStore _store;
         private readonly WorldObjectRegistry _objects;
@@ -28,7 +28,12 @@ namespace Sol
         public bool RecordPlacedTaken(string objectGuid, Vector3 homePosition, uint generation)
         {
             int objectIndex = _objects.IndexOf(objectGuid);
-            if (objectIndex <= 0) return false;
+            if (objectIndex <= 0)
+            {
+                // Without an index the pickup cannot be saved, and the item would come back on reload as a duplicate.
+                UnityEngine.Debug.LogError($"[{nameof(WorldCellWriter)}] Placed item '{objectGuid}' is not in the WorldObjectRegistry, so its pickup was not saved and it will return on load.");
+                return false;
+            }
 
             CellKey home = CellKey.FromWorld(homePosition);
             _store.Upsert(home, new CellRecord
@@ -45,7 +50,8 @@ namespace Sol
         /// A placed object is at a new position. Its record goes to the cell it now stands in. Its home cell gets a tombstone, so the
         /// authored copy does not come back on load. A move within the home cell needs no tombstone.
         /// </summary>
-        public bool RecordPlacedMoved(string objectGuid, Vector3 homePosition, Vector3 position, Quaternion rotation, uint generation)
+        public bool RecordPlacedMoved(string objectGuid, Vector3 homePosition, Vector3 position, Quaternion rotation, uint generation,
+            Vector3 linearVelocity = default, Vector3 angularVelocity = default, bool moving = false)
         {
             int objectIndex = _objects.IndexOf(objectGuid);
             if (objectIndex <= 0) return false;
@@ -54,25 +60,43 @@ namespace Sol
             CellKey now = CellKey.FromWorld(position);
             CellPose.Encode(position, rotation, out int x, out int y, out int z, out ushort yaw);
 
-            _store.Upsert(now, new CellRecord
+            // A moving body keeps its velocity, so a load can resume the motion. A resting body stores none.
+            var flags = CellRecordFlags.Moved;
+            var record = new CellRecord
             {
                 Kind = CellRecordKind.Placed,
-                Flags = CellRecordFlags.Moved,
                 Index = (uint)objectIndex,
                 Generation = generation,
                 X = x, Y = y, Z = z, YawTenths = yaw,
-            });
+            };
+            if (moving)
+            {
+                flags |= CellRecordFlags.Moving;
+                if (linearVelocity.sqrMagnitude > 0f || angularVelocity.sqrMagnitude > 0f)
+                {
+                    flags |= CellRecordFlags.HasVelocity;
+                    CellPose.EncodeVelocity(linearVelocity, angularVelocity, out record.LinearVelocity, out record.AngularVelocity);
+                }
+            }
+            record.Flags = flags;
+
+            _store.Upsert(now, record);
 
             if (now != home)
             {
+                // The tombstone only needs the object's index. Where it went is in the moved record in the destination cell.
                 _store.Upsert(home, new CellRecord
                 {
                     Kind = CellRecordKind.Tombstone,
                     Index = (uint)objectIndex,
                     Generation = generation,
-                    MovedCellX = now.X,
-                    MovedCellZ = now.Z,
                 });
+            }
+            else
+            {
+                // Back in its home cell: the tombstone that marked it as displaced is no longer needed. Only the tombstone is
+                // removed, so the live placed record just written to this cell is kept.
+                _store.RemoveTombstone(home, (uint)objectIndex);
             }
             return true;
         }

@@ -29,16 +29,39 @@ namespace Sol
         /// <summary>The cells currently in memory. Read-only view for other systems.</summary>
         public IReadOnlyCollection<CellKey> Loaded => _loaded;
 
-        /// <summary>The pins that keep a cell loaded regardless of the ring.</summary>
-        public CellPins Pins { get; } = new CellPins();
+        // The pins that keep a cell loaded regardless of the ring. Owned here, so residency has one owner.
+        private readonly CellPins _pins = new CellPins();
+
+        /// <summary>Keeps a cell loaded while a moving body is in it. Counted, so several bodies can share a cell.</summary>
+        public void Pin(CellKey key) => _pins.Add(key);
+
+        /// <summary>Releases one pin on a cell. The cell is kept until its last pin is gone.</summary>
+        public void Unpin(CellKey key) => _pins.Remove(key);
 
         public void SetPlayer(Transform player) => _player = player;
 
-        public void SetCellsFolder(string folder) => _cellsFolder = folder;
+        // A new slot starts with no winners, so records from the previous slot can never decide the new one.
+        public void SetCellsFolder(string folder)
+        {
+            _cellsFolder = folder;
+            _placedWinners.Clear();
+        }
+
+        // Placed object indices that have been taken or displaced. A scene copy that shows up later, for example because its cell
+        // loaded after the record was read, is removed as it registers, so a taken item can never come back as a duplicate.
+        private readonly HashSet<uint> _removedPlaced = new();
 
         /// <summary>Registers a placed item with the cell it stands in, so it can be found without a scene scan.</summary>
         public void Register(WorldItem item)
         {
+            // A placed copy whose record says it is gone is removed here, not left in the scene as a duplicate.
+            uint index = IndexOfPlaced(item);
+            if (index != 0 && _removedPlaced.Contains(index))
+            {
+                Destroy(item.gameObject);
+                return;
+            }
+
             CellKey key = CellKey.FromWorld(item.transform.position);
             if (!_itemsByCell.TryGetValue(key, out List<WorldItem> list))
             {
@@ -46,6 +69,13 @@ namespace Sol
                 _itemsByCell[key] = list;
             }
             if (!list.Contains(item)) list.Add(item);
+        }
+
+        // The object index of a placed item, or 0 if it is not a placed item or is not registered.
+        private uint IndexOfPlaced(WorldItem item)
+        {
+            if (item.IsDropped || _objectRegistry == null) return 0;
+            return (uint)_objectRegistry.IndexOf(item.ItemInstanceId);
         }
 
         /// <summary>Removes an item from its cell's list, for example when it is taken.</summary>
@@ -109,7 +139,12 @@ namespace Sol
                 if (!InRing(key)) continue;
 
                 _loaded.Add(key);
-                if (result.Found) ApplyCell(key, result);
+                if (result.Found)
+                {
+                    // The saved records become the cell's baseline in the store, so later changes build on what was saved.
+                    Store?.SetBaseline(key, result.Data.Records);
+                    ApplyCell(key, result);
+                }
             }
         }
 
@@ -120,7 +155,7 @@ namespace Sol
             var leaving = new List<CellKey>();
             foreach (CellKey key in _loaded)
             {
-                if (!InRing(key) && !Pins.IsPinned(key)) leaving.Add(key);
+                if (!InRing(key) && !_pins.IsPinned(key)) leaving.Add(key);
             }
 
             foreach (CellKey key in leaving)
@@ -152,16 +187,30 @@ namespace Sol
                 switch (record.Kind)
                 {
                     case CellRecordKind.Placed:
-                        ApplyPlaced(key, record);
+                        // Only the live copy of a placed object applies. A stale copy in another cell is ignored (design 6.3).
+                        bool live = _placedWinners.Offer(key, record, IsOwnCell(key, record), out string tie);
+                        if (live) ApplyPlaced(key, record);
+                        if (tie != null) Debug.LogWarning($"[{nameof(WorldStreamer)}] {tie}");
                         break;
                     case CellRecordKind.Dropped:
                         ApplyDropped(key, record);
                         break;
                     case CellRecordKind.Tombstone:
-                        RemovePlacedAt(record.Index);
+                        if (_placedWinners.Offer(key, record, IsOwnCell(key, record), out string tombTie))
+                            RemovePlacedAt(record.Index);
+                        if (tombTie != null) Debug.LogWarning($"[{nameof(WorldStreamer)}] {tombTie}");
                         break;
                 }
             }
+        }
+
+        // The live record for each placed object across every cell. Cleared when a slot loads, so one slot never decides another.
+        private readonly PlacedGenerations _placedWinners = new PlacedGenerations();
+
+        // A record is in its own cell when the cell is the one that contains the record's saved position.
+        private static bool IsOwnCell(CellKey key, CellRecord record)
+        {
+            return key.Equals(CellKey.FromWorld(CellPose.PositionOf(record)));
         }
 
         // A placed record that is taken is removed from the scene. A placed record that is not taken, but has moved, is placed at
@@ -173,16 +222,29 @@ namespace Sol
 
             if (record.IsTaken)
             {
-                Destroy(item.gameObject);
+                RemovePlacedAt(record.Index);
                 return;
             }
 
             // A placed object that has moved carries a pose. The Moved flag says so; other flags do not imply a move.
             if ((record.Flags & CellRecordFlags.Moved) != 0)
             {
-                item.transform.SetPositionAndRotation(
-                    new Vector3(record.X, record.Y, record.Z) * 0.01f,
-                    Quaternion.Euler(0f, record.YawTenths * 0.1f, 0f));
+                // Moved through the Rigidbody, not the transform. A transform move leaves the body's contacts and sleep state
+                // from before the move, so it can resume in the air or inside a surface. Its velocity is restored from the record.
+                Vector3 position = CellPose.PositionOf(record);
+                Quaternion rotation = CellPose.RotationOf(record);
+                Rigidbody body = item.GetComponent<Rigidbody>();
+                if (body == null)
+                {
+                    item.transform.SetPositionAndRotation(position, rotation);
+                    return;
+                }
+
+                body.position = position;
+                body.rotation = rotation;
+                body.linearVelocity = record.HasVelocity ? CellPose.LinearVelocityOf(record) : Vector3.zero;
+                body.angularVelocity = record.HasVelocity ? CellPose.AngularVelocityOf(record) : Vector3.zero;
+                body.WakeUp();
             }
         }
 
@@ -219,8 +281,10 @@ namespace Sol
             return null;
         }
 
+        // Removes the placed copy now if it is in the scene, and remembers the index so a copy that registers later is removed too.
         private void RemovePlacedAt(uint index)
         {
+            _removedPlaced.Add(index);
             WorldItem item = FindPlacedByIndex(index);
             if (item != null) Destroy(item.gameObject);
         }

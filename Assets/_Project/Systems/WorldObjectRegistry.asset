@@ -12,9 +12,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 463950960d748e1e9aa7036dbc7a932a, type: 3}
   m_Name: WorldObjectRegistry
   m_EditorClassIdentifier: Sol_Scripts::Sol.WorldObjectRegistry
-  _nextIndex: 2
+  _nextIndex: 15
   _entries:
   - guid: 215a73347c494136a64709c728a012ae
     objectIndex: 1
     itemId: rusted-dagger
+    retired: 0
+  - guid: b995d213c1914f69923ec1ef263f5014
+    objectIndex: 2
+    itemId: rusted-dagger
+    retired: 0
+  - guid: 5ceed5edb46a4074bd4f2efa293f672f
+    objectIndex: 3
+    itemId: shiny-dagger
+    retired: 0
+  - guid: 899dccacd3b649a6bb9f7aae81e4c27b
+    objectIndex: 4
+    itemId: shiny-dagger
+    retired: 0
+  - guid: 9d51548719844267b36b0cdcce0dcee4
+    objectIndex: 5
+    itemId: shiny-dagger
+    retired: 0
+  - guid: a850aafda8a0467d8430d421e4018e8d
+    objectIndex: 6
+    itemId: shiny-dagger
+    retired: 0
+  - guid: e638537fccd8452a9ca4e9179c085aec
+    objectIndex: 7
+    itemId: shiny-armor
+    retired: 0
+  - guid: e28c350651944a05840e4b6e5530c326
+    objectIndex: 8
+    itemId: shiny-armor
+    retired: 0
+  - guid: 878bd52c7cdf46598808c85074a67f24
+    objectIndex: 9
+    itemId: shiny-armor
+    retired: 0
+  - guid: b391852dad12429aac63860684c5e17c
+    objectIndex: 10
+    itemId: shiny-dagger
+    retired: 0
+  - guid: d0795533be0b4453a47fde06a76d93fc
+    objectIndex: 11
+    itemId: shiny-armor
+    retired: 0
+  - guid: faf2fda3a57a427283e749f10f6f03bd
+    objectIndex: 12
+    itemId: shiny-armor
+    retired: 0
+  - guid: 320151e4b9294826b9c67c029eed8d13
+    objectIndex: 13
+    itemId: shiny-dagger
+    retired: 0
+  - guid: 784c45d6bb14406098bd10682552ed25
+    objectIndex: 14
+    itemId: shiny-dagger
     retired: 0

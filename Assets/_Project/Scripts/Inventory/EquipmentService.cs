@@ -5,13 +5,13 @@ namespace Sol
 {
     /// <summary>
     /// Plain C# equipment state. Each piece's authored stat modifiers are Equipment modifiers keyed by its instance ID,
-    /// so unequip removes exactly what that piece added. Armour weight and piece counts are totals written as base
-    /// values, because DerivedStatResolver reads base values to derive resistance and deflection.
+    /// so unequip removes exactly what that piece added. Armour weight, piece counts and armour value are totals
+    /// written as one Equipment contribution, so DerivedStatResolver reads them through GetStat like any other stat.
     /// </summary>
     public class EquipmentService : IEquipmentService
     {
         private readonly IStatsService _stats;
-        private readonly System.Action _recalculateDerived;
+        private readonly System.Action _recalculateAttributeRules;
 
         public event System.Action Changed;
         private readonly Dictionary<EquipmentSlot, EquippedPiece> _slots = new();
@@ -23,12 +23,12 @@ namespace Sol
         }
 
         /// <param name="stats">The stats the equipment writes modifiers to.</param>
-        /// <param name="recalculateDerived">Re-derives resistance and deflection from weight and piece counts.
+        /// <param name="recalculateAttributeRules">Re-derives resistance and deflection from weight and piece counts.
         /// Supplied by ProgressionService, which owns the one DerivedStatResolver.</param>
-        public EquipmentService(IStatsService stats, System.Action recalculateDerived)
+        public EquipmentService(IStatsService stats, System.Action recalculateAttributeRules)
         {
             _stats = stats;
-            _recalculateDerived = recalculateDerived;
+            _recalculateAttributeRules = recalculateAttributeRules;
         }
 
         public bool TryEquip(string instanceId, EquipmentDataSO item)
@@ -55,7 +55,7 @@ namespace Sol
             _slots[slot] = new EquippedPiece { InstanceId = instanceId, Item = item };
             ApplyContribution(instanceId, item);
             RecalculateArmourTotals();
-            _recalculateDerived?.Invoke();
+            _recalculateAttributeRules?.Invoke();
             Changed?.Invoke();
             return true;
         }
@@ -67,7 +67,7 @@ namespace Sol
             _stats.RemoveModifiersFromSource(piece.InstanceId);
             _slots.Remove(slot);
             RecalculateArmourTotals();
-            _recalculateDerived?.Invoke();
+            _recalculateAttributeRules?.Invoke();
             Changed?.Invoke();
             return true;
         }
@@ -116,9 +116,8 @@ namespace Sol
             ApplyAuthoredModifiers(instanceId, item);
         }
 
-        // Weight and piece counts are totals across every equipped piece. They are written as BASE values, not
-        // modifiers, because DerivedStatResolver reads base values. Recomputed from the slots on every change, so an
-        // equip or unequip always leaves the totals correct.
+        // Weight, piece counts and armour value are totals across every equipped piece. They are written as Equipment
+        // contributions through SetSourceContribution, under one source, and recomputed from the slots on every change.
         // Armour value per piece = Weight x Type Multiplier x Material Efficiency (design doc, section 2).
         // Plate is 4x, flex 3x, cloth 1x. Material efficiency is 1 until items carry it.
         public const float PlateMultiplier = 4f;
@@ -139,6 +138,9 @@ namespace Sol
 
         private void RecalculateArmourTotals()
         {
+            // Clears the previous totals first, so a piece that was removed is never counted again.
+            _stats.RemoveModifiersFromSource(ArmourTotalsSourceId);
+
             float plateKg = 0f, flexKg = 0f, armourValue = 0f;
             int plateCount = 0, flexCount = 0, clothCount = 0;
 
@@ -157,18 +159,17 @@ namespace Sol
                 armourValue += ArmorValueFor(wearable);
             }
 
-            _stats.SetDerivedBase(StatTypeEnum.RigidWeight, plateKg);
-            _stats.SetDerivedBase(StatTypeEnum.FlexWeight, flexKg);
-            _stats.SetDerivedBase(StatTypeEnum.PlateCount, plateCount);
-            _stats.SetDerivedBase(StatTypeEnum.FlexCount, flexCount);
-            _stats.SetDerivedBase(StatTypeEnum.ClothCount, clothCount);
-            // ArmorValue's base is the character's own starting armour, captured once. Equipped armour is then set on
-            // top of that each time, so repeated equips and unequips never compound.
-            _baseArmourValue ??= _stats.GetBaseStat(StatTypeEnum.ArmorValue);
-            _stats.SetDerivedBase(StatTypeEnum.ArmorValue, _baseArmourValue.Value + armourValue);
+            // Each total is this source's single contribution. Setting it again replaces it, so nothing compounds.
+            _stats.SetSourceContribution(StatTypeEnum.RigidWeight, ArmourTotalsSourceId, plateKg, ModifierCategory.Equipment);
+            _stats.SetSourceContribution(StatTypeEnum.FlexWeight, ArmourTotalsSourceId, flexKg, ModifierCategory.Equipment);
+            _stats.SetSourceContribution(StatTypeEnum.PlateCount, ArmourTotalsSourceId, plateCount, ModifierCategory.Equipment);
+            _stats.SetSourceContribution(StatTypeEnum.FlexCount, ArmourTotalsSourceId, flexCount, ModifierCategory.Equipment);
+            _stats.SetSourceContribution(StatTypeEnum.ClothCount, ArmourTotalsSourceId, clothCount, ModifierCategory.Equipment);
+            // ArmorValue keeps its SO base (the character's own starting armour). Equipped armour is added on top.
+            _stats.SetSourceContribution(StatTypeEnum.ArmorValue, ArmourTotalsSourceId, armourValue, ModifierCategory.Equipment);
         }
 
-        private float? _baseArmourValue;
+        private const string ArmourTotalsSourceId = "Equipment_ArmourTotals";
 
         // Slot comes from the item's first valid slot. Items with no slot cannot be equipped.
         private static EquipmentSlot SlotFor(EquipmentDataSO item)

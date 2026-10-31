@@ -7,6 +7,10 @@ namespace Sol
 {
     public class UIManager : MonoBehaviour, IUIManager
     {
+        // Scene names used by Load. The persistent scene holds the game's systems, so it always loads first.
+        private const string PersistentSceneName = "Persistant Scene";
+        private const string WorldSceneName = "OutdoorsScene";
+
         [Header("UI References")]
         [SerializeField] private UIDocument _document;
         [SerializeField] private VisualTreeAsset _nodeTemplate;
@@ -73,13 +77,28 @@ namespace Sol
             return ServiceLocator.TryGet<ISaveManager>()?.RequestSave(reason) ?? false;
         }
 
-        // Options > Load. The chosen slot is recorded, then the active scene is reloaded. Startup reads the chosen slot, so the
-        // load takes effect exactly like a normal startup from that save.
+        // Options > Load. The chosen slot is recorded, then the whole game is restarted from its first scene, so every scene
+        // comes back with the save, not only the one that happened to be active. Startup reads the chosen slot, so the load
+        // takes effect exactly like a normal startup from that save.
         private void RequestLoadRestart()
         {
-            PendingLoad.Request(SaveCoordinator.ManualSlot);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            // Load always uses the newest save, from whichever slot wrote it last. Null means no save exists to load.
+            string newest = ServiceLocator.TryGet<ISaveService>()?.NewestSlot();
+            if (newest == null)
+            {
+                ServiceLocator.TryGet<ICombatLog>()?.Add("No save to load.", CombatLogKind.Warning);
+                return;
+            }
+            PendingLoad.Request(newest);
+
+            // The persistent scene holds GameInitializer, so it is loaded first, in single mode, which replaces the open
+            // scenes. The world scene is then loaded additively, so the environment comes back with the save.
+            string world = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (world == PersistentSceneName)
+                world = WorldSceneName;
+
+            UnityEngine.SceneManagement.SceneManager.LoadScene(PersistentSceneName);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(world, UnityEngine.SceneManagement.LoadSceneMode.Additive);
         }
 
         // Feedback from the options tab, shown in the combat log, which the player already reads.
@@ -277,7 +296,7 @@ namespace Sol
 
             int notches = _virtualCursor.GetScrollNotches();
             if (notches != 0)
-                _statsTab.ScrollDerivedBy(notches);
+                _statsTab.ScrollStatsBy(notches);
         }
 
         // Drives an active inventory drag every frame, so R and the ghost work without mouse movement.

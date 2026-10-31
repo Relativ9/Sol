@@ -12,6 +12,9 @@ namespace Sol
         Autosave,
         ManualSave,
         SaveAndQuit,
+
+        // Written by the save-repair prompt. Goes to the repair slot, and is promoted to the manual slot by the choice.
+        Repair,
     }
 
     /// <summary>
@@ -36,9 +39,6 @@ namespace Sol
         private bool _saving;
         private bool _queued;
         private SaveReason _queuedReason;
-
-        /// <summary>Raised after a save finishes, so the UI can confirm it. Carries whether the write succeeded.</summary>
-        public event Action<SaveReason, bool> Completed;
 
         /// <param name="writeSave">Performs the save for a reason and returns whether it succeeded. Supplied by SaveManager.</param>
         /// <param name="canAutosave">
@@ -95,7 +95,6 @@ namespace Sol
             finally
             {
                 _saving = false;
-                Completed?.Invoke(reason, ok);
             }
 
             // A request made during the save runs now, so nothing is lost.

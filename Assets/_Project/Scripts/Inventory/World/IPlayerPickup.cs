@@ -11,5 +11,11 @@ namespace Sol
 
         /// <summary>Drops a stored item at the player's feet, using the item's own world model. False if it cannot.</summary>
         bool TryDrop(string instanceId);
+
+        /// <summary>The Grab action's hold completed. Picks up the item in view into the carry, without looting it.</summary>
+        void BeginGrab();
+
+        /// <summary>The Grab action was released. Ends the carry and leaves the item where it is.</summary>
+        void EndGrab();
     }
 }

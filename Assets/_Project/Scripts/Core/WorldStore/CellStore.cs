@@ -38,6 +38,20 @@ namespace Sol
             Bump(key);
         }
 
+        /// <summary>
+        /// Removes only the tombstone for a placed object from a cell, and leaves any placed record in that cell alone.
+        /// Used when an object returns to its home cell, where its live record is also stored and must survive.
+        /// </summary>
+        public bool RemoveTombstone(CellKey key, uint objectIndex)
+        {
+            if (!_cells.TryGetValue(key, out List<CellRecord> list)) return false;
+            int existing = list.FindIndex(r => r.Kind == CellRecordKind.Tombstone && r.Index == objectIndex);
+            if (existing < 0) return false;
+            list.RemoveAt(existing);
+            Bump(key);
+            return true;
+        }
+
         /// <summary>Removes the record for an object from a cell, if present, and bumps the cell's version.</summary>
         public bool Remove(CellKey key, CellRecord record)
         {
@@ -49,9 +63,13 @@ namespace Sol
             return true;
         }
 
-        /// <summary>Loads a cell's records from disk as its baseline. Loading is not a change, so no slot is made dirty by it.</summary>
+        /// <summary>
+        /// Seeds a cell from the saved records. Only applies to a cell this session has not changed, so a change made before the
+        /// cell was streamed back in is never overwritten by the saved copy. Loading is not a change, so no slot is made dirty.
+        /// </summary>
         public void SetBaseline(CellKey key, IEnumerable<CellRecord> records)
         {
+            if (VersionOf(key) != 0) return;
             _cells[key] = new List<CellRecord>(records);
         }
 

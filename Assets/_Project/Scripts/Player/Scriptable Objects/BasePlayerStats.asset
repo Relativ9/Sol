@@ -29,17 +29,11 @@ MonoBehaviour:
   baseFallDamageMultiplier: 1
   baseGravityMultiplier: 2
   baseTerminalVelocity: -20
-  baseMaxHealth: 100
-  baseHealthRegen: 1
-  baseMaxEnergy: 100
-  baseEnergyRegen: 10
-  baseCarryCapacity: 40
   baseInventorySpace: 100
   baseLootMultiplier: 1
-  baseHunger: 100
-  baseThirst: 100
   brawnToMeleeDamage: 0.5
   brawnToCarryCapacity: 2
+  brawnToLiftStrength: 1
   finesseToProjectileDamage: 0.5
   insightToSpellPower: 1
   insightToCritMultiplier: 0.02
@@ -47,34 +41,34 @@ MonoBehaviour:
   finesseToPenetration: 1.5
   vigorToMaxHealth: 5
   willpowerToMaxEnergy: 5
-  baseMeleeDamage: 1
-  baseProjectileDamage: 1
-  baseProjectileRange: 10
-  baseSpellPower: 0
+  vigorToEnergyRegen: 1
+  focusToHealthRegen: 0.1
+  vigorToHunger: 1
+  vigorToThirst: 1
+  focusToProjectileRange: 1
+  insightToMagicResistance: 1
+  vigorToEnvironmentalResistance: 1
+  focusToParryAndBlockTime: 0.01
+  focusToClueRange: 1
+  willpowerToCharmChance: 0.5
+  insightToKnowledgeChance: 0.5
+  finesseToDeceptionChance: 0.5
+  brawnToIntimidationChance: 0.5
+  finesseToCovertMovement: 1
+  finesseToTinker: 1
+  minCritMultiplier: 1.2
   baseArmorValue: 0
-  baseCritChance: 0
-  baseCritMultiplier: 1.2
   baseDeflectionChance: 0
-  baseMagicResistance: 0
   baseFireResistance: 0
   baseIceResistance: 0
   baseVoidResistance: 0
   baseSonicResistance: 0
   baseSoulResistance: 0
   baseReflectChance: 0
-  baseEnvironmentalResistance: 0
-  baseParryAndBlockTime: 0.1
-  baseClueRange: 0
-  baseCharmChance: 0
-  baseKnowledgeChance: 0
-  baseDeceptionChance: 0
-  baseIntimidationChance: 0
-  baseCovertMovement: 0
-  baseTinker: 0
   baseStaggerResistance: 0
   baseBleedResistance: 0
-  baseRigidWeight: 40
-  baseFlexWeight: 15
+  baseRigidWeight: 0
+  baseFlexWeight: 0
   basePlateCount: 0
   baseFlexCount: 0
   baseClothCount: 0

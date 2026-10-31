@@ -270,18 +270,11 @@ namespace Sol
             }
         }
 
-        // Pickup on the Interact input (E). Only acts when pressed, not held or released.
+        // Interact on E, a Tap interaction in the input asset. It performs once on a quick tap, so a loot happens only on tap,
+        // never while E is held. The Input System decides what a tap is; this only runs the pickup.
         public void OnPickup(InputAction.CallbackContext context)
         {
-            // Logs every phase, so the console shows whether E reaches the game at all.
-            Debug.Log($"[Pickup] Interact input: phase={context.phase}");
-
-            if (_timeManager.IsPaused)
-            {
-                Debug.Log("[Pickup] Ignored: game is paused.");
-                return;
-            }
-            if (!context.started) return;
+            if (!context.performed || _timeManager.IsPaused) return;
 
             IPlayerPickup pickup = GetService<IPlayerPickup>();
             if (pickup == null)
@@ -290,6 +283,18 @@ namespace Sol
                 return;
             }
             pickup.TryPickUp();
+        }
+
+        // Grab on its own action (the Grab action, bound to E as a Hold interaction). Performed when the hold completes, which
+        // starts the carry. Canceled when it is released, which ends the carry. A release while paused still ends the carry,
+        // so an item is never left stuck to the view.
+        public void OnGrab(InputAction.CallbackContext context)
+        {
+            IPlayerPickup pickup = GetService<IPlayerPickup>();
+            if (pickup == null) return;
+
+            if (context.performed && !_timeManager.IsPaused) pickup.BeginGrab();
+            else if (context.canceled) pickup.EndGrab();
         }
 
         public void OnAttack(InputAction.CallbackContext context)

@@ -58,7 +58,10 @@ namespace Sol
                 if (col != null)
                 {
                     float bottom = col.bounds.min.y - transform.position.y;
-                    _checkPoint.localPosition = new Vector3(0, bottom + 0.3f, 0);
+                    // The sphere radius is 0.3, so 0.3 puts the sphere's lowest point exactly at the feet. A surface the feet
+                    // sink into by a few millimetres (contact penetration) is then already inside the sphere, and SphereCast
+                    // ignores colliders it starts inside. The extra 0.1 is a skin that keeps the sphere clear of that.
+                    _checkPoint.localPosition = new Vector3(0, bottom + 0.4f, 0);
                 }
                 else
                 {
@@ -101,16 +104,33 @@ namespace Sol
             }
         }
         
+        // Where the ground probe starts. Read from the collider every time, so it follows the feet wherever the body is.
+        // A value baked at Initialize would be measured before the saved position is restored, and would stay wrong.
+        // The sphere radius is 0.3, so an offset of 0.4 keeps the sphere's lowest point 0.1 m above the feet. A surface
+        // the feet sink into by a few millimetres is then clear of the sphere, and SphereCast does not ignore it.
+        private const float ProbeSkin = 0.4f;
+        private Collider _collider;
+
+        private Vector3 ProbeOrigin()
+        {
+            if (_collider == null) _collider = GetComponent<Collider>();
+            if (_collider == null) return _checkPoint != null ? _checkPoint.position : transform.position;
+
+            Bounds b = _collider.bounds;
+            return new Vector3(b.center.x, b.min.y + ProbeSkin, b.center.z);
+        }
+
         private void CheckGround()
         {
             bool hitGround = false;
             _distanceToGround = float.MaxValue;
+            Vector3 origin = ProbeOrigin();
         
             if (_useSphereCast)
             {
                 // Sphere cast for better detection on uneven terrain
                 if (Physics.SphereCast(
-                        _checkPoint.position,
+                        origin,
                         _checkRadius,
                         Vector3.down,
                         out _groundHit,
@@ -125,7 +145,7 @@ namespace Sol
             {
                 // Simple raycast
                 if (Physics.Raycast(
-                        _checkPoint.position,
+                        origin,
                         Vector3.down,
                         out _groundHit,
                         _checkDistance,
@@ -167,7 +187,7 @@ namespace Sol
             _hasLookAheadHit = false;
             if (_isGrounded && _lookAheadDirection.sqrMagnitude > 0.01f)
             {
-                Vector3 probeOrigin = _checkPoint.position 
+                Vector3 probeOrigin = origin 
                                       + _lookAheadDirection.normalized * _lookAheadRayOffset;
                 _hasLookAheadHit = Physics.Raycast(
                     probeOrigin,
@@ -203,7 +223,8 @@ namespace Sol
         
         private void OnDrawGizmos()
         {
-            if (!_debugDraw || _checkPoint == null) return;
+            if (!_debugDraw) return;
+            Vector3 gizmoOrigin = ProbeOrigin();
             
             if (IsGrounded)
             {
@@ -217,19 +238,19 @@ namespace Sol
             if (_useSphereCast)
             {
                 // Draw sphere at check point
-                Gizmos.DrawWireSphere(_checkPoint.position, _checkRadius);
+                Gizmos.DrawWireSphere(gizmoOrigin, _checkRadius);
                 
                 // Draw sphere at max distance
                 Gizmos.DrawWireSphere(
-                    _checkPoint.position + Vector3.down * _checkDistance,
+                    gizmoOrigin + Vector3.down * _checkDistance,
                     _checkRadius);
             }
             else
             {
                 // Draw ray
                 Gizmos.DrawLine(
-                    _checkPoint.position,
-                    _checkPoint.position + Vector3.down * _checkDistance);
+                    gizmoOrigin,
+                    gizmoOrigin + Vector3.down * _checkDistance);
             }
         }
     }

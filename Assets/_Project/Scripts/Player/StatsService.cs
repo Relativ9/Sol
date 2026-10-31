@@ -7,7 +7,8 @@ namespace Sol
     public class StatsService : MonoBehaviour, IStatsService
     {
         private Dictionary<StatTypeEnum, float> _baseValues = new();
-        private Dictionary<StatTypeEnum, float> _derivedCache = new();
+        private Dictionary<StatTypeEnum, float> _totalCache = new();
+        private Dictionary<StatTypeEnum, float> _statFloors = new();
 
         private Dictionary<StatTypeEnum, Dictionary<ModifierCategory, List<StatModifier>>> _modifiersByCategory = new();
         private Dictionary<string, StatTypeEnum> _modifierToStatLookup = new();
@@ -35,53 +36,27 @@ namespace Sol
 
             //Movement
             _baseValues[StatTypeEnum.MoveSpeed] = statSO.baseMoveSpeed;
-            _baseValues[StatTypeEnum.RunMultiplier] = statSO.baseRunMultiplier;
             _baseValues[StatTypeEnum.Deceleration] = statSO.baseDeceleration;
             _baseValues[StatTypeEnum.CrouchSpeed] = statSO.baseCrouchSpeed;
-            _baseValues[StatTypeEnum.JumpForce] = statSO.baseJumpForce;
             _baseValues[StatTypeEnum.JumpCooldown] = statSO.baseJumpCooldown;
             _baseValues[StatTypeEnum.JumpDirectionBoost] = statSO.baseJumpDirectionBoost;
             _baseValues[StatTypeEnum.MaxDoubleJump] = statSO.baseMaxDoubleJump;
-            _baseValues[StatTypeEnum.FallDamageMultiplier] = statSO.baseFallDamageMultiplier;
             _baseValues[StatTypeEnum.GravityMultiplier] = statSO.baseGravityMultiplier;
             _baseValues[StatTypeEnum.TerminalVelocity] = statSO.baseTerminalVelocity;
 
             //Resources
-            _baseValues[StatTypeEnum.MaxHealth] = statSO.baseMaxHealth;
-            _baseValues[StatTypeEnum.MaxEnergy] = statSO.baseMaxEnergy;
-            _baseValues[StatTypeEnum.HealthRegen] = statSO.baseHealthRegen;
-            _baseValues[StatTypeEnum.EnergyRegen] = statSO.baseEnergyRegen;
-            _baseValues[StatTypeEnum.CarryCapacity] = statSO.baseCarryCapacity;
             _baseValues[StatTypeEnum.InventorySpace] = statSO.baseInventorySpace;
             _baseValues[StatTypeEnum.LootMultiplier] = statSO.baseLootMultiplier;
-            _baseValues[StatTypeEnum.Hunger] = statSO.baseHunger;
-            _baseValues[StatTypeEnum.Thirst] = statSO.baseThirst;
 
             //Combat
-            _baseValues[StatTypeEnum.MeleeDamage] = statSO.baseMeleeDamage;
-            _baseValues[StatTypeEnum.ProjectileDamage] = statSO.baseProjectileDamage;
-            _baseValues[StatTypeEnum.ProjectileRange] = statSO.baseProjectileRange;
-            _baseValues[StatTypeEnum.SpellPower] = statSO.baseSpellPower;
             _baseValues[StatTypeEnum.ArmorValue] = statSO.baseArmorValue;
-            _baseValues[StatTypeEnum.CritChance] = statSO.baseCritChance;
-            _baseValues[StatTypeEnum.CritMultiplier] = statSO.baseCritMultiplier;
             _baseValues[StatTypeEnum.DeflectionChance] = statSO.baseDeflectionChance;
-            _baseValues[StatTypeEnum.MagicResistance] = statSO.baseMagicResistance;
             _baseValues[StatTypeEnum.FireResistance] = statSO.baseFireResistance;
             _baseValues[StatTypeEnum.IceResistance] = statSO.baseIceResistance;
             _baseValues[StatTypeEnum.VoidResistance] = statSO.baseVoidResistance;
             _baseValues[StatTypeEnum.SonicResistance] = statSO.baseSonicResistance;
             _baseValues[StatTypeEnum.SoulResistance] = statSO.baseSoulResistance;
             _baseValues[StatTypeEnum.ReflectChance] = statSO.baseReflectChance;
-            _baseValues[StatTypeEnum.EnvironmentalResistance] = statSO.baseEnvironmentalResistance;
-            _baseValues[StatTypeEnum.ParryAndBlockTime] = statSO.baseParryAndBlockTime;
-            _baseValues[StatTypeEnum.ClueRange] = statSO.baseClueRange;
-            _baseValues[StatTypeEnum.CharmChance] = statSO.baseCharmChance;
-            _baseValues[StatTypeEnum.KnowledgeChance] = statSO.baseKnowledgeChance;
-            _baseValues[StatTypeEnum.DeceptionChance] = statSO.baseDeceptionChance;
-            _baseValues[StatTypeEnum.IntimidationChance] = statSO.baseIntimidationChance;
-            _baseValues[StatTypeEnum.CovertMovement] = statSO.baseCovertMovement;
-            _baseValues[StatTypeEnum.Tinker] = statSO.baseTinker;
             _baseValues[StatTypeEnum.StaggerResistance] = statSO.baseStaggerResistance;
             _baseValues[StatTypeEnum.BleedResistance] = statSO.baseBleedResistance;
             _baseValues[StatTypeEnum.RigidWeight] = statSO.baseRigidWeight;
@@ -155,7 +130,7 @@ namespace Sol
             }
 
             foreach (StatTypeEnum stat in affectedStats)
-                RefreshDerivedStat(stat);
+                RefreshStat(stat);
 
             // foreach (var statEntry in _modifiersByCategory)
             // {
@@ -203,11 +178,11 @@ namespace Sol
         public float GetStat(StatTypeEnum statType)
         {
 
-            if (_derivedCache.TryGetValue(statType, out float cached))
+            if (_totalCache.TryGetValue(statType, out float cached))
                 return cached;
             // Stat hasn't been calculated yet (e.g. queried before any modifier applied)
-            RefreshDerivedStat(statType);
-            return _derivedCache.GetValueOrDefault(statType, _baseValues.GetValueOrDefault(statType, 0f));
+            RefreshStat(statType);
+            return _totalCache.GetValueOrDefault(statType, _baseValues.GetValueOrDefault(statType, 0f));
             // if (!_baseValues.TryGetValue(statType, out float baseValue))
             //     return 0f;
             // // Flatten all modifiers for this stat, skipping Base category in the filter if desired
@@ -262,37 +237,54 @@ namespace Sol
             WriteBase(statType, value);
         }
 
-        // Equipment and the derivation are the only writers of derived totals.
-        public void SetDerivedBase(StatTypeEnum statType, float value)
+        // One source, one contribution per stat. ApplyOrReplaceModifier swaps the old entry for the same source, so the
+        // source's total is the value it last set and never accumulates across calls.
+        public void SetSourceContribution(StatTypeEnum statType, string sourceId, float value, ModifierCategory category)
+        {
+            ApplyOrReplaceModifier(new StatModifier(
+                type: ModifierType.FlatAdditive,
+                category: category,
+                statType: statType,
+                value: value,
+                sourceId: sourceId,
+                duration: -1f));
+        }
+
+        // Floors are minimums on a derived total. They are set by the resolver from the stat asset, so the design value
+        // of a multiplier is never lost to a negative modifier.
+        public void SetDerivedFloor(StatTypeEnum statType, float floor)
         {
             if (!StatRoles.IsDerived(statType))
             {
-                Debug.LogError($"[{nameof(StatsService)}] {statType} is a {StatRoles.RoleOf(statType)} stat, not a derived stat. It was not set.");
+                Debug.LogError($"[{nameof(StatsService)}] {statType} is a {StatRoles.RoleOf(statType)} stat, not a derived stat. No floor was set.");
                 return;
             }
-            WriteBase(statType, value);
+            _statFloors[statType] = floor;
+            RefreshStat(statType);
         }
 
         private void WriteBase(StatTypeEnum statType, float value)
         {
             _baseValues[statType] = value;
-            RefreshDerivedStat(statType);
+            RefreshStat(statType);
         }
 
-        private void RefreshDerivedStat(StatTypeEnum statType)
+        private void RefreshStat(StatTypeEnum statType)
         {
-            if (!_baseValues.TryGetValue(statType, out float baseValue))
-                return;
+            // Derived stats have no SO base, so a missing base is 0. Returning early here would leave them stuck at 0.
+            float baseValue = _baseValues.GetValueOrDefault(statType, 0f);
             StatModifier[] mods = _modifiersByCategory[statType]
                 .SelectMany(kvp => kvp.Value)
                 .Where(m => m.category != ModifierCategory.Base)
                 .ToArray();
             // Caps apply to the stacked total from every source, so the stats screen and every consumer see the same value.
-            float newValue = StatCaps.Apply(statType, _calculator.Calculate(statType, baseValue, mods));
-            float oldValue = _derivedCache.GetValueOrDefault(statType, baseValue);
+            float total = _calculator.Calculate(statType, baseValue, mods);
+            if (_statFloors.TryGetValue(statType, out float floor)) total = Mathf.Max(total, floor);
+            float newValue = StatCaps.Apply(statType, total);
+            float oldValue = _totalCache.GetValueOrDefault(statType, baseValue);
             if (!Mathf.Approximately(oldValue, newValue))
             {
-                _derivedCache[statType] = newValue;
+                _totalCache[statType] = newValue;
                 _statsDirty = true;
             }
         }
@@ -347,7 +339,7 @@ namespace Sol
 
             // Shared tail: runs for both replace and add so the lookup and cache stay in sync
             _modifierToStatLookup[modToStore.id] = statType;
-            RefreshDerivedStat(statType);
+            RefreshStat(statType);
 
             return modToStore.id;
         }
@@ -367,7 +359,7 @@ namespace Sol
             _modifiersByCategory[modifier.statType][modifier.category].Add(modifier);
 
             _modifierToStatLookup[modifier.id] = modifier.statType;
-            RefreshDerivedStat(modifier.statType);
+            RefreshStat(modifier.statType);
 
             return modifier.id;
         }
@@ -387,7 +379,7 @@ namespace Sol
             }
 
             _modifierToStatLookup.Remove(modifierId);
-            RefreshDerivedStat(statType);
+            RefreshStat(statType);
 
             // foreach (var statEntry in _modifiersByCategory)
             // {
@@ -437,7 +429,7 @@ namespace Sol
             }
 
             foreach (StatTypeEnum stat in affectedStats)
-                RefreshDerivedStat(stat);
+                RefreshStat(stat);
 
             // foreach (var statEntry in _modifiersByCategory)
             // {
@@ -458,7 +450,7 @@ namespace Sol
 
             _modifiersByCategory[statType][category].Clear();
 
-            RefreshDerivedStat(statType);
+            RefreshStat(statType);
         }
 
         public float GetSpeedMultiplier()

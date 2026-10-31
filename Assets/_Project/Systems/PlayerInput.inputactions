@@ -66,7 +66,7 @@
                     "id": "7e746da6-3ffb-4d0c-8ab5-6bc93ea4d47c",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Tap",
                     "initialStateCheck": false
                 },
                 {
@@ -76,6 +76,15 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Grab",
+                    "type": "Button",
+                    "id": "f24f9873-1ad7-4662-b0b0-f6ff846adc4e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Hold",
                     "initialStateCheck": false
                 }
             ],
@@ -194,7 +203,7 @@
                     "name": "",
                     "id": "61306076-8568-4e2c-a1cc-fa63e83c529b",
                     "path": "<Keyboard>/e",
-                    "interactions": "",
+                    "interactions": "Tap",
                     "processors": "",
                     "groups": ";Mouse&Keyboard",
                     "action": "Interact",
@@ -209,6 +218,17 @@
                     "processors": "",
                     "groups": ";Mouse&Keyboard",
                     "action": "Discard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3e708126-0358-4b7e-a113-be102c368081",
+                    "path": "<Keyboard>/e",
+                    "interactions": "Hold(duration=0.21)",
+                    "processors": "",
+                    "groups": ";Mouse&Keyboard",
+                    "action": "Grab",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

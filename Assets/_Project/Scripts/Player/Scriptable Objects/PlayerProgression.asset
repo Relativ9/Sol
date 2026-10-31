@@ -16,4 +16,4 @@ MonoBehaviour:
   talentPointsPerLevel: 1
   startingTalentPoints: 6
   attributePointsPerLevel: 3
-  startingAttributePoints: 3
+  startingAttributePoints: 60

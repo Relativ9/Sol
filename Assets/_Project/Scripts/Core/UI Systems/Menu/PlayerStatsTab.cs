@@ -6,8 +6,8 @@ namespace Sol
 {
     /// <summary>
     /// Player Stats tab of the K menu. The layout comes from PlayerStatsTab.uxml and MenuTheme.uss. This class fills the
-    /// named containers: attributes with spend and refund, vitals, and derived stats as flowing category sections.
-    /// Only Attribute and Derived stats are shown (see StatRoles). Tuning stats never appear here.
+    /// named containers: attributes with spend and refund, vitals, and stats as flowing category sections.
+    /// Attribute stats can be spent on; every Combat stat is shown, Tuning included, so changes can be measured.
     /// The only writes are the attribute buttons, which call ProgressionService.
     /// </summary>
     public class PlayerStatsTab : IMenuTab
@@ -43,9 +43,10 @@ namespace Sol
             { StatTypeEnum.Willpower, "Maximum energy, global cooldown, spell cost, charm" }
         };
 
-        // Derived stats shown on the tab, grouped in order. Format: F = decimals, P = percent, X = multiplier, N = n/5.
-        // Every row is filtered through StatRoles.IsVisible before it is shown, so a Tuning stat can never appear here.
-        private static readonly (string Group, StatTypeEnum Stat, string Label, string Format)[] DerivedRows =
+        // Stats shown on the tab, grouped in order. Format: F = decimals, P = percent, X = multiplier, N = n/5.
+        // Every Combat stat from StatTypeEnum is listed here, Tuning included, so each one can be measured as it changes.
+        // Rows are not filtered by role: a Tuning stat on this list is shown like any other.
+        private static readonly (string Group, StatTypeEnum Stat, string Label, string Format)[] StatRows =
         {
             ("Offense", StatTypeEnum.MeleeDamage, "Melee damage", "F1"),
             ("Offense", StatTypeEnum.ProjectileDamage, "Projectile damage", "F1"),
@@ -54,8 +55,11 @@ namespace Sol
             ("Offense", StatTypeEnum.CritChance, "Crit chance", "P"),
             ("Offense", StatTypeEnum.CritMultiplier, "Crit multiplier", "X"),
             ("Offense", StatTypeEnum.Penetration, "Penetration", "F1"),
+            ("Offense", StatTypeEnum.ParryAndBlockTime, "Parry and block time (s)", "F2"),
+            ("Offense", StatTypeEnum.ClueRange, "Clue range", "F1"),
             ("Defense", StatTypeEnum.ArmorValue, "Armor", "F0"),
             ("Defense", StatTypeEnum.DeflectionChance, "Deflection", "P"),
+            ("Defense", StatTypeEnum.ReflectChance, "Reflect chance", "P"),
             ("Defense", StatTypeEnum.MagicResistance, "Magic resistance", "F0"),
             ("Defense", StatTypeEnum.FireResistance, "Fire resistance", "F0"),
             ("Defense", StatTypeEnum.IceResistance, "Ice resistance", "F0"),
@@ -65,6 +69,12 @@ namespace Sol
             ("Defense", StatTypeEnum.StaggerResistance, "Stagger resistance", "P"),
             ("Defense", StatTypeEnum.BleedResistance, "Bleed resistance", "P"),
             ("Defense", StatTypeEnum.EnvironmentalResistance, "Environmental resistance", "F0"),
+            ("Social", StatTypeEnum.CharmChance, "Charm", "P"),
+            ("Social", StatTypeEnum.KnowledgeChance, "Knowledge", "P"),
+            ("Social", StatTypeEnum.DeceptionChance, "Deception", "P"),
+            ("Social", StatTypeEnum.IntimidationChance, "Intimidation", "P"),
+            ("Offense", StatTypeEnum.StaggerChance, "Stagger chance", "P"),
+            ("Offense", StatTypeEnum.BleedChance, "Bleed chance", "P"),
             ("Armour set", StatTypeEnum.PlateCount, "Plate pieces", "N"),
             ("Armour set", StatTypeEnum.FlexCount, "Flex pieces", "N"),
             ("Armour set", StatTypeEnum.ClothCount, "Cloth pieces", "N"),
@@ -73,6 +83,7 @@ namespace Sol
             ("Survival", StatTypeEnum.MaxEnergy, "Max energy", "F0"),
             ("Survival", StatTypeEnum.EnergyRegen, "Energy regen /s", "F1"),
             ("Utility", StatTypeEnum.CarryCapacity, "Carry capacity (kg)", "F0"),
+            ("Utility", StatTypeEnum.LiftStrength, "Lift strength", "F1"),
             ("Utility", StatTypeEnum.InventorySpace, "Inventory space", "F0"),
             ("Utility", StatTypeEnum.LootMultiplier, "Loot multiplier", "X"),
         };
@@ -86,7 +97,7 @@ namespace Sol
         private readonly Label[] _vitalLabels = new Label[4];
         private ScrollView _scroll;
         private VisualElement _attributeList;
-        private VisualElement _derivedFlow;
+        private VisualElement _statFlow;
 
         private const float ScrollStepPixels = 40f;
 
@@ -94,7 +105,7 @@ namespace Sol
         private readonly Dictionary<StatTypeEnum, Label> _attributeAllocLabels = new();
         private readonly Dictionary<StatTypeEnum, Button> _spendButtons = new();
         private readonly Dictionary<StatTypeEnum, Button> _refundButtons = new();
-        private readonly List<(StatTypeEnum Stat, Label Value)> _derivedLabels = new();
+        private readonly List<(StatTypeEnum Stat, Label Value)> _statLabels = new();
 
         public void Build(VisualElement content)
         {
@@ -120,10 +131,10 @@ namespace Sol
                 _vitalsRow.Add(_vitalLabels[i]);
             }
             _attributeList = content.Q("stats-attributes");
-            _derivedFlow = content.Q("stats-derived");
+            _statFlow = content.Q("stats-flow");
 
             BuildAttributes();
-            BuildDerived();
+            BuildStats();
         }
 
         public void OnShow() => Refresh();
@@ -132,7 +143,7 @@ namespace Sol
 
         // The virtual cursor sends no wheel events, so UIManager forwards its scroll notches here while this tab is open.
         // Inverted to match the talent tree: wheel up moves the list up, wheel down moves it down.
-        public void ScrollDerivedBy(int notches)
+        public void ScrollStatsBy(int notches)
         {
             if (_scroll == null || notches == 0) return;
             Vector2 offset = _scroll.scrollOffset;
@@ -150,14 +161,14 @@ namespace Sol
             }
         }
 
-        // Each derived category is its own section in a wrapping row, so Defense sits beside Offense and Armour set
+        // Each stat category is its own section in a wrapping row, so Defense sits beside Offense and Armour set
         // beside Defense while there is room, and wraps only when the panel runs out of width.
-        private void BuildDerived()
+        private void BuildStats()
         {
             var sections = new Dictionary<string, VisualElement>();
-            foreach (var row in DerivedRows)
+            foreach (var row in StatRows)
             {
-                if (!StatRoles.IsVisible(row.Stat)) continue;
+                
 
                 if (!sections.TryGetValue(row.Group, out VisualElement section))
                 {
@@ -165,11 +176,11 @@ namespace Sol
                     section.AddToClassList("stats-category");
                     section.Add(Text(row.Group, "stats-category-title"));
                     sections[row.Group] = section;
-                    _derivedFlow.Add(section);
+                    _statFlow.Add(section);
                 }
 
                 var value = Text("", "menu-value");
-                _derivedLabels.Add((row.Stat, value));
+                _statLabels.Add((row.Stat, value));
                 section.Add(StatRow(row.Label, value));
             }
         }
@@ -250,17 +261,17 @@ namespace Sol
                 for (int i = 1; i < _vitalLabels.Length; i++) _vitalLabels[i].text = "";
             }
 
-            foreach (var entry in _derivedLabels)
+            foreach (var entry in _statLabels)
             {
                 entry.Value.text = StatCaps.IsCapped(entry.Stat)
                     ? $"{_stats.GetStat(entry.Stat):0}/{StatCaps.ResistanceCap:0}"
-                    : FormatDerived(entry.Stat, _stats.GetStat(entry.Stat));
+                    : FormatStat(entry.Stat, _stats.GetStat(entry.Stat));
             }
         }
 
-        private static string FormatDerived(StatTypeEnum stat, float value)
+        private static string FormatStat(StatTypeEnum stat, float value)
         {
-            foreach (var row in DerivedRows)
+            foreach (var row in StatRows)
             {
                 if (row.Stat != stat) continue;
                 return row.Format switch

@@ -50,12 +50,8 @@ namespace Sol
 
             if (r.Kind == CellRecordKind.Dropped) w.Write(r.Guid.ToByteArray());
 
-            if (r.Kind == CellRecordKind.Tombstone)
-            {
-                w.Write(r.MovedCellX);
-                w.Write(r.MovedCellZ);
-                return;
-            }
+            // A tombstone is only the object's identity. It carries no pose, since the destination is in the moved record.
+            if (r.Kind == CellRecordKind.Tombstone) return;
 
             w.Write(r.X);
             w.Write(r.Y);

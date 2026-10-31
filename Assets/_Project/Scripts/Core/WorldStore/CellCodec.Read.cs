@@ -67,12 +67,7 @@ namespace Sol
                 if (record.Kind == CellRecordKind.Dropped)
                     record.Guid = new Guid(r.ReadBytes(16));
 
-                if (record.Kind == CellRecordKind.Tombstone)
-                {
-                    record.MovedCellX = r.ReadInt32();
-                    record.MovedCellZ = r.ReadInt32();
-                    return true;
-                }
+                if (record.Kind == CellRecordKind.Tombstone) return true;
 
                 if (record.Kind != CellRecordKind.Placed && record.Kind != CellRecordKind.Dropped) return false;
 

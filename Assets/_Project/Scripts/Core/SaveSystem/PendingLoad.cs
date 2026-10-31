@@ -15,10 +15,17 @@ namespace Sol
             Slot = string.IsNullOrEmpty(slot) ? SaveCoordinator.ManualSlot : slot;
         }
 
-        /// <summary>The slot startup should read: the requested one if any, otherwise the manual slot. Consumed on read.</summary>
-        public static string Consume()
+        /// <summary>
+        /// The slot startup should read. A requested slot is used if one was set. Otherwise the newest save across all
+        /// slots is used, so a normal boot always resumes from the latest state. Falls back to the manual slot when no save
+        /// exists at all, so a new game is created there. Consumed on read.
+        /// </summary>
+        public static string Consume(ISaveService saves)
         {
-            string slot = string.IsNullOrEmpty(Slot) ? SaveCoordinator.ManualSlot : Slot;
+            string slot = Slot;
+            if (string.IsNullOrEmpty(slot)) slot = saves?.NewestSlot();
+            if (string.IsNullOrEmpty(slot)) slot = SaveCoordinator.ManualSlot;
+
             Slot = null;
             return slot;
         }

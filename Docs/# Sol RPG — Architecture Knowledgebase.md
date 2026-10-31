@@ -74,7 +74,7 @@ The roadmap from scratch to a working character pipeline, in the order it was bu
 ### Phase 6.5 — Player Stats & Menu (DONE)
 - K opens a full-screen menu with a vertical tab bar (`IMenuTab`, `MenuTabBar`)
 - Talents tab (wheel, arrows, mouse-wheel tier scroll, tree header, outlines in tree colour)
-- Player Stats tab (attributes with spend/refund, vitals, derived stats in a 4-column grid)
+- Player Stats tab (attributes with spend/refund, vitals, and a Stats section with every Combat stat, Tuning included, in category columns)
 - Menu hides the HUD while open
 
 ### Phase 7 — Damage & Status (DONE)
@@ -93,7 +93,7 @@ The roadmap from scratch to a working character pipeline, in the order it was bu
 
 ### Phase 8 — Inventory & Equipment (IN PROGRESS: playtested for drag, persistence, slots and icons; weapon combat not yet built)
 - Equipment: `IEquipmentService` writes `Equipment` modifiers keyed by item instance ID; unequip removes them
-- Equipped armour feeds `RigidWeight`, `FlexWeight` and the plate, flex and cloth piece counts (resistance and deflection derive from these)
+- Equipped armour totals (`RigidWeight`, `FlexWeight`, the plate, flex and cloth piece counts, and `ArmorValue`) are written as one `Equipment` contribution through `SetSourceContribution`, under `Equipment_ArmourTotals`. Resistance and deflection derive from these through `GetStat`.
 - Inventory: `IInventoryService` owns a grid sized from `InventorySpace`; items have a footprint and rotation
 - Equipment silhouette: `EquipmentSilhouette` defines each slot's position and size in one place
 - Drag and drop: press to pick up, the nearest fitting spot (or matching slot) highlights, release commits exactly what was highlighted
@@ -126,7 +126,7 @@ This is a status board for re-orientation after a break.
 | GameInitializer Awake/Start split | ✅ Complete | Validates the damage table at startup |
 | SaveService / ISaveManager | ✅ Complete | Lazy (2 s debounce) and immediate; skipped while the repair prompt is open |
 | PlayerSaveData schema | ✅ Complete | Attribute allocations now saved |
-| Save validation + repair prompt | ✅ Complete | Repairs broken talent pools; backup on new game |
+| Save validation + repair prompt | ✅ Complete | Repairs broken talent pools. An unreadable save is never repaired: the player chooses Start new game (manual slot backed up first) or Keep file (saves blocked for the session). |
 | Stat system | ✅ Complete | Append-only `StatTypeEnum` |
 | Progression / attributes | ✅ Complete | Pool derived from level |
 | Talent tree (data, effects, UI) | ✅ Complete | Verified in Unity: allocation, stacking, tree focus |
@@ -152,13 +152,12 @@ This is a status board for re-orientation after a break.
 
 ## 4. Active Task — What We Are Doing Right Now
 
-**Current focus: Phase 8, Inventory & Equipment (first draft built).** Phase 7 is closed. Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play. The Phase 8 draft needs a playtest before it's treated as done.
+**Current focus: Phase 8, Inventory & Equipment (playtested).** Phase 7 is closed. Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play. Inventory, equipment, world item moves across cells, save and load, and the repair prompts are playtested.
 
 Open items, carried into Phase 8:
-1. Equipment must set the plate, flex and cloth counts and the armour weights, through `Equipment` modifiers (see §17).
+1. Set bonuses for full plate, flex and cloth (see the armour doc).
 2. Player weapon swings need attack animations to be fully tested.
 3. The temporary harnesses come out once animations exist. The swing path itself stays.
-4. Set bonuses for full plate, flex and cloth are defined in the armour doc but not built. They belong with the set system.
 
 Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
 
@@ -246,9 +245,12 @@ void Start()
     _progressionService.Initialize(playerProgressionSO, playerStatSO, _statsService,
         saveData.level, saveData.totalTalentPoints, saveData.totalAttributePoints,
         saveData.attributeAllocations);
-    _progressionService.ReloadAllBaseStats(); // Must stay here: needed on load, see §15
+    _progressionService.ReloadAllBaseStats(); // Must stay here: applies the attribute rules. Derived stats have no SO base, so this runs before vitals.
 
-    // 4. Calculate talent tree node positions (no UI)
+    // 4. Apply attribute rules (inside step 3). Then seed vitals, which read MaxHealth, MaxEnergy, MaxHunger and MaxThirst.
+    _playerVitals?.Initialize(saveData, _statsService);
+
+    // 4b. Calculate talent tree node positions (no UI)
     _talentTreeGenerator = ServiceLocator.Get<ITalentTreeGenerator>();
     _talentTreeGenerator?.LoadData();
 
@@ -261,7 +263,7 @@ void Start()
     int derivedSpent = talentState?.GetTotalAllocatedPoints() ?? 0;
     _progressionService.SetSpentTalentPoints(derivedSpent);
 
-    // Step 7: DerivedStatResolver.RecalculateAll() (implemented, called after each attribute change)
+    // Step 7: DerivedStatResolver.RecalculateAll() runs after each attribute change, equipment change and load.
     // Future step 8: Equipment system loads and pushes Equipment modifiers
 }
 ```
@@ -334,19 +336,23 @@ StatsService._baseValues (runtime base storage, per StatTypeEnum)
     ↓ stacked by Equipment system → ApplyOrReplaceModifier(Equipment) [Future]
     ↓ stacked by triggers/spells → ApplyOrReplaceModifier(Temporary/Environmental) [Runtime]
     ↓ calculated by StandardStatCalculator.Calculate(base, modifiers[])
-    ↓ result cached in StatsService._derivedCache
+    ↓ result cached in StatsService._totalCache
     ↓ read via GetStat(StatTypeEnum) — O(1) dictionary lookup
 ```
 
 ### Ownership Table
 | Data | Owner | Method |
 |---|---|---|
-| Default stat template | `PlayerStatSO` | `StatsService.Initialize()` seeds bases |
-| Level-up attribute deltas | `ProgressionService` | `StatsService.SetBaseStat()` |
+| Default stat template | `PlayerStatSO` | `StatsService.Initialize()` seeds bases for attributes and Tuning stats only. Derived stats have no SO base. The stats screen shows every Combat stat, Tuning included. |
+| Level-up attribute deltas | `ProgressionService` | `StatsService.SetAttributeBase()` |
+| Attribute-derived values | `DerivedStatResolver` | `ApplyOrReplaceModifier(Permanent)` with a `Derived_*` source |
 | Talent permanent bonuses | `TalentStateService` | `StatsService.ApplyOrReplaceModifier(Permanent)` |
-| Equipment bonuses | Equipment system (future) | `StatsService.ApplyOrReplaceModifier(Equipment)` |
+| Equipment bonuses | `EquipmentService` | `StatsService.ApplyOrReplaceModifier(Equipment)` |
+| Armour totals | `EquipmentService` | `StatsService.SetSourceContribution(Equipment)` |
+| Potions and effects | Effects / triggers | `StatsService.SetSourceContribution` or `ApplyOrReplaceModifier` |
+| Minimum on a derived total | `DerivedStatResolver` | `StatsService.SetDerivedFloor()` |
 | Temporary effects | Spells/triggers | `StatsService.ApplyOrReplaceModifier(Temporary)` |
-| Final derived values | `StatsService._derivedCache` | `GetStat()` |
+| Final derived values | `StatsService._totalCache` | `GetStat()` |
 
 ### StatTypeEnum
 ```csharp
@@ -399,8 +405,47 @@ public enum StatTypeEnum
 - `StaggerResistance = RigidWeight × 0.2` points per kg (plate).
 - `BleedResistance = FlexWeight × 0.333` points per kg (flex).
 - `DeflectionChance = min(PlateCount, 5) × 3` points. Deflection comes only from plate. No attribute feeds it.
-- `Penetration` gets `Finesse × 1.5` points per point above default, plus equipment and talent sources.
-- Every derived value is an `Equipment` modifier with a reserved `sourceId`, replaced on every recalculation.
+- `Penetration` gets `Finesse × 1.5` points per point of Finesse, plus equipment and talent sources.
+- `RunMultiplier` has a floor (`PlayerStatSO.minRunMultiplier`, default 1) set through `SetDerivedFloor`. Running is never slower than walking.
+- `FallDamageMultiplier` starts at 1 and goes down: `max(0, 1 − Finesse × finesseToFallDamageReduction)`. Derived stats have no SO base, so the starting 1 is part of the rule.
+- `CritMultiplier` has a floor (`PlayerStatSO.minCritMultiplier`, default 1.2) set through `SetDerivedFloor`. A total below the floor is raised to it; a total above it is unchanged.
+- Every attribute rule is a `Derived_*` `Equipment` modifier with a reserved `sourceId`, replaced on every recalculation.
+
+### Attribute rules (every Derived stat)
+Each rule is `attribute's full current value × rate`. The rate is a field on `PlayerStatSO` and is tuned by testing. Defaults are placeholders.
+
+| Derived stat | Owner attribute | Rate field |
+|---|---|---|
+| MeleeDamage | Brawn | brawnToMeleeDamage |
+| CarryCapacity | Brawn | brawnToCarryCapacity |
+| LiftStrength | Brawn | brawnToLiftStrength |
+| IntimidationChance | Brawn | brawnToIntimidationChance |
+| ProjectileDamage | Finesse | finesseToProjectileDamage |
+| Penetration | Finesse | finesseToPenetration |
+| DeceptionChance | Finesse | finesseToDeceptionChance |
+| CovertMovement | Finesse | finesseToCovertMovement |
+| Tinker | Finesse | finesseToTinker |
+| SpellPower | Insight | insightToSpellPower |
+| CritMultiplier | Insight | insightToCritMultiplier (with floor) |
+| JumpForce | Brawn | brawnToJumpForce |
+| FallDamageMultiplier | Finesse (reduces) | finesseToFallDamageReduction |
+| RunMultiplier | none (floor only) | minRunMultiplier |
+| MagicResistance | Insight | insightToMagicResistance |
+| KnowledgeChance | Insight | insightToKnowledgeChance |
+| CritChance | Focus | focusToCritChance |
+| ProjectileRange | Focus | focusToProjectileRange |
+| HealthRegen | Focus | focusToHealthRegen |
+| ParryAndBlockTime | Focus | focusToParryAndBlockTime |
+| ClueRange | Focus | focusToClueRange |
+| MaxHealth | Vigor | vigorToMaxHealth |
+| EnergyRegen | Vigor | vigorToEnergyRegen |
+| Hunger | Vigor | vigorToHunger |
+| Thirst | Vigor | vigorToThirst |
+| EnvironmentalResistance | Vigor | vigorToEnvironmentalResistance |
+| MaxEnergy | Willpower | willpowerToMaxEnergy |
+| CharmChance | Willpower | willpowerToCharmChance |
+
+Stats with no attribute rule are Tuning or equipment-driven: DeflectionChance, ReflectChance, ArmorValue, all resistances, attunements, InventorySpace, LootMultiplier and the armour weight and piece counts.
 
 ### ModifierType
 ```csharp
@@ -426,7 +471,7 @@ finalValue *= (1f + percentSum);
 ```csharp
 public enum ModifierCategory
 {
-    Base,           // Reserved. Never pushed by external systems. Base mutations go through SetBaseStat().
+    Base,           // Reserved. Never pushed by external systems. Attribute base mutations go through SetAttributeBase(); Derived and Tuning stats are never set this way.
     Permanent,      // Talents, shrine blessings, achievement rewards. Persist in save.
     Equipment,      // From equipped items. Removed on unequip.
     Temporary,      // Spell effects, buffs, debuffs. Have duration > 0f. Tick down in Update().
@@ -489,7 +534,7 @@ If you ever want category-compounding (e.g., Equipment and Talent percents multi
 ### StatsService — Internal Storage Fields
 ```csharp
 private Dictionary<StatTypeEnum, float> _baseValues;
-private Dictionary<StatTypeEnum, float> _derivedCache;
+private Dictionary<StatTypeEnum, float> _totalCache;
 private Dictionary<StatTypeEnum, Dictionary<ModifierCategory, List<StatModifier>>> _modifiersByCategory;
 private Dictionary<string, StatTypeEnum> _modifierToStatLookup; // O(1) reverse lookup
 private bool _statsDirty;
@@ -498,9 +543,9 @@ private IStatCalculator _calculator;
 ```
 
 ### StatsService — Cache & Dirty Pattern
-- `GetStat()` reads `_derivedCache` (O(1)). Falls back to `RefreshDerivedStat` only on first access before any modifier is applied.
-- Every mutation calls `RefreshDerivedStat(statType)` immediately after the change.
-- `RefreshDerivedStat` uses `Mathf.Approximately` — only updates cache if value actually changed. Sets `_statsDirty = true` if changed.
+- `GetStat()` reads `_totalCache` (O(1)). Falls back to `RefreshStat` only on first access before any modifier is applied.
+- Every mutation calls `RefreshStat(statType)` immediately after the change.
+- `RefreshStat` uses `Mathf.Approximately` — only updates cache if value actually changed. Sets `_statsDirty = true` if changed.
 - `LateUpdate()` fires `_onStatsChangedEvent.Raise()` once per frame if dirty, then resets flag. Multiple stat changes in one frame produce one event.
 - `UpdateModifierDurations()` runs in `Update()` (NOT `LateUpdate`) so gameplay systems see expired values in the same frame they expire.
 - Expiry uses reverse iteration (`Count - 1` down) and `HashSet<StatTypeEnum>` to refresh each affected stat exactly once.
@@ -509,7 +554,9 @@ private IStatCalculator _calculator;
 ```csharp
 float  GetBaseStat(StatTypeEnum statType);
 float  GetStat(StatTypeEnum statType);
-void   SetBaseStat(StatTypeEnum statType, float value);
+void   SetAttributeBase(StatTypeEnum statType, float value); // Attribute stats only (progression)
+void   SetDerivedFloor(StatTypeEnum statType, float floor);  // Derived stats only (minimum total)
+void   SetSourceContribution(StatTypeEnum statType, string sourceId, float value, ModifierCategory category); // any role; replaces the source's last value
 string ApplyOrReplaceModifier(StatModifier modifier);
 string ApplyModifier(StatModifier modifier);
 void   RemoveModifier(string modifierId);
@@ -523,10 +570,10 @@ Immutable SO. Stores defaults for every stat. Core attributes are `int`; all oth
 
 ```
 Core (int, default 10 each): brawn, finesse, insight, focus, vigor, willpower
-Movement: baseMoveSpeed=3, baseRunMultiplier=1.6, baseGravityMultiplier=2.5,
-          baseTerminalVelocity=-20, baseJumpForce=5, ...
-Resources: baseMaxHealth=100, baseMaxEnergy=100, baseHealthRegen=1, ...
-Combat:    baseMeleeDamage=1, baseCritMultiplier=1.2, baseMagicResistance=0, ...
+Movement: baseMoveSpeed=3, baseGravityMultiplier=2.5,
+          baseTerminalVelocity=-20, ... (JumpForce and FallDamage are Derived, no base)
+Resources (Tuning only): baseInventorySpace=10, baseLootMultiplier=1. Derived resources (MaxHealth, MaxEnergy, Regen, Hunger, Thirst) have no base; they come from attribute rules.
+Combat (Tuning only): baseArmorValue=0, baseReflectChance=0, baseFireResistance=0, .... minCritMultiplier=1.2 (floor, Derived Minimums header).
 ```
 
 Planned addition for Phase 6:
@@ -563,7 +610,7 @@ UI calls: _progressionService.TrySpendAttributePoint(StatTypeEnum.Brawn)
   → RebuildBaseStat(Brawn):
        float defaultValue = GetDefaultAttributeValue(Brawn) = PlayerStatSO.brawn = 10
        int   allocated    = _attributeAllocations[Brawn] = 3
-       _statsService.SetBaseStat(Brawn, 13) → triggers cache refresh
+       _statsService.SetAttributeBase(Brawn, 13) → triggers cache refresh
   → returns true
 ```
 
@@ -598,7 +645,7 @@ int   GetTotalTalentPoints();
 int   GetAvailableTalentPoints();
 int   GetAvailableAttributePoints();
 float GetDefaultAttributeValue(StatTypeEnum);
-void  RebuildBaseStat(StatTypeEnum);         // default + allocated → SetBaseStat
+void  RebuildBaseStat(StatTypeEnum);         // default + allocated → SetAttributeBase
 void  ReloadAllBaseStats();                  // iterate allocations, rebuild each — called on load
 bool  TrySpendAttributePoint(StatTypeEnum);  // validates, increments, rebuilds
 bool  TryRefundAttributePoint(StatTypeEnum);
@@ -767,7 +814,7 @@ public interface ISaveManager
 ```
 1. StatsService.Initialize(playerStatSO, saveData)     → seeds raw SO defaults
 2. ProgressionService.Initialize(...)                  → loads allocation dictionaries
-3. ProgressionService.ReloadAllBaseStats()             → pushes attribute deltas via SetBaseStat
+3. ProgressionService.ReloadAllBaseStats()             → pushes attribute deltas via SetAttributeBase
 4. DerivedStatResolver.RecalculateAll()                → Brawn→MeleeDamage etc. (implemented)
 5. TalentStateService.Initialize(saveData, stats)      → loads allocations
    + ApplyNodeEffects for each                         → replays Permanent modifiers
@@ -785,6 +832,14 @@ Every item in the game has an `ItemInstanceId`: one identity that follows it fro
 - **Despawn on load:** `WorldItem.ApplySavedState` destroys any placed item whose ID is in `pickedUpItemInstanceIds` or is already in the saved inventory or equipment. It runs after inventory and equipment are restored.
 - **Save keys:** `pickedUpItemInstanceIds` (placed items taken) and `droppedItemInstances` (dropped items lying in the world, with position). Stored items and worn items already carry the same ID in `inventory` and `equipped`.
 - **Existing saves** written before the `ItemInstanceId` rename hold random inventory IDs that cannot match their placed copies. Delete the save to test cleanly.
+
+### World item physics (automatic)
+- `WorldItem` requires a `Rigidbody` and a `BoxCollider`. Unity adds them when the script is attached, so designers do not set them by hand.
+- `Awake` sets the Rigidbody to `Interpolate` and `ContinuousDynamic` collision detection. Interpolation smooths motion between physics steps. Continuous Dynamic stops fast items tunnelling through thin colliders.
+- The item ignores every collider on the `PlayerMesh` layer only while it is carried. `PlayerPickup.BeginGrab` turns the exclusion on (`SetPlayerCollisionIgnored(true)`), and `EndGrab` turns it off. The exclusion is not permanent, so the player can knock a resting item and move it. The project layer matrix is unchanged.
+- A carried item destroyed mid-carry needs no reset, because the destroyed item no longer exists.
+- Cost: a sleeping Rigidbody adds almost nothing per physics step, so these settings cost little on a resting item. An item kept awake by constant contact or a moving surface pays their cost every step. Profile scenes with many awake items.
+- Player colliders are found once and shared across items, and re-searched while none are known, so an item that loads before the player is still excluded.
 
 ### Material Tiers (verified)
 `MaterialTier` (Iron, Steel, HardenedSteel, Titanium, AethericWeave) sits on `ItemDataSO`. `Efficiency()` gives 0.8, 1.0, 1.2, 1.6 and 2.0 (armour design doc section 5). Armour value per piece is `Weight x Type Multiplier x MaterialEfficiency`, where plate is 4, flex 3 and cloth 1.
@@ -885,7 +940,7 @@ public void ResetAllAttributes()
     foreach (StatTypeEnum coreStat in GetCoreAttributes())
     {
         float defaultValue = GetDefaultAttributeValue(coreStat);
-        _statsService.SetBaseStat(coreStat, defaultValue); // explicitly push each default
+        _statsService.SetAttributeBase(coreStat, defaultValue); // explicitly push each default
     }
 }
 ```
@@ -896,7 +951,7 @@ Does NOT call `ReloadAllBaseStats()` (which iterates the now-empty dictionary an
 ```csharp
 _progressionService.TryRefundAttributePoint(StatTypeEnum.Brawn);
 // Validates: IsCoreAttribute, current > 0
-// Decrements, calls RebuildBaseStat → SetBaseStat
+// Decrements, calls RebuildBaseStat → SetAttributeBase
 ```
 
 ---
@@ -910,7 +965,7 @@ The early return in the replace branch skipped the reverse lookup and cache refr
 When refunding an attribute to 0, keep the key in `_attributeAllocations` with value 0. Deleting the key makes `ReloadAllBaseStats()` skip that stat, so `StatsService` keeps the old raised base. Call `RebuildBaseStat(statType)` explicitly after a decrement.
 
 ### 🟡 WATCH-OUT: ReloadAllBaseStats must stay in the init sequence
-On a new game it iterates nothing and looks redundant, but on load it is essential. `ResolveDerived` is also called from it, so removing it breaks derived stats on load.
+On a new game it iterates nothing and looks redundant, but on load it is essential. `RecalculateAll` (DerivedStatResolver) is also called from it, so removing it breaks derived stats on load. Derived stats have no SO base, so vitals must be seeded after it.
 
 ### 🟡 WATCH-OUT: Talent effects sharing a sourceId
 Every effect on one node uses `sourceId = nodeId`. Two effects on the same node that hit the same stat and category overwrite each other. Single-effect nodes are fine. Fix (per-effect key, e.g. `nodeId + index`) before authoring multi-effect nodes.
@@ -964,14 +1019,14 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 | Progression | Attribute pool derived from level (saved value ignored on load) | ✅ |
 | Progression | Spend, refund, reset, reload, and `DerivedStatResolver` | ✅ |
 | Save System | Attribute allocations saved | ✅ |
-| Save System | `SaveValidator` + repair prompt for broken talent pools | ✅ |
-| Save System | Backup on new game (`save_default.backup.json`) | ✅ |
+| Save System | `SaveValidator` + repair prompt for broken talent pools, and an unreadable-save prompt | ✅ |
+| Save System | Backup on new game: the replaced manual save is copied to `save_default.backup.json` before the new file is written | ✅ |
 | Talent System | `TalentEffectSO` strategy assets (stat modifier, passive stub) | ✅ |
 | Talent System | Effects applied, reduced, stripped on reset, replayed on load | ✅ |
 | Talent System | Tree focus (arrows, mouse-wheel tier scroll, eased rotation) | ✅ |
 | Talent System | Tree header, outlines in tree colour, counter-rotated labels | ✅ |
 | UI | K menu: full-screen, vertical tabs (`IMenuTab`, `MenuTabBar`) | ✅ |
-| UI | Player Stats tab (attributes, vitals, 4-column derived grid) | ✅ |
+| UI | Player Stats tab (attributes, vitals, Stats section with every Combat stat) | ✅ |
 | UI | HUD (vitals bars) and combat log, hidden while the menu is open | ✅ |
 | UI | Virtual cursor owns OS cursor; camera cannot unlock it while active | ✅ |
 | UI | Modal dialog via `IUIManager.ShowModal` | ✅ |

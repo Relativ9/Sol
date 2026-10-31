@@ -256,7 +256,7 @@ flowchart TD
   B -- no --> X1["Error logged, false"]
   B -- yes --> C{"Spent attribute points <\ntotal attribute points?"}
   C -- no --> X2["No points, false"]
-  C -- yes --> D["Increment allocation\nRebuildBaseStat: SetBaseStat on StatsService"]
+  C -- yes --> D["Increment allocation\nRebuildBaseStat: SetAttributeBase on StatsService"]
   E["Refund requested"] --> F["Decrement allocation\nRebuildBaseStat"]
 ```
 

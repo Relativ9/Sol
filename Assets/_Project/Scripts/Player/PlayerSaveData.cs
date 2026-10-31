@@ -75,8 +75,14 @@ namespace Sol
         // Stored items on the grid, with their cells. Layout is saved, because it cannot be rebuilt from a list.
         public InventorySaveEntry[] inventory = System.Array.Empty<InventorySaveEntry>();
 
-        // World state: placed items already picked up (so they do not respawn), and dropped items lying in the world.
-        public string[] pickedUpItemInstanceIds = System.Array.Empty<string>();
-        public WorldDropEntry[] droppedItemInstances = System.Array.Empty<WorldDropEntry>();
+        // Where the player stood when saved. Restored on load, so Load returns the player to the same place, not the scene spawn.
+        // Position is in metres. Yaw is the facing around the vertical axis, in degrees.
+        public float posX;
+        public float posY;
+        public float posZ;
+        public float yawDegrees;
+        public bool hasPosition;
+
+        // World state is not stored here. It lives in per-slot cell files (see CellStore and SaveManager.SlotCellsFolder).
     }
 }

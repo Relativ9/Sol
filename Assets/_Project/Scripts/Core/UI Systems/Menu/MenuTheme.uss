@@ -226,9 +226,9 @@
     white-space: nowrap;
 }
 
-/* Derived categories flow left to right and wrap only when the panel runs out of width. Each category is sized to its
+/* Stat categories flow left to right and wrap only when the panel runs out of width. Each category is sized to its
    content, so Defense follows Offense on the same line, and Armour set follows Defense. */
-.stats-derived-flow {
+.stats-flow {
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;

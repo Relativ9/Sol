@@ -16,73 +16,89 @@ namespace Sol
 
         [Header("Movement")]
         public float baseMoveSpeed = 3f;
-        public float baseRunMultiplier = 1.6f;
         public float baseDeceleration = 8f;
         public float baseCrouchSpeed = 3f;
-        public float baseJumpForce = 5f;
         public float baseJumpDirectionBoost = 1.0f;
         public int baseMaxDoubleJump = 0;
         public float baseJumpCooldown = 0.1f;
-        public float baseFallDamageMultiplier = 1f;
         public float baseGravityMultiplier = 2.5f;
         public float baseTerminalVelocity = -20f;
         
         [Header("Resources")]
-        public float baseMaxHealth = 100f;
-        public float baseHealthRegen = 1f;  //Number of health points added per second
-        public float baseMaxEnergy = 100f; //Global resource, spells, attacks, sprinting, jumping, abilities, etc all use Energy.
-        public float baseEnergyRegen = 10f;  //Number of energy points added per second
-        public float baseCarryCapacity = 40f; //Equivalent to KGs, from the start the max you can carry (including warn gear is 40gk).
         public int baseInventorySpace = 10;
         public float baseLootMultiplier = 1f;
-        public float baseHunger = 10f;
-        public float baseThirst = 10f;
         
-        [Header("Attribute Scaling (per point above default)")]
-        [Tooltip("Brawn → MeleeDamage, per point above default.")]
+        [Header("Attribute Scaling")]
+        [Tooltip("Brawn → JumpForce. Bonus = attribute value × this rate.")]
+        public float brawnToJumpForce = 0.5f;
+        [Tooltip("Finesse → FallDamageMultiplier reduction, per point of Finesse. FallDamageMultiplier starts at 1 and goes down: 0.02 means 10 points take it from 1.0 to 0.8. Reduction is clamped at 0.")]
+        public float finesseToFallDamageReduction = 0.02f;
+        [Tooltip("Brawn → MeleeDamage. Bonus = attribute value × this rate.")]
         public float brawnToMeleeDamage = 0.5f;
-        [Tooltip("Brawn → CarryCapacity (kg), per point above default.")]
+        [Tooltip("Brawn → CarryCapacity (kg). Bonus = attribute value × this rate.")]
         public float brawnToCarryCapacity = 2f;
-        [Tooltip("Finesse → ProjectileDamage (archery), per point above default.")]
+        [Tooltip("Brawn → LiftStrength, Bonus = attribute value × this rate. 1 means lift strength levels one-for-one with Brawn.")]
+        public float brawnToLiftStrength = 1f;
+        [Tooltip("Finesse → ProjectileDamage (archery). Bonus = attribute value × this rate.")]
         public float finesseToProjectileDamage = 0.5f;
-        [Tooltip("Insight → SpellPower, per point above default.")]
+        [Tooltip("Insight → SpellPower. Bonus = attribute value × this rate.")]
         public float insightToSpellPower = 1f;
-        [Tooltip("Insight → CritMultiplier, per point above default. Design cap is 3.")]
+        [Tooltip("Insight → CritMultiplier. Bonus = attribute value × this rate. Minimum set by minCritMultiplier. Design cap is 3.")]
         public float insightToCritMultiplier = 0.02f;
-        [Tooltip("Focus → CritChance, in points per point above default (0.5 = +0.5%).")]
+        [Tooltip("Focus → CritChance. Bonus = attribute value × this rate (0.5 = +0.5%).")]
         public float focusToCritChance = 0.5f;
-        [Tooltip("Finesse → Penetration, in points per point above default. Capped with resistance at 400 points.")]
+        [Tooltip("Finesse → Penetration. Bonus = attribute value × this rate, in points. Capped with resistance at 400 points.")]
         public float finesseToPenetration = 1.5f;
-        [Tooltip("Vigor → MaxHealth, per point above default.")]
+        [Tooltip("Vigor → MaxHealth. Bonus = attribute value × this rate.")]
         public float vigorToMaxHealth = 5f;
-        [Tooltip("Willpower → MaxEnergy, per point above default.")]
+        [Tooltip("Willpower → MaxEnergy. Bonus = attribute value × this rate.")]
         public float willpowerToMaxEnergy = 5f;
+        [Tooltip("Vigor → EnergyRegen. Bonus = attribute value × this rate.")]
+        public float vigorToEnergyRegen = 1f;
+        [Tooltip("Focus → HealthRegen. Bonus = attribute value × this rate.")]
+        public float focusToHealthRegen = 0.1f;
+        [Tooltip("Vigor → Hunger. Bonus = attribute value × this rate.")]
+        public float vigorToHunger = 1f;
+        [Tooltip("Vigor → Thirst. Bonus = attribute value × this rate.")]
+        public float vigorToThirst = 1f;
+        [Tooltip("Focus → ProjectileRange (metres). Bonus = attribute value × this rate.")]
+        public float focusToProjectileRange = 1f;
+        [Tooltip("Insight → MagicResistance. Bonus = attribute value × this rate.")]
+        public float insightToMagicResistance = 1f;
+        [Tooltip("Vigor → EnvironmentalResistance. Bonus = attribute value × this rate.")]
+        public float vigorToEnvironmentalResistance = 1f;
+        [Tooltip("Focus → ParryAndBlockTime (seconds). Bonus = attribute value × this rate.")]
+        public float focusToParryAndBlockTime = 0.01f;
+        [Tooltip("Focus → ClueRange (metres). Bonus = attribute value × this rate.")]
+        public float focusToClueRange = 1f;
+        [Tooltip("Willpower → CharmChance. Bonus = attribute value × this rate (0.5 = +0.5%).")]
+        public float willpowerToCharmChance = 0.5f;
+        [Tooltip("Insight → KnowledgeChance. Bonus = attribute value × this rate (0.5 = +0.5%).")]
+        public float insightToKnowledgeChance = 0.5f;
+        [Tooltip("Finesse → DeceptionChance. Bonus = attribute value × this rate (0.5 = +0.5%).")]
+        public float finesseToDeceptionChance = 0.5f;
+        [Tooltip("Brawn → IntimidationChance. Bonus = attribute value × this rate (0.5 = +0.5%).")]
+        public float brawnToIntimidationChance = 0.5f;
+        [Tooltip("Finesse → CovertMovement. Bonus = attribute value × this rate.")]
+        public float finesseToCovertMovement = 1f;
+        [Tooltip("Finesse → Tinker (lock-picking and repair). Bonus = attribute value × this rate.")]
+        public float finesseToTinker = 1f;
+
+        [Header("Derived Minimums")]
+        [Tooltip("Lowest CritMultiplier a player can have, from any source. Totals above it are unchanged. Design cap is 3.")]
+        public float minCritMultiplier = 1.2f;
+        [Tooltip("Lowest RunMultiplier a player can have, from any source. 1 means running is never slower than walking.")]
+        public float minRunMultiplier = 1f;
 
         [Header("Combat")]
-        public float baseMeleeDamage = 1f; //Weapon damage on equipped weapons add to this, unarmed attacks do 1 damage (unless boosted)
-        public float baseProjectileDamage = 1f; //even throwing rocks deal some damage, effects throwing weapons, arrows, and projectile spells.
-        public float baseProjectileRange = 10f; //10 meter effective range, after this drop and damage falloff starts taking noticable effect.
-        public float baseSpellPower = 0f; //increases potency of spells usually calculated at base spell damage + spellPower/100*energycost
         public float baseArmorValue = 0f; //Armor lowers all physical damage and with the right talents give extra bonus protection (deflect, reflect etc).
-        public float baseCritChance = 0f; //Crit chance is the chance you have to crit on an armored weakpoint (such as a head with a helmet) with projectiles or direct melee damage AOE and indirect target spells have a 0.5 x critChance modifier, unarmored weakpoints are guaranteed crits. 
-        public float baseCritMultiplier = 1.2f; //Very difficult to increase, capped at 3f.
         public float baseDeflectionChance = 0f; //points (5 = 5%). Chance to deflect incoming physical attacks, including physical projectiles. Only plate armour increases it.
-        public float baseMagicResistance = 0f;
         public float baseFireResistance = 0f;
         public float baseIceResistance = 0f;
         public float baseVoidResistance = 0f;
         public float baseSonicResistance = 0f;
         public float baseSoulResistance = 0f;
         public float baseReflectChance = 0f; //chance of reflecting spells back at attacker
-        public float baseEnvironmentalResistance = 0f; //resistence to damage caused by enviromental factors (gas, heat, cold, acid, traps, etc).
-        public float baseParryAndBlockTime = 0.1f; //How long the perry and perfect block window lasts on incoming enemy attacks (time slows so animations match).
-        public float baseClueRange = 0f; //Spells and talents which highlight loot and secrets add to this range, as does certain talents.
-        public float baseCharmChance = 0f; //speech check
-        public float baseKnowledgeChance = 0f; //speech check
-        public float baseDeceptionChance = 0f; //speech check
-        public float baseIntimidationChance = 0f; //speech check
-        public float baseCovertMovement = 0f; //replaces stealth. Reduces detection radius and noise.
-        public float baseTinker = 0f; //replaces lock-picking. Lock-picking and repairs.
         public float baseStaggerResistance = 0f; //from heavy plate (rigid weight x 0.2%)
         public float baseBleedResistance = 0f; //from flexible armour (flex weight x 0.333%)
         public float baseRigidWeight = 0f; //kg of plate equipped. Set by equipment later.

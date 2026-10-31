@@ -46,9 +46,6 @@ namespace Sol
         public int X, Y, Z;
         public ushort YawTenths;
 
-        // Tombstone only: the cell the object moved to.
-        public int MovedCellX, MovedCellZ;
-
         // Moving records only. Centimetres per second, and centi-radians per second.
         public Vector3Short LinearVelocity;
         public Vector3Short AngularVelocity;

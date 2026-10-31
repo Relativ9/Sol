@@ -30,7 +30,5 @@ namespace Sol
 
         public static bool IsDerived(StatTypeEnum stat) => RoleOf(stat) == StatRole.Derived;
 
-        /// <summary>True for stats that appear on the stats screen. Tuning stats never do.</summary>
-        public static bool IsVisible(StatTypeEnum stat) => RoleOf(stat) != StatRole.Tuning;
     }
 }

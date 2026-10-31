@@ -115,6 +115,11 @@ namespace Sol
 
         private void Awake()
         {
+            // Time.timeScale is global and survives a scene reload. A load taken while the menu is open leaves it at 0, and
+            // the new scene would then start frozen. Every boot starts unpaused at normal speed, so a reload cannot inherit it.
+            _isPaused = false;
+            Time.timeScale = 1f;
+
             ServiceLocator.RegisterService<ITimeManager>(this); //Registers itself with the service locator.
             
             var calculator = new CelestialCalculator(this);

@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayName: Shiny Dagger
   _description: This is so clean I'd pick my teeth with it
   _itemCategory: 0
-  _weight: 1
+  _weight: 0.2
   _maxStackSize: 3
   _rotatable: 1
   _materialTier: 0
@@ -24,7 +24,7 @@ MonoBehaviour:
   _worldPrefab: {fileID: 5045876931230186202, guid: 649cf0750e922efe192d63547b3f44e3, type: 3}
   validSlots: 0a0000000b000000
   statModifiers:
-  - statName: 60
+  - statName: 48
     modifierType: 0
     value: 10
   physicalAttack: 7
