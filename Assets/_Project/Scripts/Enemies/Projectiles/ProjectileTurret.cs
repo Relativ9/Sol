@@ -9,7 +9,7 @@ namespace Sol
     public class ProjectileTurret : MonoBehaviour
     {
         [SerializeField] private Projectile _projectilePrefab;
-        [SerializeField] private DamageSO _damage;
+        [SerializeField] private DamageProfileSO _damage;
         [SerializeField] private Transform _muzzle;
         [SerializeField] private float _interval = 2f;
         [SerializeField] private string _sourceName = "Turret";

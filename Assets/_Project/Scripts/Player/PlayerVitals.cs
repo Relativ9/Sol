@@ -127,8 +127,8 @@ namespace Sol
             ServiceLocator.TryGet<ICombatLog>()?.Add(
                 $"{info.SourceId}: -{result.FinalAmount:0.#} Health ({info.Type})", CombatLogKind.Damage);
 
-            // Status procs go to StatusController, which owns the status rules and their effect assets.
-            ServiceLocator.TryGet<IStatusController>()?.RollHitProcs(result, info, roller);
+            // Status procs are rolled by the shared StatusRoller, and applied through the player's status controller.
+            StatusRoller.Roll(result, info, roller, ServiceLocator.TryGet<IStatusController>(), "You", false, transform.position);
         }
 
         // Only logs when a source is given, so per-frame drains and regen don't flood the log.

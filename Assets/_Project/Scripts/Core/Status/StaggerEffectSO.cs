@@ -16,6 +16,7 @@ namespace Sol
         [Tooltip("Animator trigger fired on stagger. Empty = none.")]
         [SerializeField] private string _animatorTrigger = "Stagger";
 
+        public override StatusKind Kind => StatusKind.Stagger;
         public override bool LocksMovement => true;
         public override bool LocksCombat => true;
         public override float EnergyCostOnApply => _energyCost;

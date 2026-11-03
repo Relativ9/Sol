@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3372142103939786672
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3853376916022190196}
+  m_Layer: 0
+  m_Name: Grip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3853376916022190196
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3372142103939786672}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2632239119404050839}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5045876931230186202
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,7 +44,6 @@ GameObject:
   - component: {fileID: 3668164868567911641}
   - component: {fileID: 8239797265785097234}
   - component: {fileID: 8481853090281781785}
-  - component: {fileID: 6679457856496439199}
   - component: {fileID: 1648746598670803202}
   m_Layer: 0
   m_Name: ShinyDagger
@@ -31,10 +61,11 @@ Transform:
   m_GameObject: {fileID: 5045876931230186202}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.02, y: 0.76, z: 6.02}
-  m_LocalScale: {x: 0.07249145, y: 0.083898, z: 0.37604}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.07249145, y: 0.08389804, z: 0.818226}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3853376916022190196}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1833376929978517892
@@ -128,22 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Sol_Scripts::Sol.WorldItem
   _item: {fileID: 11400000, guid: f0a9fd7c1bcf8a94b96b6ce405fefa02, type: 2}
-  _itemInstanceId: 4a2e1775c49e4550954443fe38f05077
---- !u!114 &6679457856496439199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5045876931230186202}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65e990d1380c1bed8a70898387c6b512, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Sol_Scripts::Sol.WorldItemHighlight
-  _glowColor: {r: 1, g: 0.9256262, b: 0.7216981, a: 2.5}
-  _renderers:
-  - {fileID: 3668164868567911641}
+  _itemInstanceId: 44132faa910740849df01a7c04d3531c
 --- !u!54 &1648746598670803202
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -168,6 +184,6 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2

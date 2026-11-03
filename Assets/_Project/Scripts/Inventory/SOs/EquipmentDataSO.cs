@@ -10,8 +10,6 @@ namespace Sol
         public StatModifierDefinition[] statModifiers;
 
         [Header("Attack")]
-        [Tooltip("Flat physical damage. Weapons and offhands both have one (a shield bash, a dagger stab). 0 for gear with no attack.")]
-        [Min(0f)] public float physicalAttack;
 
         [Tooltip("Extra elemental damage on top of physical, for example fire. Leave empty for a purely physical attack.")]
         public ElementalAttack[] elementalAttacks = Array.Empty<ElementalAttack>();

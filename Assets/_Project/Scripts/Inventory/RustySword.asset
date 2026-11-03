@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9b2f0abfd5c2655c9cba9921d8a1de5, type: 3}
+  m_Name: RustySword
+  m_EditorClassIdentifier: Sol_Scripts::Sol.WeaponDataSO
+  _itemId: Rusty-Sword
+  _displayName: Rusty Sword
+  _description: Ancient doesn't always mean valuable, and it pretty much never means
+    sharp.
+  _itemCategory: 0
+  _weight: 6
+  _maxStackSize: 1
+  _rotatable: 1
+  _materialTier: 1
+  _icon: {fileID: 21300000, guid: 42f34aaea3f7131529efde86cdaf7241, type: 3}
+  _worldPrefab: {fileID: 8880630458417936031, guid: a1c45ce8872a3e35bbf699671a1a31a9, type: 3}
+  validSlots: 0a0000000b000000
+  statModifiers:
+  - statName: 31
+    modifierType: 0
+    value: 10
+  elementalAttacks:
+  - damageType: 5
+    damage: 1
+  weaponType: 0
+  weaponSize: 0
+  weaponDamage: 10
+  _statusEffect: {fileID: 11400000, guid: e9750f776d279108c97f1a0e49bcfb70, type: 2}
+  weaponPrefab: {fileID: 8880630458417936031, guid: c05afba97ccfb14c3b3aa9131d5471c3, type: 3}
+  sheathedPosition: {x: 0, y: 0, z: 0}
+  sheathedRotation: {x: 0, y: 0, z: 0}
+  unsheathedPosition: {x: 0, y: 0, z: 0}
+  unsheathedRotation: {x: 70.555, y: 23.258, z: 10.518}
+  hitEffectPrefab: {fileID: 0}
+  _hitSound: {fileID: 0}
+  _swingSound: {fileID: 0}
+  _sheathSound: {fileID: 0}
+  _unsheathSound: {fileID: 0}
+  equipAnimationTrigger: Shethe
+  unequipAnimationTrigger: Unshethe

@@ -15,6 +15,12 @@ namespace Sol
             Debug.Log($"Animation Event Dispatcher initialized on {gameObject.name}");
         }
         
+        // Unity calls animation events as messages, by function name, on the object that owns the Animator. These are the names
+        // the attack clip uses, so each forwards to the receivers registered for that name.
+        public void OnAttackStart() => DispatchAnimationEvent("OnAttackStart");
+        public void OnAttackEnd() => DispatchAnimationEvent("OnAttackEnd");
+        public void AttackRecovery() => DispatchAnimationEvent("AttackRecovery");
+
         // Called by Animation Events
         public void DispatchAnimationEvent(string eventName)
         {

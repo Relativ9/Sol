@@ -55,9 +55,19 @@ namespace Sol
             
             // Register Combet interfaces
             RegisterService<ICombatController>(GetComponent<CombatStateController>());
-            RegisterService<IStatusController>(GetComponent<StatusController>());
+            // The player's status controller is required. The player is its target, through an adapter built here from this context.
+            // A missing controller is reported here, not as a null later.
+            StatusController status = GetComponent<StatusController>();
+            if (status == null)
+            {
+                Debug.LogError($"[{nameof(PlayerController)}] No StatusController on the player. Add the Status Controller component to the Player object.", this);
+            }
+            else
+            {
+                status.Initialize(new PlayerStatusAdapter(this));
+                RegisterService<IStatusController>(status);
+            }
             RegisterService<IPlayerPickup>(GetComponent<PlayerPickup>());
-            //RegisterService<IWeaponService>(GetComponent<WeaponService>());
             
             AnimationEventDispatcher eventDispatcher = GetComponent<AnimationEventDispatcher>();
             if (eventDispatcher == null)
@@ -274,7 +284,7 @@ namespace Sol
         // never while E is held. The Input System decides what a tap is; this only runs the pickup.
         public void OnPickup(InputAction.CallbackContext context)
         {
-            if (!context.performed || _timeManager.IsPaused) return;
+            if (!context.performed || IsPaused) return;
 
             IPlayerPickup pickup = GetService<IPlayerPickup>();
             if (pickup == null)
@@ -293,13 +303,16 @@ namespace Sol
             IPlayerPickup pickup = GetService<IPlayerPickup>();
             if (pickup == null) return;
 
-            if (context.performed && !_timeManager.IsPaused) pickup.BeginGrab();
+            if (context.performed && !IsPaused) pickup.BeginGrab();
             else if (context.canceled) pickup.EndGrab();
         }
 
+        // Input can arrive before Start has resolved the time manager. Until it does, the game is not paused.
+        private bool IsPaused => (_timeManager ??= ServiceLocator.TryGet<ITimeManager>())?.IsPaused ?? false;
+
         public void OnAttack(InputAction.CallbackContext context)
         {
-            if (_timeManager.IsPaused) return;
+            if (IsPaused) return;
             if (context.started)
             {
                 _attackInputDetected = true;

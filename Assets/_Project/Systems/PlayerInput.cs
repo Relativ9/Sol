@@ -367,7 +367,7 @@ namespace Sol
                 {
                     ""name"": """",
                     ""id"": ""ddee1bcb-0d20-4467-9ffd-d5847c46a833"",
-                    ""path"": ""<Keyboard>/k"",
+                    ""path"": ""<Keyboard>/tab"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Mouse&Keyboard"",

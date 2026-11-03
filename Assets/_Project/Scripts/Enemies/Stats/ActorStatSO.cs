@@ -22,6 +22,12 @@ namespace Sol
         [Tooltip("Base value for each stat. Add a row per stat that is not zero.")]
         public List<Entry> baseStats = new List<Entry>();
 
+        [Tooltip("Status kinds this enemy type cannot be affected by. A blocked status is never applied.")]
+        public StatusKind immunities = StatusKind.None;
+
+        /// <summary>True if this enemy type is immune to a status kind.</summary>
+        public bool IsImmune(StatusKind kind) => kind != StatusKind.None && (immunities & kind) == kind;
+
         /// <summary>Returns the base value for a stat, or zero if the asset does not list it.</summary>
         public float GetBase(StatTypeEnum stat)
         {

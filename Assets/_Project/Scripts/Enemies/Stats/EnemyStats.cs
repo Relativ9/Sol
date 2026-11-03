@@ -17,6 +17,9 @@ namespace Sol
             Stats = new ActorStats(_baseStats);
         }
 
+        /// <summary>True if this enemy type blocks a status effect, from its type's immunities.</summary>
+        public bool IsImmuneTo(IStatusEffect effect) => _baseStats != null && _baseStats.IsImmune(effect.Kind);
+
         /// <summary>Returns the stats for the enemy on this object or a parent, or null when there is none.</summary>
         public static ActorStats Find(Transform from)
         {

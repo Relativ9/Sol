@@ -230,13 +230,11 @@ namespace Sol
                     _animator.SetTrigger(triggerName);
             
                     // You might also need to set parameters on the upper body layer specifically
-                    _animator.SetLayerWeight(1, 1f); // Ensure upper body layer is active
                 }
                 else
                 {
                     // Regular animation triggers go to base layer
                     _animator.SetTrigger(triggerName);
-                    _animator.SetLayerWeight(1, 0f);
                 }
             }
         }

@@ -15,6 +15,7 @@ namespace Sol
         [Tooltip("Scaled game seconds between ticks.")]
         [SerializeField] private float _tickIntervalSeconds = 1f;
 
+        public override StatusKind Kind => StatusKind.Bleed;
         public override float DamageFractionOfRaw => _damageFractionOfRaw;
         public override float TickIntervalSeconds => _tickIntervalSeconds;
     }

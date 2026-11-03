@@ -288,10 +288,8 @@ namespace Sol
         {
             // Core services
             _statsService.Initialize(playerStatSO, saveData);
-            //_progressionService.Initialize(playerProgressionSO, saveData);
             
             // 2. Init progression with TOTAL POOL ONLY
-            //_progressionService.Initialize(playerProgressionSO, saveData.level, saveData.talentPoints);
             _progressionService.Initialize(playerProgressionSO, playerStatSO, _statsService, saveData.level, saveData.totalTalentPoints, saveData.totalAttributePoints, saveData.attributeAllocations);
             // Attribute rules must run before vitals are seeded. Derived stats have no SO base, so MaxHealth, MaxEnergy,
             // MaxHunger and MaxThirst are only correct once the rules have applied.

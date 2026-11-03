@@ -26,6 +26,8 @@ namespace Sol
         public StatusStackingMode StackingMode => _stackingMode;
 
         // Defaults for locks and per-application values. Subclasses override only what they use.
+        // The kind of status this is, for immunities. Each subclass sets its own.
+        public virtual StatusKind Kind => StatusKind.None;
         public virtual bool LocksMovement => false;
         public virtual bool LocksCombat => false;
         public virtual float EnergyCostOnApply => 0f;

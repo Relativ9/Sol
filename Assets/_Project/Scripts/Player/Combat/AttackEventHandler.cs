@@ -15,10 +15,8 @@ namespace Sol
         [SerializeField] private AudioClip _impactSound;
         [SerializeField] private GameObject _slashEffectPrefab;
         [SerializeField] private Transform _slashEffectSpawn;
-        [SerializeField] private float _attackRadius = 1.5f;
-        [Tooltip("Damage definition for this weapon's swings. When set, swings use it (damage type, tags, status chances). When empty, the fixed _attackDamage float is used.")]
-        [SerializeField] private DamageSO _attackDamageSO;
-        [SerializeField] private float _attackDamage = 25f;
+
+
         [SerializeField] private bool _debugAttacks = true;
         
         // Dependencies
@@ -115,8 +113,7 @@ namespace Sol
                 Instantiate(_slashEffectPrefab, _slashEffectSpawn.position, _slashEffectSpawn.rotation);
             }
             
-            // Check for hits
-            CheckForHits();
+            // Hits are detected by the blade's trigger (WeaponHitbox), not by an overlap at impact.
             
             if (_debugAttacks)
             {
@@ -129,68 +126,6 @@ namespace Sol
             if (_debugAttacks)
             {
                 Debug.Log("Attack ended");
-            }
-        }
-        
-        private void CheckForHits()
-        {
-            // Simple sphere cast to detect hits
-            Collider[] hits = Physics.OverlapSphere(transform.position + transform.forward, _attackRadius);
-            
-            bool hitSomething = false;
-            
-            foreach (var hit in hits)
-            {
-                // Skip self
-                if (hit.transform == transform || hit.transform.IsChildOf(transform))
-                    continue;
-                    
-                // New path: a DamageSO on this weapon sends a typed hit to anything that can receive damage.
-                if (_attackDamageSO != null)
-                {
-                    IDamageReceiver receiver = hit.GetComponentInParent<IDamageReceiver>();
-                    if (receiver != null)
-                    {
-                        // The player's own swing: always logged, regardless of distance.
-                        // Origin is the player's root; the hit point is the swing's contact with the target.
-                        // Penetration comes from the player's stats (Finesse, equipment, talents). Points, as with every stat.
-                        receiver.ReceiveHit(_attackDamageSO.Build(gameObject.name, 0f, true, transform.root.position,
-                            hit.transform.position, penetration: _stats != null ? _stats.GetStat(StatTypeEnum.Penetration) : 0f));
-                        if (_impactSound != null && _audioSource != null) _audioSource.PlayOneShot(_impactSound);
-                        hitSomething = true;
-                        if (_debugAttacks) Debug.Log($"Hit {hit.name} with {_attackDamageSO.name}");
-                    }
-                    continue;
-                }
-
-                // Legacy path: fixed float damage to anything implementing IDamageable.
-                IDamageable damageable = hit.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    // Apply damage
-                    damageable.TakeDamage(_attackDamage);
-                    
-                    // Play impact sound
-                    if (_audioSource != null && _impactSound != null)
-                    {
-                        _audioSource.PlayOneShot(_impactSound);
-                    }
-                    
-                    hitSomething = true;
-                    
-                    if (_debugAttacks)
-                    {
-                        Debug.Log($"Hit enemy: {hit.name} for {_attackDamage} damage");
-                    }
-                }
-            }
-            
-            // Visual debug
-            if (_debugAttacks)
-            {
-                // Draw debug sphere to visualize attack range
-                Debug.DrawRay(transform.position, transform.forward * _attackRadius, hitSomething ? Color.red : Color.yellow, 1.0f);
-                StartCoroutine(DrawDebugSphere(transform.position + transform.forward, _attackRadius, hitSomething ? Color.red : Color.yellow, 1.0f));
             }
         }
         

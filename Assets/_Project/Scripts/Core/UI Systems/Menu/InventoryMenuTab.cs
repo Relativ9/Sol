@@ -1095,6 +1095,12 @@ namespace Sol
         // One line of the details panel, with a comparison when the selected item has the same value.
         // The hovered item's value is shown, then the difference from the selection in brackets: green when this item is
         // higher, red when lower, and "=" when equal. With nothing to compare, the line is shown plainly.
+        // A weapon's physical attack is its Weapon Damage. Non-weapon gear has no physical attack of its own.
+        private static float PhysicalAttackValue(EquipmentDataSO item)
+        {
+            return item is WeaponDataSO weapon ? weapon.weaponDamage : 0f;
+        }
+
         private void AddComparedLine(string label, float value, float? other, string format, Color plain, string suffix = "")
         {
             string shown = $"{label} {value.ToString(format)}{suffix}";
@@ -1358,10 +1364,10 @@ namespace Sol
 
             // Attack: the flat physical damage, then each elemental part. Compared line by line with the selection, so a
             // weapon that adds fire damage is compared on its fire as well as its physical damage.
-            if (item is EquipmentDataSO attacker && (attacker.physicalAttack > 0f || attacker.elementalAttacks.Length > 0))
+            if (item is EquipmentDataSO attacker && (PhysicalAttackValue(attacker) > 0f || attacker.elementalAttacks.Length > 0))
             {
                 EquipmentDataSO other = compareAgainst as EquipmentDataSO;
-                AddComparedLine("Attack", attacker.physicalAttack, other != null ? other.physicalAttack : (float?)null,
+                AddComparedLine("Attack", PhysicalAttackValue(attacker), other != null ? PhysicalAttackValue(other) : (float?)null,
                     "0.##", new Color(0.95f, 0.85f, 0.7f));
                 foreach (EquipmentDataSO.ElementalAttack elemental in attacker.elementalAttacks)
                 {

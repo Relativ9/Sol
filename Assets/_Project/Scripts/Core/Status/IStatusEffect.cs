@@ -7,6 +7,7 @@ namespace Sol
     public interface IStatusEffect
     {
         string DisplayName { get; }
+        StatusKind Kind { get; }
         string ExpireMessage { get; }
         float DurationSeconds { get; }
         StatusStackingMode StackingMode { get; }

@@ -18,19 +18,18 @@ MonoBehaviour:
   focus: 10
   vigor: 10
   willpower: 10
-  baseMoveSpeed: 8
-  baseRunMultiplier: 0.5
+  baseMoveSpeed: 6
   baseDeceleration: 8
   baseCrouchSpeed: 3
-  baseJumpForce: 8
   baseJumpDirectionBoost: 1
   baseMaxDoubleJump: 1
   baseJumpCooldown: 0.1
-  baseFallDamageMultiplier: 1
   baseGravityMultiplier: 2
   baseTerminalVelocity: -20
   baseInventorySpace: 100
   baseLootMultiplier: 1
+  brawnToJumpForce: 0.5
+  finesseToFallDamageReduction: 0.02
   brawnToMeleeDamage: 0.5
   brawnToCarryCapacity: 2
   brawnToLiftStrength: 1
@@ -57,6 +56,7 @@ MonoBehaviour:
   finesseToCovertMovement: 1
   finesseToTinker: 1
   minCritMultiplier: 1.2
+  minRunMultiplier: 1
   baseArmorValue: 0
   baseDeflectionChance: 0
   baseFireResistance: 0

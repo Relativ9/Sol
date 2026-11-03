@@ -4,7 +4,7 @@ namespace Sol
 {
     /// <summary>
     /// Hurts the player while they stay inside this trigger, once per cooldown.
-    /// Builds each hit from a DamageSO, so this component never knows what the damage does.
+    /// Builds each hit from a DamageProfileSO, so this component never knows what the damage does.
     /// Used for the training dummy now, and reusable for traps and enemies later.
     /// Requires a Collider set to Is Trigger, and the player tagged "Player".
     /// </summary>
@@ -13,7 +13,7 @@ namespace Sol
         [Tooltip("The trigger collider to check. Can be on this object or a child. Leave empty to use one on this object.")]
         [SerializeField] private Collider _trigger;
 
-        [SerializeField] private DamageSO _damage;
+        [SerializeField] private DamageProfileSO _damage;
 
         [Tooltip("Seconds between hits while the player stays inside.")]
         [SerializeField] private float _cooldown = 1f;
@@ -28,7 +28,7 @@ namespace Sol
         void Awake()
         {
             if (_damage == null)
-                Debug.LogWarning($"[{nameof(EnemyDamageSource)}] {name} has no DamageSO assigned. It will do nothing.", this);
+                Debug.LogWarning($"[{nameof(EnemyDamageSource)}] {name} has no DamageProfileSO assigned. It will do nothing.", this);
 
             if (_trigger == null) _trigger = GetComponent<Collider>();
 
@@ -71,7 +71,7 @@ namespace Sol
         }
 
         // The enemy's stat sheet supplies the status chances, so enchantments and traits on the enemy apply here.
-        // Without an EnemyStats on this object or a parent, the DamageSO's own chances are used.
+        // Without an EnemyStats on this object or a parent, the DamageProfileSO's own chances are used.
         // Knockback origin is the enemy's ROOT (its body), not this trigger: the trigger is the weapon head,
         // so using it made every push point toward the enemy's front. The hit point is the trigger.
         private DamageInfo BuildHit()
@@ -79,7 +79,7 @@ namespace Sol
             Vector3 origin = EnemyStats.RootPosition(transform);
             Vector3 hitPoint = transform.position;
 
-            // The enemy's stats only add bonuses. The base chance is doctrine, computed inside DamageSO.Build.
+            // The enemy's stats only add bonuses. The base chance is doctrine, computed inside DamageProfileSO.Build.
             ActorStats stats = EnemyStats.Find(transform);
             if (stats == null)
                 return _damage.Build(SourceId, 0f, false, origin, hitPoint);

@@ -205,6 +205,14 @@ This rule exists because Unity does NOT guarantee `Start()` execution order acro
 
 The cast to concrete is documented and intentional. `ITalentStateService` intentionally omits `Initialize()` so no other system can accidentally re-initialize talent state.
 
+### Adapter Rule
+When a system must implement a contract it does not own, write a **plain C# adapter** named `<Thing><Contract>Adapter`
+(e.g. `PlayerStatusAdapter : IStatusTarget`, following `TalentNodeTooltipAdapter`).
+- It is built by the composition root and receives its dependencies through its **constructor**. The player's composition root is `PlayerController.Awake`.
+- It reads services **lazily**, when a call needs them, not in the constructor. Services can register after the adapter is built.
+- If the class already owns the state the contract needs, implement the contract **directly** and do not add an adapter (`TargetHealth : IStatusTarget`).
+- Targets receive their contract object through an explicit `Initialize(...)` push from the composition root (`StatusController.Initialize(IStatusTarget)`), not by searching for it.
+
 ### GameEvent Rule
 All cross-system events must use the SO `GameEvent` system. C# `Action<T>` is not used for cross-system notifications. Events are parameterless — listeners pull data themselves via `GetStat()` / service reads.
 

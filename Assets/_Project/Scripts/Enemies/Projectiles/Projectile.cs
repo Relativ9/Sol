@@ -3,13 +3,13 @@ using UnityEngine;
 namespace Sol
 {
     /// <summary>
-    /// A moving hit. Travels straight at a fixed speed, delivers its DamageSO once on the first receiver it
+    /// A moving hit. Travels straight at a fixed speed, delivers its DamageProfileSO once on the first receiver it
     /// touches, then despawns. Requires a Collider set to Is Trigger. Uses the same receiver path as every other hit.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class Projectile : MonoBehaviour
     {
-        [SerializeField] private DamageSO _damage;
+        [SerializeField] private DamageProfileSO _damage;
         [SerializeField] private float _speed = 20f;
         [SerializeField] private float _lifetime = 5f;
         [Tooltip("Combat log name. Leave empty to use this object's name.")]
@@ -37,7 +37,7 @@ namespace Sol
         private Vector3 _shooterOrigin;
 
         /// <param name="shooterOrigin">The shooter's root position. Knockback pushes away from this, not from the projectile.</param>
-        public void Launch(DamageSO damage, string sourceId, ActorStats shooterStats, Vector3 shooterOrigin)
+        public void Launch(DamageProfileSO damage, string sourceId, ActorStats shooterStats, Vector3 shooterOrigin)
         {
             _damage = damage;
             _sourceId = sourceId;

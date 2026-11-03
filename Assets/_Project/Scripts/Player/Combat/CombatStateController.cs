@@ -28,7 +28,7 @@ namespace Sol
         private IPlayerContext _context;
         private IAnimationController _animationController;
         private IStatusController _status;
-        //private IWeaponService _weaponService;
+        private IEquipmentService _equipment;
         private AnimationEventDispatcher _eventDispatcher;
         
         // State
@@ -43,6 +43,13 @@ namespace Sol
         // Attack state
         private bool _isAttacking = false;
         private float _lastAttackTime = -10f;
+
+        // The swing window. The attack clip has no animation events, so the combat controller owns when a swing is in
+        // progress. The weapon rig releases the hand for this window. Set this to the clip's length.
+        [Header("Swing")]
+        [Tooltip("Seconds the attack takes, from the start of the swing until the hand is held again. Match it to the attack clip.")]
+        [SerializeField] private float _swingDuration = 0.8f;
+        private float _swingEndTime = -10f;
         
         public void Initialize(IPlayerContext context)
         {
@@ -50,17 +57,13 @@ namespace Sol
             
             _animationController = context.GetService<IAnimationController>();
             _status = context.GetService<IStatusController>();
-            //_weaponService = context.GetService<IWeaponService>();
+            _equipment = ServiceLocator.TryGet<IEquipmentService>();
             
             if (_animationController == null)
             {
                 Debug.LogError("Animation Controller not found! Combat animations won't work.");
             }
             
-            // if (_weaponService == null)
-            // {
-            //     Debug.LogWarning("Weapon Service not found! Using default weapon settings.");
-            // }
             
             // Find the animator component
             Animator animator = GetComponentInChildren<Animator>();
@@ -116,6 +119,7 @@ namespace Sol
             else if (eventName == _attackEndEvent)
             {
                 _isAttackAnimationPlaying = false;
+                _swingEndTime = -10f; // The clip has finished, so the hand is held again at once, not when the timer runs out.
                 _isAttacking = false;
                 _context.SetStateValue("IsAttacking", false);
                 
@@ -255,6 +259,7 @@ private void StartAttack()
     // Set attack state
     _isAttacking = true;
     _lastAttackTime = Time.time;
+    _swingEndTime = Time.time + _swingDuration;
     
     // Set animation trigger
     if (_animationController != null)
@@ -276,6 +281,18 @@ public CombatState GetCurrentCombatState()
     return _currentState;
 }
 
+// A one-handed loadout is a one-handed weapon in the main hand and nothing in the off hand. Anything else is not one-handed,
+// so the one-handed grip never plays for it.
+private bool IsOneHandedLoadout()
+{
+    if (_equipment == null) return false;
+
+    if (_equipment.GetEquipped(EquipmentSlot.MainHand) is not WeaponDataSO weapon) return false;
+    if (weapon.weaponSize != WeaponSize.OneHanded) return false;
+
+    return _equipment.GetEquipped(EquipmentSlot.Offhand) == null;
+}
+
 private void UnsheatheWeapon()
 {
     if (_currentState != CombatState.Sheathed)
@@ -287,28 +304,21 @@ private void UnsheatheWeapon()
     // Start transition to unsheathed state
     SetCombatState(CombatState.Unsheathing);
     
-    // Get weapon type from service or use default
-    // WeaponType weaponType = _weaponService != null ? 
-    //     _weaponService.GetEquippedWeaponType() : WeaponType.OneHanded;
-    //
-    // // Set animation parameters
-    // if (_animationController != null)
-    // {
-    //     _animationController.SetTrigger("Unsheathe");
-    //     
-    //     // Set weapon type in animator
-    //     switch (weaponType)
-    //     {
-    //         case WeaponType.OneHanded:
-    //             _animationController.SetBool("OneHanded", true);
-    //             break;
-    //         case WeaponType.TwoHanded:
-    //             _animationController.SetBool("TwoHanded", true);
-    //             break;
-    //         // Add other weapon types as needed
-    //     }
-    // }
-    
+    // The one-handed grip layer only turns on for a real one-handed loadout. The animator is told the truth
+    // about the equipment, so the grip never plays with nothing in the hand.
+    bool oneHanded = IsOneHandedLoadout();
+    if (_animationController != null)
+    {
+        _animationController.SetTrigger("Unsheathe");
+        _animationController.SetBool("OneHanded", oneHanded);
+        _animationController.SetBool("TwoHanded", false);
+    }
+
+    if (_debugCombat)
+    {
+        Debug.Log($"Unsheathing. One-handed loadout: {oneHanded}");
+    }
+
     // Start coroutine to complete unsheathing after animation time
     if (_stateTransitionCoroutine != null)
     {
@@ -320,10 +330,6 @@ private void UnsheatheWeapon()
     // Update context state
     _context.SetStateValue("IsWeaponDrawn", true);
     
-    // if (_debugCombat)
-    // {
-    //     Debug.Log($"Unsheathing weapon of type: {weaponType}");
-    // }
 }
 
 private IEnumerator CompleteUnsheathe()
@@ -331,6 +337,7 @@ private IEnumerator CompleteUnsheathe()
     yield return new WaitForSeconds(_unsheatheTime);
 
     // Complete transition to unsheathed state
+    _isUnsheatheAnimationPlaying = false;
     SetCombatState(CombatState.Unsheathed);
 
     if (_debugCombat)
@@ -381,6 +388,7 @@ private IEnumerator CompleteSheathe()
     yield return new WaitForSeconds(_sheatheTime);
     
     // Complete transition to sheathed state
+    _isSheatheAnimationPlaying = false;
     SetCombatState(CombatState.Sheathed);
     
     // Reset weapon type booleans in animator
@@ -461,10 +469,16 @@ public void CancelAttack()
     }
 }
 
+// True for the swing window that starts when an attack begins. Driven by time, not animation events, because the clip has none.
+public bool IsSwinging()
+{
+    return Time.time < _swingEndTime;
+}
+
 // Helper method to check if player is currently in an attack
 public bool IsAttacking()
 {
-    return _isAttackAnimationPlaying;
+    return _isAttackAnimationPlaying || IsSwinging();
 }
 
 // Debug visualization
@@ -482,400 +496,5 @@ private void OnGUI()
     
     GUILayout.EndArea();
 }
-        
-        // [Header("Combat Settings")]
-        // [SerializeField] private float _unsheatheTime = 0.5f;
-        // [SerializeField] private float _sheatheTime = 0.5f;
-        // [SerializeField] private bool _debugCombat = true;
-        // private bool _isFirstUnsheathe = true;
-        //
-        // [Header("Attack Settings")]
-        // [SerializeField] private float _attackCooldown = 0.8f;
-        // [SerializeField] private string _attackTrigger = "Attack";
-        //
-        // // Dependencies
-        // private IPlayerContext _context;
-        // private IAnimationController _animationController;
-        // private IWeaponService _weaponService;
-        //
-        // // State
-        // private CombatState _currentState = CombatState.Sheathed;
-        // private Coroutine _stateTransitionCoroutine;
-        //
-        // // Attack state
-        // private bool _isAttacking = false;
-        // private float _lastAttackTime = -10f;
-        // private Coroutine _attackCoroutine;
-        //
-        // public void Initialize(IPlayerContext context)
-        // {
-        //     _context = context;
-        //     
-        //     _animationController = context.GetService<IAnimationController>();
-        //     _weaponService = context.GetService<IWeaponService>();
-        //     
-        //     if (_animationController == null)
-        //     {
-        //         Debug.LogError("Animation Controller not found! Combat animations won't work.");
-        //     }
-        //     
-        //     if (_weaponService == null)
-        //     {
-        //         Debug.LogWarning("Weapon Service not found! Using default weapon settings.");
-        //     }
-        //     
-        //     // Initialize in sheathed state
-        //     SetCombatState(CombatState.Sheathed);
-        //     
-        //     if (_context != null)
-        //     {
-        //         _context.SetStateValue("IsWeaponDrawn", false);
-        //         _context.SetStateValue("CombatState", (int)CombatState.Sheathed);
-        //     }
-        //     
-        //     _isFirstUnsheathe = true;
-        //
-        //     Debug.Log("Combat State Controller initialized in Sheathed state");
-        // }
-        //
-        // public bool CanBeActivated()
-        // {
-        //     // Combat controller can always be active
-        //     return true;
-        // }
-        //
-        // public void OnActivate()
-        // {
-        //     // Nothing special needed when activated
-        //     Debug.Log("Combat controller activated");
-        // }
-        //
-        // public void OnDeactivate()
-        // {
-        //     // Force sheathe weapon when deactivated
-        //     if (_currentState != CombatState.Sheathed)
-        //     {
-        //         ForceSheatheWeapon();
-        //     }
-        //     
-        //     // Stop any attack coroutines
-        //     if (_attackCoroutine != null)
-        //     {
-        //         StopCoroutine(_attackCoroutine);
-        //         _attackCoroutine = null;
-        //     }
-        //     
-        //     Debug.Log("Combat controller deactivated");
-        // }
-        //
-        // public void ToggleWeaponState()
-        // {
-        //     // Only allow toggling if we're in a stable state and not attacking
-        //     if ((_currentState == CombatState.Sheathed || _currentState == CombatState.Unsheathed) && !_isAttacking)
-        //     {
-        //         if (_currentState == CombatState.Sheathed)
-        //         {
-        //             UnsheatheWeapon();
-        //         }
-        //         else
-        //         {
-        //             SheatheWeapon();
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Debug.Log($"Cannot toggle weapon during state: {_currentState} or while attacking");
-        //     }
-        // }
-        //
-        // public bool IsWeaponDrawn()
-        // {
-        //     return _currentState != CombatState.Sheathed && _currentState != CombatState.Sheathing;
-        // }
-        //
-        // public void HandleAttackInput()
-        // {
-        //     // Only allow attacks when weapon is drawn and in the unsheathed state
-        //     if (_currentState != CombatState.Unsheathed)
-        //     {
-        //         if (_debugCombat)
-        //         {
-        //             Debug.Log($"Cannot attack in state: {_currentState}");
-        //         }
-        //         return;
-        //     }
-        //     
-        //     // Check if we're already attacking or on cooldown
-        //     if (_isAttacking)
-        //     {
-        //         if (_debugCombat)
-        //         {
-        //             Debug.Log("Already attacking");
-        //         }
-        //         return;
-        //     }
-        //     
-        //     // Check cooldown
-        //     float timeSinceLastAttack = Time.time - _lastAttackTime;
-        //     if (timeSinceLastAttack < _attackCooldown)
-        //     {
-        //         if (_debugCombat)
-        //         {
-        //             Debug.Log($"Attack on cooldown for {_attackCooldown - timeSinceLastAttack:F2} more seconds");
-        //         }
-        //         return;
-        //     }
-        //     
-        //     // Start attack
-        //     StartAttack();
-        // }
-        //
-        // private void StartAttack()
-        // {
-        //     // Set attack state
-        //     _isAttacking = true;
-        //     _lastAttackTime = Time.time;
-        //     
-        //     // Set animation trigger
-        //     if (_animationController != null)
-        //     {
-        //         _animationController.SetTrigger(_attackTrigger);
-        //     }
-        //     
-        //     // Set context state for other components
-        //     _context.SetStateValue("IsAttacking", true);
-        //     
-        //     // Start cooldown coroutine
-        //     if (_attackCoroutine != null)
-        //     {
-        //         StopCoroutine(_attackCoroutine);
-        //     }
-        //     _attackCoroutine = StartCoroutine(AttackCooldown());
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Starting attack");
-        //     }
-        // }
-        //
-        // private IEnumerator AttackCooldown()
-        // {
-        //     // Wait for attack animation to complete
-        //     yield return new WaitForSeconds(_attackCooldown);
-        //     
-        //     // Reset attack state
-        //     _isAttacking = false;
-        //     _context.SetStateValue("IsAttacking", false);
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Attack completed and cooldown finished");
-        //     }
-        //     
-        //     _attackCoroutine = null;
-        // }
-        //
-        // public CombatState GetCurrentCombatState()
-        // {
-        //     return _currentState;
-        // }
-        //
-        // private void UnsheatheWeapon()
-        // {
-        //     if (_currentState != CombatState.Sheathed)
-        //     {
-        //         Debug.LogWarning($"Cannot unsheathe from state: {_currentState}");
-        //         return;
-        //     }
-        //     
-        //     // Start transition to unsheathed state
-        //     SetCombatState(CombatState.Unsheathing);
-        //     
-        //     // Get weapon type from service or use default
-        //     WeaponType weaponType = _weaponService != null ? 
-        //         _weaponService.GetEquippedWeaponType() : WeaponType.OneHanded;
-        //     
-        //     // Set animation parameters
-        //     if (_animationController != null)
-        //     {
-        //         _animationController.SetTrigger("Unsheathe");
-        //         
-        //         // Set weapon type in animator
-        //         switch (weaponType)
-        //         {
-        //             case WeaponType.OneHanded:
-        //                 _animationController.SetBool("OneHanded", true);
-        //                 break;
-        //             case WeaponType.TwoHanded:
-        //                 _animationController.SetBool("TwoHanded", true);
-        //                 break;
-        //             // Add other weapon types as needed
-        //         }
-        //     }
-        //     
-        //     // Start coroutine to complete unsheathing after animation time
-        //     if (_stateTransitionCoroutine != null)
-        //     {
-        //         StopCoroutine(_stateTransitionCoroutine);
-        //     }
-        //     
-        //     _stateTransitionCoroutine = StartCoroutine(CompleteUnsheathe());
-        //     
-        //     // Update context state
-        //     _context.SetStateValue("IsWeaponDrawn", true);
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log($"Unsheathing weapon of type: {weaponType}");
-        //     }
-        // }
-        //
-        // private IEnumerator CompleteUnsheathe()
-        // {
-        //     yield return new WaitForSeconds(_unsheatheTime);
-        //
-        //     // Complete transition to unsheathed state
-        //     SetCombatState(CombatState.Unsheathed);
-        //
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Weapon fully unsheathed");
-        //     }
-        //
-        //     _stateTransitionCoroutine = null;
-        // }
-        //
-        // private void SheatheWeapon()
-        // {
-        //     if (_currentState != CombatState.Unsheathed)
-        //     {
-        //         Debug.LogWarning($"Cannot sheathe from state: {_currentState}");
-        //         return;
-        //     }
-        //     
-        //     // If attacking, cancel the attack
-        //     if (_isAttacking)
-        //     {
-        //         CancelAttack();
-        //     }
-        //     
-        //     // Start transition to sheathed state
-        //     SetCombatState(CombatState.Sheathing);
-        //     
-        //     // Set animation parameters
-        //     if (_animationController != null)
-        //     {
-        //         _animationController.SetTrigger("Sheathe");
-        //     }
-        //     
-        //     // Start coroutine to complete sheathing after animation time
-        //     if (_stateTransitionCoroutine != null)
-        //     {
-        //         StopCoroutine(_stateTransitionCoroutine);
-        //     }
-        //     
-        //     _stateTransitionCoroutine = StartCoroutine(CompleteSheathe());
-        //     
-        //     // Update context state
-        //     _context.SetStateValue("IsWeaponDrawn", false);
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Sheathing weapon");
-        //     }
-        // }
-        //
-        // private void CancelAttack()
-        // {
-        //     if (_attackCoroutine != null)
-        //     {
-        //         StopCoroutine(_attackCoroutine);
-        //         _attackCoroutine = null;
-        //     }
-        //     
-        //     _isAttacking = false;
-        //     _context.SetStateValue("IsAttacking", false);
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Attack canceled due to weapon sheathing");
-        //     }
-        // }
-        //
-        // private IEnumerator CompleteSheathe()
-        // {
-        //     // Wait for sheathe animation to complete
-        //     yield return new WaitForSeconds(_sheatheTime);
-        //     
-        //     // Complete transition to sheathed state
-        //     SetCombatState(CombatState.Sheathed);
-        //     
-        //     // Reset weapon type booleans in animator
-        //     if (_animationController != null)
-        //     {
-        //         _animationController.SetBool("OneHanded", false);
-        //         _animationController.SetBool("TwoHanded", false);
-        //         // Reset other weapon types as needed
-        //     }
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Weapon fully sheathed");
-        //     }
-        //     
-        //     _stateTransitionCoroutine = null;
-        // }
-        //
-        // private void ForceSheatheWeapon()
-        // {
-        //     // Cancel any attacks
-        //     if (_isAttacking)
-        //     {
-        //         CancelAttack();
-        //     }
-        //     
-        //     // Immediately set to sheathed state without animation
-        //     SetCombatState(CombatState.Sheathed);
-        //     
-        //     // Reset all weapon type booleans
-        //     if (_animationController != null)
-        //     {
-        //         _animationController.SetBool("OneHanded", false);
-        //         _animationController.SetBool("TwoHanded", false);
-        //         // Reset other weapon types as needed
-        //     }
-        //     
-        //     // Update context state
-        //     _context.SetStateValue("IsWeaponDrawn", false);
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log("Weapon forcibly sheathed");
-        //     }
-        //     
-        //     // Stop any ongoing transitions
-        //     if (_stateTransitionCoroutine != null)
-        //     {
-        //         StopCoroutine(_stateTransitionCoroutine);
-        //         _stateTransitionCoroutine = null;
-        //     }
-        // }
-        //
-        // private void SetCombatState(CombatState newState)
-        // {
-        //     _currentState = newState;
-        //     _context.SetStateValue("CombatState", (int)newState);
-        //     
-        //     if (_debugCombat)
-        //     {
-        //         Debug.Log($"Combat state changed to: {newState}");
-        //     }
-        // }
-        //
-        // // Helper method to check if player is currently in an attack
-        // public bool IsAttacking()
-        // {
-        //     return _isAttacking;
-        // }
-    }
+}
 }

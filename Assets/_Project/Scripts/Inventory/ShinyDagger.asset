@@ -27,16 +27,15 @@ MonoBehaviour:
   - statName: 48
     modifierType: 0
     value: 10
-  physicalAttack: 7
   elementalAttacks:
   - damageType: 1
     damage: 4
   weaponType: 0
   weaponSize: 0
-  weaponPrefab: {fileID: 0}
+  weaponPrefab: {fileID: 5045876931230186202, guid: 28520218569badfc09961cd96e472ff1, type: 3}
   sheathedPosition: {x: 0, y: 0, z: 0}
   sheathedRotation: {x: 0, y: 0, z: 0}
-  unsheathedPosition: {x: 0, y: 0, z: 0}
+  unsheathedPosition: {x: 0, y: 0, z: 0.36}
   unsheathedRotation: {x: 0, y: 0, z: 0}
   hitEffectPrefab: {fileID: 0}
   _hitSound: {fileID: 0}

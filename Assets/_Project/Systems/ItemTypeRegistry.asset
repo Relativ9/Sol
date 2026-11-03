@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e3132df3646cd77e8ac7496fa4707ba, type: 3}
   m_Name: ItemTypeRegistry
   m_EditorClassIdentifier: Sol_Scripts::Sol.ItemTypeRegistry
-  _nextIndex: 12
+  _nextIndex: 14
   _entries:
   - itemId: relic-shield
     itemIndex: 1
@@ -34,7 +34,7 @@ MonoBehaviour:
     retired: 0
   - itemId: test-club
     itemIndex: 7
-    retired: 0
+    retired: 1
   - itemId: test-flex-sleeve
     itemIndex: 8
     retired: 0
@@ -46,4 +46,10 @@ MonoBehaviour:
     retired: 0
   - itemId: test-two-handed-sword
     itemIndex: 11
+    retired: 1
+  - itemId: Rusty-Sword
+    itemIndex: 12
+    retired: 0
+  - itemId: rusty-shield
+    itemIndex: 13
     retired: 0

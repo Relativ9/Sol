@@ -30,7 +30,6 @@ MonoBehaviour:
   - statName: 29
     modifierType: 0
     value: 20
-  physicalAttack: 0
   elementalAttacks: []
   _wearableCategory: 0
   _armorType: 0
