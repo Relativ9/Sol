@@ -263,6 +263,20 @@ namespace Sol
             }
         }
         
+        public void SetAnimatorSpeed(float speed)
+        {
+            if (_animator != null)
+            {
+                _animator.speed = speed;
+            }
+        }
+
+        public void PlayState(string stateName, int layerIndex, float crossFadeSeconds)
+        {
+            if (_animator == null) return;
+            _animator.CrossFade(stateName, Mathf.Max(0f, crossFadeSeconds), layerIndex, 0f);
+        }
+
         public void SetInteger(string paramName, int value)
         {
             if (_animator != null)

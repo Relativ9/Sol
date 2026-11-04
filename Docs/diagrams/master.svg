@@ -1,395 +1,932 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3200" height="1800" viewBox="0 0 3200 1800" font-family="Helvetica, Arial, sans-serif">
-<rect width="100%" height="100%" fill="#ffffff"/>
-<text x="1600.0" y="1782" text-anchor="middle" font-size="12" fill="#616e7c">Sol systems. Each core is an organizer; its components orbit it. Arrows show data and direction. Dashed = read or poll. Dotted = collider or scene. Unverified items are marked.</text>
-<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5a6470"/></marker></defs>
-<ellipse cx="573.3333333333334" cy="418.3333333333333" rx="497.33333333333337" ry="262.3333333333333" fill="#fdecea" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="573.3333333333334" cy="955.0" rx="497.33333333333337" ry="262.3333333333333" fill="#f3e8ff" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="1600.0" cy="955.0" rx="497.33333333333337" ry="262.3333333333333" fill="#fff1f0" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="2626.666666666667" cy="955.0" rx="497.33333333333337" ry="262.3333333333333" fill="#eceff1" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="1600.0" cy="418.3333333333333" rx="497.33333333333337" ry="262.3333333333333" fill="#fff3e0" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="573.3333333333334" cy="1491.6666666666665" rx="497.33333333333337" ry="262.3333333333333" fill="#e0f7fa" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="2626.666666666667" cy="418.3333333333333" rx="497.33333333333337" ry="262.3333333333333" fill="#e0f7fa" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="1600.0" cy="1491.6666666666665" rx="497.33333333333337" ry="262.3333333333333" fill="#ede7f6" fill-opacity="0.55" stroke="none"/>
-<ellipse cx="2626.666666666667" cy="1491.6666666666665" rx="497.33333333333337" ry="262.3333333333333" fill="#e8eaf6" fill-opacity="0.55" stroke="none"/>
-<path d="M280.0,90.0 Q374.1,301.1 573.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M720.0,90.0 Q594.1,230.7 573.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1160.0,90.0 Q814.1,160.3 573.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,90.0 Q1034.1,89.9 573.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2040.0,90.0 Q1254.1,19.5 573.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2480.0,90.0 Q1330.0,399.6 573.3,1319.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2920.0,90.0 Q1494.8,501.5 573.3,1664.0" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,418.3 Q600.9,332.2 573.3,246.0" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M573.3,418.3 Q738.0,423.5 875.0,332.2" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1901.7,1041.2 Q1364.7,431.1 573.3,246.0" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M573.3,418.3 Q710.4,509.7 875.0,504.5" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,418.3 Q545.8,504.5 573.3,590.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M875.0,504.5 Q1706.3,923.9 2626.7,782.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,590.7 Q1569.3,1015.2 2626.7,782.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,955.0 Q2654.2,868.8 2626.7,782.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M271.7,504.5 Q463.9,423.5 573.3,246.0" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M271.7,504.5 Q573.3,601.0 875.0,504.5" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M271.7,504.5 Q408.7,595.8 573.3,590.7" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M271.7,332.2 Q922.0,587.8 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,418.3 Q1059.1,340.2 573.3,590.7" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M573.3,955.0 Q659.2,686.7 573.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M573.3,955.0 Q600.9,868.8 573.3,782.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,955.0 Q631.6,772.8 573.3,590.7" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M573.3,1491.7 Q659.2,1223.3 573.3,955.0" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,418.3 Q1000.8,850.9 1600.0,955.0" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,955.0 Q1627.6,868.8 1600.0,782.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,782.7 Q1572.4,868.8 1600.0,955.0" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1600.0,782.7 Q1709.5,960.2 1901.7,1041.2" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1600.0,955.0 Q1200.1,436.2 573.3,246.0" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M2626.7,782.7 Q1921.1,699.4 1298.3,1041.2" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="1 4" marker-end="url(#arr)"/>
-<path d="M1285.0,260.3 Q1417.2,389.7 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,955.0 Q2067.0,393.0 1285.0,260.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="1 4" marker-end="url(#arr)"/>
-<path d="M1285.0,418.3 Q1870.0,901.3 2626.7,955.0" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1285.0,576.3 Q1467.8,547.7 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,418.3 Q2027.5,850.9 2626.7,955.0" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1915.0,260.3 Q1732.2,288.9 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1600.0,418.3 Q1455.8,868.8 1600.0,1319.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,955.0 Q1330.0,901.3 1915.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="1 4" marker-end="url(#arr)"/>
-<path d="M573.3,1491.7 Q1771.7,1283.5 2626.7,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,418.3 Q2800.8,474.1 2975.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,418.3 Q2599.1,504.5 2626.7,590.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,246.0 Q2599.1,332.2 2626.7,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M2626.7,590.7 Q2480.1,448.8 2278.3,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,590.7 Q2140.9,340.2 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M2975.0,418.3 Q2287.5,198.3 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M2278.3,418.3 Q1795.0,760.3 1600.0,1319.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,1664.0 Q1799.3,1369.7 2626.7,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,1319.3 Q545.8,1405.5 573.3,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,1491.7 Q1600.0,1820.2 2626.7,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,1664.0 Q600.9,1577.8 573.3,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,1491.7 Q2140.9,1241.2 1600.0,1319.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,1491.7 Q2654.2,1405.5 2626.7,1319.3" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1600.0,1319.3 Q1572.4,1405.5 1600.0,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M573.3,1491.7 Q1086.7,1655.9 1600.0,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,1491.7 Q1774.2,1547.4 1948.3,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1948.3,1491.7 Q1746.6,1522.1 1600.0,1664.0" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1600.0,1664.0 Q1801.7,1633.6 1948.3,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M1251.7,1491.7 Q1600.0,1603.1 1948.3,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1251.7,1491.7 Q2285.1,1230.7 2975.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1251.7,1491.7 Q2083.3,1261.2 2626.7,590.7" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M1251.7,1491.7 Q1597.6,1010.7 1600.0,418.3" fill="none" stroke="#5a6470" stroke-width="1.2" marker-end="url(#arr)"/>
-<path d="M2626.7,590.7 Q1969.2,876.9 1600.0,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<path d="M2975.0,418.3 Q2115.8,735.0 1600.0,1491.7" fill="none" stroke="#5a6470" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
-<text x="374.1" y="301.1" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Button event (OnJump)</text>
-<text x="594.1" y="230.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Vector2 and bool (OnMove, OnRun)</text>
-<text x="814.1" y="160.3" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Vector2 (OnLook)</text>
-<text x="1034.1" y="89.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Button event (OnAttack)</text>
-<text x="1254.1" y="19.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Button event (OnToggleWeapon)</text>
-<text x="1330.0" y="399.6" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Button event (OnOpenTalentWheel)</text>
-<text x="1494.8" y="501.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Mouse button state, polled</text>
-<text x="600.9" y="332.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SetStateValue (bool, int, float)</text>
-<text x="738.0" y="423.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">RegisterService at Awake</text>
-<text x="1364.7" y="431.1" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetStateValue, read by animator</text>
-<text x="710.4" y="509.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">HandleJumpInput (direct call)</text>
-<text x="545.8" y="504.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">ProcessMovement (FixedUpdate)</text>
-<text x="1706.3" y="923.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">AddForce Impulse (Vector3)</text>
-<text x="1569.3" y="1015.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">linearVelocity (Vector3)</text>
-<text x="2654.2" y="868.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">AddForce Acceleration (Vector3)</text>
-<text x="463.9" y="423.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SetStateValue IsGrounded (bool)</text>
-<text x="573.3" y="601.0" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">IsGrounded (bool, read)</text>
-<text x="408.7" y="595.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">IsGrounded (bool, read)</text>
-<text x="922.0" y="587.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">ApplyOrReplaceModifier (StatModifier)</text>
-<text x="1059.1" y="340.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetStat MoveSpeed (float, read)</text>
-<text x="659.2" y="686.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetLookInput (Vector2, polled)</text>
-<text x="600.9" y="868.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Rotation (Quaternion)</text>
-<text x="631.6" y="772.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetCameraYaw (float, polled)</text>
-<text x="659.2" y="1223.3" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OnDeactivate / OnActivate (lock cursor)</text>
-<text x="1000.8" y="850.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">HandleAttackInput, ToggleWeaponState</text>
-<text x="1627.6" y="868.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SetTrigger Attack (animator parameter)</text>
-<text x="1572.4" y="868.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OnAnimationEvent (string)</text>
-<text x="1709.5" y="960.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OnAnimationEvent (string)</text>
-<text x="1200.1" y="436.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">IsWeaponDrawn, IsAttacking (bool)</text>
-<text x="1921.1" y="699.4" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OverlapSphere (collider query)</text>
-<text x="1417.2" y="389.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">ApplyOrReplaceModifier (StatModifier)</text>
-<text x="2067.0" y="393.0" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Trigger enter and exit (Collider, tag Player)</text>
-<text x="1870.0" y="901.3" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SetGravityScale, custom direction (Vector3)</text>
-<text x="1467.8" y="547.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">ApplyOrReplaceModifier (RunMultiplier)</text>
-<text x="2027.5" y="850.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetStat Gravity and Terminal (float, read)</text>
-<text x="1732.2" y="288.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetSpeedMultiplier (float, polled)</text>
-<text x="1455.8" y="868.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OnStatsChanged (GameEvent)</text>
-<text x="1330.0" y="901.3" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Faces camera (Transform, optional)</text>
-<text x="1771.7" y="1283.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">InitializeTalentPanel</text>
-<text x="2800.8" y="474.1" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SpendTalentPoint, RefundTalentPoint (bool)</text>
-<text x="2599.1" y="504.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">TryAllocatePoint, TryRemovePoint (nodeId)</text>
-<text x="2599.1" y="332.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetNodeData (TalentNodeDataSO)</text>
-<text x="2480.1" y="448.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Raise (GameEvent)</text>
-<text x="2140.9" y="340.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">RemoveModifiersFromSource (reset only)</text>
-<text x="2287.5" y="198.3" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SetBaseStat (attribute value)</text>
-<text x="1795.0" y="760.3" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OnEventRaised (GameEvent)</text>
-<text x="1799.3" y="1369.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Synthesized MouseDownEvent (button 0 or 1)</text>
-<text x="545.8" y="1405.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">TogglePanel (string)</text>
-<text x="1600.0" y="1820.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">TogglePause (bool)</text>
-<text x="600.9" y="1577.8" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">SetActiveDocument (UIDocument)</text>
-<text x="2140.9" y="1241.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">OnDay, OnSeason, OnYear (GameEvent)</text>
-<text x="2654.2" y="1405.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">CelestialTime, season index (polled)</text>
-<text x="1572.4" y="1405.5" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">RequestLazySave (2 s debounce)</text>
-<text x="1086.7" y="1655.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">RequestImmediateSave (immediate)</text>
-<text x="1774.2" y="1547.4" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Save (PlayerSaveData, JSON)</text>
-<text x="1746.6" y="1522.1" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Write JSON (persistentDataPath)</text>
-<text x="1801.7" y="1633.6" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Read JSON on load</text>
-<text x="1600.0" y="1603.1" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Load, Delete</text>
-<text x="2285.1" y="1230.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Initialize, ReloadAllBaseStats</text>
-<text x="2083.3" y="1261.2" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Initialize (allocations)</text>
-<text x="1597.6" y="1010.7" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">Initialize (base stats)</text>
-<text x="1969.2" y="876.9" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetAllocatedNodeIds (read)</text>
-<text x="2115.8" y="735.0" font-size="10" text-anchor="middle" fill="#2d3a45" stroke="#ffffff" stroke-width="3" paint-order="stroke">GetLevel, GetTotalTalentPoints (read)</text>
-<rect x="423.33333333333337" y="343.3333333333333" width="300" height="150" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="2.2"/>
-<text x="435.33333333333337" y="367.3333333333333" font-size="16" font-weight="bold" fill="#1f2933">PlayerController</text>
-<text x="435.33333333333337" y="387.3333333333333" font-size="11" fill="#2d3a45">Implements IPlayerContext. Receives every player</text>
-<text x="435.33333333333337" y="401.3333333333333" font-size="11" fill="#2d3a45">input and routes it. Runs the active movement state</text>
-<text x="435.33333333333337" y="415.3333333333333" font-size="11" fill="#2d3a45">in FixedUpdate. Owns the state dictionary and local</text>
-<text x="435.33333333333337" y="429.3333333333333" font-size="11" fill="#2d3a45">service registry.</text>
-<rect x="448.33333333333337" y="186.0" width="250" height="118" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="1.4"/>
-<text x="460.33333333333337" y="204.0" font-size="14" font-weight="bold" fill="#1f2933">State dictionary</text>
-<text x="460.33333333333337" y="224.0" font-size="11" fill="#2d3a45">String-keyed store that components use</text>
-<text x="460.33333333333337" y="238.0" font-size="11" fill="#2d3a45">to talk to each other: JumpPriority,</text>
-<text x="460.33333333333337" y="252.0" font-size="11" fill="#2d3a45">IsGrounded, IsRunning, IsWeaponDrawn,</text>
-<text x="460.33333333333337" y="266.0" font-size="11" fill="#2d3a45">IsAttacking. Only some keys are read</text>
-<text x="460.33333333333337" y="280.0" font-size="11" fill="#2d3a45">by another component.</text>
-<rect x="749.9988489849129" y="270.16666666666663" width="250" height="118" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="1.4"/>
-<text x="761.9988489849129" y="290.16666666666663" font-size="14" font-weight="bold" fill="#1f2933">Service registry</text>
-<text x="761.9988489849129" y="310.16666666666663" font-size="11" fill="#2d3a45">Per-player dictionary from type to</text>
-<text x="761.9988489849129" y="324.16666666666663" font-size="11" fill="#2d3a45">component. Components call</text>
-<text x="761.9988489849129" y="338.16666666666663" font-size="11" fill="#2d3a45">GetService&lt;T&gt; to get a collaborator.</text>
-<text x="761.9988489849129" y="352.16666666666663" font-size="11" fill="#2d3a45">Filled in PlayerController.Awake.</text>
-<rect x="749.9988489849129" y="438.49999999999994" width="250" height="132" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="1.4"/>
-<text x="761.9988489849129" y="462.49999999999994" font-size="14" font-weight="bold" fill="#1f2933">Jumping</text>
-<text x="761.9988489849129" y="482.49999999999994" font-size="11" fill="#2d3a45">Grounded jump and one double jump.</text>
-<text x="761.9988489849129" y="496.49999999999994" font-size="11" fill="#2d3a45">Adds an impulse to the Rigidbody.</text>
-<text x="761.9988489849129" y="510.49999999999994" font-size="11" fill="#2d3a45">Cooldown 0.1 s. Sets JumpPriority for</text>
-<text x="761.9988489849129" y="524.5" font-size="11" fill="#2d3a45">0.15 s to stop Movement fighting the</text>
-<text x="761.9988489849129" y="538.5" font-size="11" fill="#2d3a45">jump.</text>
-<rect x="448.33333333333337" y="524.6666666666666" width="250" height="132" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="1.4"/>
-<text x="460.33333333333337" y="548.6666666666666" font-size="14" font-weight="bold" fill="#1f2933">Movement</text>
-<text x="460.33333333333337" y="568.6666666666666" font-size="11" fill="#2d3a45">Grounded and air movement. Sets</text>
-<text x="460.33333333333337" y="582.6666666666666" font-size="11" fill="#2d3a45">Rigidbody.linearVelocity from input</text>
-<text x="460.33333333333337" y="596.6666666666666" font-size="11" fill="#2d3a45">and the MoveSpeed stat. Applies a</text>
-<text x="460.33333333333337" y="610.6666666666666" font-size="11" fill="#2d3a45">sticky downward force when grounded.</text>
-<text x="460.33333333333337" y="624.6666666666666" font-size="11" fill="#2d3a45">Skipped while JumpPriority is set.</text>
-<rect x="146.66781768175395" y="438.5" width="250" height="132" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="1.4"/>
-<text x="158.66781768175395" y="462.5" font-size="14" font-weight="bold" fill="#1f2933">GroundChecker</text>
-<text x="158.66781768175395" y="482.5" font-size="11" fill="#2d3a45">Sphere or ray cast under the player</text>
-<text x="158.66781768175395" y="496.5" font-size="11" fill="#2d3a45">each FixedUpdate. Writes IsGrounded to</text>
-<text x="158.66781768175395" y="510.5" font-size="11" fill="#2d3a45">the state dictionary. Coyote time 0.15</text>
-<text x="158.66781768175395" y="524.5" font-size="11" fill="#2d3a45">s lets a jump start just after leaving</text>
-<text x="158.66781768175395" y="538.5" font-size="11" fill="#2d3a45">the ground.</text>
-<rect x="146.6678176817539" y="266.16666666666663" width="250" height="132" rx="10" fill="#fdecea" stroke="#c62828" stroke-width="1.4"/>
-<text x="158.6678176817539" y="290.16666666666663" font-size="14" font-weight="bold" fill="#1f2933">Run modifier</text>
-<text x="158.6678176817539" y="310.16666666666663" font-size="11" fill="#2d3a45">While Run is held and the player</text>
-<text x="158.6678176817539" y="324.16666666666663" font-size="11" fill="#2d3a45">moves, adds a MoveSpeed modifier from</text>
-<text x="158.6678176817539" y="338.16666666666663" font-size="11" fill="#2d3a45">RunMultiplier. Removed when Run is</text>
-<text x="158.6678176817539" y="352.16666666666663" font-size="11" fill="#2d3a45">released.</text>
-<rect x="1450.0" y="343.3333333333333" width="300" height="150" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2.2"/>
-<text x="1462.0" y="367.3333333333333" font-size="16" font-weight="bold" fill="#1f2933">StatsService</text>
-<text x="1462.0" y="387.3333333333333" font-size="11" fill="#2d3a45">Single source of truth for stats. GetStat reads a</text>
-<text x="1462.0" y="401.3333333333333" font-size="11" fill="#2d3a45">cached value, recomputed when a modifier changes.</text>
-<text x="1462.0" y="415.3333333333333" font-size="11" fill="#2d3a45">Raises OnStatsChanged when modifiers change.</text>
-<rect x="1160.0" y="194.33333333333331" width="250" height="132" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.4"/>
-<text x="1172.0" y="218.33333333333331" font-size="14" font-weight="bold" fill="#1f2933">Gravity trigger</text>
-<text x="1172.0" y="238.33333333333331" font-size="11" fill="#2d3a45">Collider trigger for the Player. On</text>
-<text x="1172.0" y="252.33333333333331" font-size="11" fill="#2d3a45">enter, adds a GravityMultiplier</text>
-<text x="1172.0" y="266.3333333333333" font-size="11" fill="#2d3a45">modifier keyed by its sourceId. On</text>
-<text x="1172.0" y="280.3333333333333" font-size="11" fill="#2d3a45">exit, removes it. Can persist while</text>
-<text x="1172.0" y="294.3333333333333" font-size="11" fill="#2d3a45">the player stays inside.</text>
-<rect x="1160.0" y="352.3333333333333" width="250" height="132" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.4"/>
-<text x="1172.0" y="376.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">Gravity zone</text>
-<text x="1172.0" y="396.3333333333333" font-size="11" fill="#2d3a45">Collider trigger that sets a custom</text>
-<text x="1172.0" y="410.3333333333333" font-size="11" fill="#2d3a45">gravity direction on</text>
-<text x="1172.0" y="424.3333333333333" font-size="11" fill="#2d3a45">GravityController. Trigger methods are</text>
-<text x="1172.0" y="438.3333333333333" font-size="11" fill="#2d3a45">verified. The configured values were</text>
-<text x="1172.0" y="452.3333333333333" font-size="11" fill="#2d3a45">not traced.</text>
-<rect x="1160.0" y="510.3333333333333" width="250" height="132" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.4"/>
-<text x="1172.0" y="534.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">Speed boost trigger</text>
-<text x="1172.0" y="554.3333333333333" font-size="11" fill="#2d3a45">Collider trigger for the Player. Adds</text>
-<text x="1172.0" y="568.3333333333333" font-size="11" fill="#2d3a45">a MoveSpeed modifier based on</text>
-<text x="1172.0" y="582.3333333333333" font-size="11" fill="#2d3a45">RunMultiplier for a fixed duration.</text>
-<text x="1172.0" y="596.3333333333333" font-size="11" fill="#2d3a45">Effects have a 0.5 s cooldown.</text>
-<rect x="1790.0" y="194.33333333333331" width="250" height="132" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.4"/>
-<text x="1802.0" y="218.33333333333331" font-size="14" font-weight="bold" fill="#1f2933">SpeedVisualizer</text>
-<text x="1802.0" y="238.33333333333331" font-size="11" fill="#2d3a45">Reads the speed multiplier each</text>
-<text x="1802.0" y="252.33333333333331" font-size="11" fill="#2d3a45">Update. Drives particle emission and</text>
-<text x="1802.0" y="266.3333333333333" font-size="11" fill="#2d3a45">optional camera FOV. Visual only.</text>
-<rect x="1790.0" y="352.3333333333333" width="250" height="132" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="1.4"/>
-<text x="1802.0" y="376.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">Rotator</text>
-<text x="1802.0" y="396.3333333333333" font-size="11" fill="#2d3a45">Spins a prop around chosen axes. Can</text>
-<text x="1802.0" y="410.3333333333333" font-size="11" fill="#2d3a45">face the camera. Not connected to</text>
-<text x="1802.0" y="424.3333333333333" font-size="11" fill="#2d3a45">player state.</text>
-<rect x="2476.666666666667" y="343.3333333333333" width="300" height="150" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="2.2"/>
-<text x="2488.666666666667" y="367.3333333333333" font-size="16" font-weight="bold" fill="#1f2933">TalentTreeController</text>
-<text x="2488.666666666667" y="387.3333333333333" font-size="11" fill="#2d3a45">Handles clicks on talent nodes. Left click</text>
-<text x="2488.666666666667" y="401.3333333333333" font-size="11" fill="#2d3a45">allocates, right click removes. Checks max points,</text>
-<text x="2488.666666666667" y="415.3333333333333" font-size="11" fill="#2d3a45">prerequisites, and dependents. Reset is scene-wired.</text>
-<rect x="2501.666666666667" y="180.0" width="250" height="132" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="1.4"/>
-<text x="2513.666666666667" y="204.0" font-size="14" font-weight="bold" fill="#1f2933">TalentTreeGenerator</text>
-<text x="2513.666666666667" y="224.0" font-size="11" fill="#2d3a45">Holds talent node data</text>
-<text x="2513.666666666667" y="238.0" font-size="11" fill="#2d3a45">(TalentNodeDataSO) and the layout.</text>
-<text x="2513.666666666667" y="252.0" font-size="11" fill="#2d3a45">Answers GetNodeData for the</text>
-<text x="2513.666666666667" y="266.0" font-size="11" fill="#2d3a45">controller.</text>
-<rect x="2850.0000000000005" y="352.3333333333333" width="250" height="132" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="1.4"/>
-<text x="2862.0000000000005" y="376.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">ProgressionService</text>
-<text x="2862.0000000000005" y="396.3333333333333" font-size="11" fill="#2d3a45">Holds the talent point pool and</text>
-<text x="2862.0000000000005" y="410.3333333333333" font-size="11" fill="#2d3a45">attribute allocations.</text>
-<text x="2862.0000000000005" y="424.3333333333333" font-size="11" fill="#2d3a45">SpendTalentPoint and RefundTalentPoint</text>
-<text x="2862.0000000000005" y="438.3333333333333" font-size="11" fill="#2d3a45">are used by the talent UI. Attribute</text>
-<text x="2862.0000000000005" y="452.3333333333333" font-size="11" fill="#2d3a45">spend and refund have no UI caller</text>
-<rect x="2501.666666666667" y="524.6666666666666" width="250" height="132" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="1.4"/>
-<text x="2513.666666666667" y="548.6666666666666" font-size="14" font-weight="bold" fill="#1f2933">TalentStateService</text>
-<text x="2513.666666666667" y="568.6666666666666" font-size="11" fill="#2d3a45">Tracks allocated points per node.</text>
-<text x="2513.666666666667" y="582.6666666666666" font-size="11" fill="#2d3a45">Enforces the rules that</text>
-<text x="2513.666666666667" y="596.6666666666666" font-size="11" fill="#2d3a45">TryAllocatePoint and TryRemovePoint</text>
-<text x="2513.666666666667" y="610.6666666666666" font-size="11" fill="#2d3a45">check. Raises the talent GameEvent</text>
-<text x="2513.666666666667" y="624.6666666666666" font-size="11" fill="#2d3a45">when anything changes.</text>
-<path d="M2153.3333333333335,352.3333333333333 H2387.3333333333335 L2403.3333333333335,368.3333333333333 V484.3333333333333 H2153.3333333333335 Z" fill="#e0f7fa" stroke="#00838f" stroke-width="1.4"/>
-<text x="2165.3333333333335" y="376.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">Talent GameEvent</text>
-<text x="2165.3333333333335" y="396.3333333333333" font-size="11" fill="#2d3a45">ScriptableObject event raised on any</text>
-<text x="2165.3333333333335" y="410.3333333333333" font-size="11" fill="#2d3a45">allocation change. Listeners are</text>
-<text x="2165.3333333333335" y="424.3333333333333" font-size="11" fill="#2d3a45">scene-wired and call the save path.</text>
-<rect x="423.33333333333337" y="880.0" width="300" height="150" rx="10" fill="#f3e8ff" stroke="#7e3ff2" stroke-width="2.2"/>
-<text x="435.33333333333337" y="904.0" font-size="16" font-weight="bold" fill="#1f2933">CameraController</text>
-<text x="435.33333333333337" y="924.0" font-size="11" fill="#2d3a45">Turns look input into camera rotation. Pitch is</text>
-<text x="435.33333333333337" y="938.0" font-size="11" fill="#2d3a45">clamped to -80 to 80 degrees. Yaw is read by</text>
-<text x="435.33333333333337" y="952.0" font-size="11" fill="#2d3a45">Movement so WASD is camera-relative. Locks and</text>
-<text x="435.33333333333337" y="966.0" font-size="11" fill="#2d3a45">unlocks the cursor.</text>
-<rect x="448.33333333333337" y="716.6666666666667" width="250" height="132" rx="10" fill="#f3e8ff" stroke="#7e3ff2" stroke-width="1.4" stroke-dasharray="6 4"/>
-<text x="460.33333333333337" y="740.6666666666667" font-size="14" font-weight="bold" fill="#1f2933">CinemachineCamera</text>
-<text x="460.33333333333337" y="760.6666666666667" font-size="11" fill="#2d3a45">Scene object that follows</text>
-<text x="460.33333333333337" y="774.6666666666667" font-size="11" fill="#2d3a45">CameraTarget. Not in code, set up in</text>
-<text x="460.33333333333337" y="788.6666666666667" font-size="11" fill="#2d3a45">the scene.</text>
-<rect x="1450.0" y="880.0" width="300" height="150" rx="10" fill="#fff1f0" stroke="#b5483c" stroke-width="2.2"/>
-<text x="1462.0" y="904.0" font-size="16" font-weight="bold" fill="#1f2933">CombatStateController</text>
-<text x="1462.0" y="924.0" font-size="11" fill="#2d3a45">Owns weapon state (Sheathed, Unsheathed,</text>
-<text x="1462.0" y="938.0" font-size="11" fill="#2d3a45">transitions) and attack timing. Attack cooldown 0.8</text>
-<text x="1462.0" y="952.0" font-size="11" fill="#2d3a45">s. Force-sheathes the weapon when movement changes</text>
-<text x="1462.0" y="966.0" font-size="11" fill="#2d3a45">state.</text>
-<rect x="1475.0" y="716.6666666666667" width="250" height="132" rx="10" fill="#fff1f0" stroke="#b5483c" stroke-width="1.4"/>
-<text x="1487.0" y="740.6666666666667" font-size="14" font-weight="bold" fill="#1f2933">AnimationEventDispatcher</text>
-<text x="1487.0" y="760.6666666666667" font-size="11" fill="#2d3a45">Receives animator events by name and</text>
-<text x="1487.0" y="774.6666666666667" font-size="11" fill="#2d3a45">forwards them to registered</text>
-<text x="1487.0" y="788.6666666666667" font-size="11" fill="#2d3a45">IAnimationEventReceiver components.</text>
-<rect x="1776.6655156515794" y="975.1666666666665" width="250" height="132" rx="10" fill="#fff1f0" stroke="#b5483c" stroke-width="1.4"/>
-<text x="1788.6655156515794" y="999.1666666666665" font-size="14" font-weight="bold" fill="#1f2933">PlayerAnimationController</text>
-<text x="1788.6655156515794" y="1019.1666666666665" font-size="11" fill="#2d3a45">Writes Animator parameters (speed,</text>
-<text x="1788.6655156515794" y="1033.1666666666665" font-size="11" fill="#2d3a45">direction, grounded) from state values</text>
-<text x="1788.6655156515794" y="1047.1666666666665" font-size="11" fill="#2d3a45">IsRunning and IsGrounded. Does not</text>
-<text x="1788.6655156515794" y="1061.1666666666665" font-size="11" fill="#2d3a45">read the jump keys.</text>
-<rect x="1173.3344843484206" y="975.1666666666667" width="250" height="132" rx="10" fill="#fff1f0" stroke="#b5483c" stroke-width="1.4" stroke-dasharray="6 4"/>
-<text x="1185.3344843484206" y="999.1666666666667" font-size="14" font-weight="bold" fill="#1f2933">AttackEventHandler</text>
-<text x="1185.3344843484206" y="1019.1666666666667" font-size="11" fill="#2d3a45">Scene-wired. On an attack impact, runs</text>
-<text x="1185.3344843484206" y="1033.1666666666667" font-size="11" fill="#2d3a45">an overlap sphere in front of the</text>
-<text x="1185.3344843484206" y="1047.1666666666667" font-size="11" fill="#2d3a45">player and calls</text>
-<text x="1185.3344843484206" y="1061.1666666666667" font-size="11" fill="#2d3a45">IDamageable.TakeDamage. No IDamageable</text>
-<text x="1185.3344843484206" y="1075.1666666666667" font-size="11" fill="#2d3a45">implementers exist in code yet.</text>
-<rect x="2476.666666666667" y="880.0" width="300" height="150" rx="10" fill="#eceff1" stroke="#455a64" stroke-width="2.2"/>
-<text x="2488.666666666667" y="904.0" font-size="16" font-weight="bold" fill="#1f2933">GravityController</text>
-<text x="2488.666666666667" y="924.0" font-size="11" fill="#2d3a45">Applies gravity every FixedUpdate. Reads</text>
-<text x="2488.666666666667" y="938.0" font-size="11" fill="#2d3a45">GravityMultiplier and TerminalVelocity from</text>
-<text x="2488.666666666667" y="952.0" font-size="11" fill="#2d3a45">StatsService. Clamps falling speed to the terminal</text>
-<text x="2488.666666666667" y="966.0" font-size="11" fill="#2d3a45">velocity.</text>
-<rect x="2501.666666666667" y="720.6666666666667" width="250" height="118" rx="10" fill="#eceff1" stroke="#455a64" stroke-width="1.4"/>
-<text x="2513.666666666667" y="740.6666666666667" font-size="14" font-weight="bold" fill="#1f2933">Rigidbody</text>
-<text x="2513.666666666667" y="760.6666666666667" font-size="11" fill="#2d3a45">The Player physics body.</text>
-<text x="2513.666666666667" y="774.6666666666667" font-size="11" fill="#2d3a45">linearVelocity and AddForce are</text>
-<text x="2513.666666666667" y="788.6666666666667" font-size="11" fill="#2d3a45">written by four components (Jumping,</text>
-<text x="2513.666666666667" y="802.6666666666667" font-size="11" fill="#2d3a45">Movement, GravityController,</text>
-<text x="2513.666666666667" y="816.6666666666667" font-size="11" fill="#2d3a45">PlayerController). Final velocity</text>
-<rect x="423.33333333333337" y="1416.6666666666665" width="300" height="150" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="2.2"/>
-<text x="435.33333333333337" y="1440.6666666666665" font-size="16" font-weight="bold" fill="#1f2933">UIManager</text>
-<text x="435.33333333333337" y="1460.6666666666665" font-size="11" fill="#2d3a45">Opens and closes panels. Pauses time on open and</text>
-<text x="435.33333333333337" y="1474.6666666666665" font-size="11" fill="#2d3a45">close. Deactivates the camera while a panel is open.</text>
-<text x="435.33333333333337" y="1488.6666666666665" font-size="11" fill="#2d3a45">Requests an immediate save on close.</text>
-<rect x="448.33333333333337" y="1253.3333333333333" width="250" height="132" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="1.4"/>
-<text x="460.33333333333337" y="1277.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">UIInputController</text>
-<text x="460.33333333333337" y="1297.3333333333333" font-size="11" fill="#2d3a45">Listens for the K action and calls</text>
-<text x="460.33333333333337" y="1311.3333333333333" font-size="11" fill="#2d3a45">UIManager.TogglePanel for the talent</text>
-<text x="460.33333333333337" y="1325.3333333333333" font-size="11" fill="#2d3a45">wheel.</text>
-<rect x="448.33333333333337" y="1597.9999999999998" width="250" height="132" rx="10" fill="#e0f7fa" stroke="#00838f" stroke-width="1.4"/>
-<text x="460.33333333333337" y="1621.9999999999998" font-size="14" font-weight="bold" fill="#1f2933">VirtualCursor</text>
-<text x="460.33333333333337" y="1641.9999999999998" font-size="11" fill="#2d3a45">Cursor driven by the mouse or</text>
-<text x="460.33333333333337" y="1655.9999999999998" font-size="11" fill="#2d3a45">navigation input. Sends synthesized</text>
-<text x="460.33333333333337" y="1669.9999999999998" font-size="11" fill="#2d3a45">clicks into the UI Toolkit tree. Keeps</text>
-<text x="460.33333333333337" y="1683.9999999999998" font-size="11" fill="#2d3a45">running while the game is paused.</text>
-<rect x="1450.0" y="1416.6666666666665" width="300" height="150" rx="10" fill="#ede7f6" stroke="#4527a0" stroke-width="2.2"/>
-<text x="1462.0" y="1440.6666666666665" font-size="16" font-weight="bold" fill="#1f2933">SaveManager</text>
-<text x="1462.0" y="1460.6666666666665" font-size="11" fill="#2d3a45">Decides when to save. Lazy saves are debounced by 2</text>
-<text x="1462.0" y="1474.6666666666665" font-size="11" fill="#2d3a45">s. Immediate saves happen on panel close. Builds</text>
-<text x="1462.0" y="1488.6666666666665" font-size="11" fill="#2d3a45">PlayerSaveData from talents, level, and points.</text>
-<rect x="1475.0" y="1253.3333333333333" width="250" height="132" rx="10" fill="#ede7f6" stroke="#4527a0" stroke-width="1.4" stroke-dasharray="6 4"/>
-<text x="1487.0" y="1277.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">GameEventListener</text>
-<text x="1487.0" y="1297.3333333333333" font-size="11" fill="#2d3a45">Scene-wired MonoBehaviour. Subscribes</text>
-<text x="1487.0" y="1311.3333333333333" font-size="11" fill="#2d3a45">to a GameEvent asset and calls</text>
-<text x="1487.0" y="1325.3333333333333" font-size="11" fill="#2d3a45">RequestLazySave on the SaveManager</text>
-<text x="1487.0" y="1339.3333333333333" font-size="11" fill="#2d3a45">when it fires.</text>
-<rect x="1823.3333333333335" y="1425.6666666666665" width="250" height="132" rx="10" fill="#ede7f6" stroke="#4527a0" stroke-width="1.4"/>
-<text x="1835.3333333333335" y="1449.6666666666665" font-size="14" font-weight="bold" fill="#1f2933">SaveService</text>
-<text x="1835.3333333333335" y="1469.6666666666665" font-size="11" fill="#2d3a45">Writes and reads PlayerSaveData as</text>
-<text x="1835.3333333333335" y="1483.6666666666665" font-size="11" fill="#2d3a45">JSON in persistentDataPath, slot</text>
-<text x="1835.3333333333335" y="1497.6666666666665" font-size="11" fill="#2d3a45">default. Write errors are logged only.</text>
-<rect x="1475.0" y="1597.9999999999998" width="250" height="132" rx="10" fill="#ede7f6" stroke="#4527a0" stroke-width="1.4"/>
-<text x="1487.0" y="1621.9999999999998" font-size="14" font-weight="bold" fill="#1f2933">Save file</text>
-<text x="1487.0" y="1641.9999999999998" font-size="11" fill="#2d3a45">JSON file on disk. Holds level, talent</text>
-<text x="1487.0" y="1655.9999999999998" font-size="11" fill="#2d3a45">points, and talent allocations.</text>
-<text x="1487.0" y="1669.9999999999998" font-size="11" fill="#2d3a45">Attribute, vitals, and equipment</text>
-<text x="1487.0" y="1683.9999999999998" font-size="11" fill="#2d3a45">fields are not written during play.</text>
-<rect x="1126.6666666666665" y="1425.6666666666665" width="250" height="132" rx="10" fill="#ede7f6" stroke="#4527a0" stroke-width="1.4"/>
-<text x="1138.6666666666665" y="1449.6666666666665" font-size="14" font-weight="bold" fill="#1f2933">GameInitializer</text>
-<text x="1138.6666666666665" y="1469.6666666666665" font-size="11" fill="#2d3a45">On Start, loads the save or creates a</text>
-<text x="1138.6666666666665" y="1483.6666666666665" font-size="11" fill="#2d3a45">new game, then initializes stats,</text>
-<text x="1138.6666666666665" y="1497.6666666666665" font-size="11" fill="#2d3a45">progression, and talent state. Forced</text>
-<text x="1138.6666666666665" y="1511.6666666666665" font-size="11" fill="#2d3a45">new game deletes the save.</text>
-<rect x="2476.666666666667" y="1416.6666666666665" width="300" height="150" rx="10" fill="#e8eaf6" stroke="#283593" stroke-width="2.2"/>
-<text x="2488.666666666667" y="1440.6666666666665" font-size="16" font-weight="bold" fill="#1f2933">TimeManager</text>
-<text x="2488.666666666667" y="1460.6666666666665" font-size="11" fill="#2d3a45">Owns CelestialTime, pause, day, season, and year.</text>
-<text x="2488.666666666667" y="1474.6666666666665" font-size="11" fill="#2d3a45">Raises OnDay, OnSeason, and OnYear events when they</text>
-<text x="2488.666666666667" y="1488.6666666666665" font-size="11" fill="#2d3a45">change.</text>
-<rect x="2501.666666666667" y="1253.3333333333333" width="250" height="132" rx="10" fill="#e8eaf6" stroke="#283593" stroke-width="1.4"/>
-<text x="2513.666666666667" y="1277.3333333333333" font-size="14" font-weight="bold" fill="#1f2933">World scripts</text>
-<text x="2513.666666666667" y="1297.3333333333333" font-size="11" fill="#2d3a45">Celestial, cloud, wind, skybox, and</text>
-<text x="2513.666666666667" y="1311.3333333333333" font-size="11" fill="#2d3a45">clock scripts. They poll TimeManager</text>
-<text x="2513.666666666667" y="1325.3333333333333" font-size="11" fill="#2d3a45">values rather than subscribe to</text>
-<text x="2513.666666666667" y="1339.3333333333333" font-size="11" fill="#2d3a45">events.</text>
-<rect x="155.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="167.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">Jump button</text>
-<text x="167.0" y="68" font-size="11" fill="#2d3a45">Keyboard space bound to the Main map</text>
-<text x="167.0" y="82" font-size="11" fill="#2d3a45">Jump action. Fires once on press.</text>
-<text x="167.0" y="96" font-size="11" fill="#2d3a45">Calls Jumping through</text>
-<text x="167.0" y="110" font-size="11" fill="#2d3a45">PlayerController.OnJump.</text>
-<rect x="595.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="607.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">Move and run</text>
-<text x="607.0" y="68" font-size="11" fill="#2d3a45">WASD as a Vector2 composite on Move.</text>
-<text x="607.0" y="82" font-size="11" fill="#2d3a45">Shift is held for Run. Both go into</text>
-<text x="607.0" y="96" font-size="11" fill="#2d3a45">PlayerController state and the</text>
-<text x="607.0" y="110" font-size="11" fill="#2d3a45">movement states.</text>
-<rect x="1035.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="1047.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">Look</text>
-<text x="1047.0" y="68" font-size="11" fill="#2d3a45">Mouse delta on the Look action. Read</text>
-<text x="1047.0" y="82" font-size="11" fill="#2d3a45">by CameraController every Update,</text>
-<text x="1047.0" y="96" font-size="11" fill="#2d3a45">scaled by sensitivity. Ignored while</text>
-<text x="1047.0" y="110" font-size="11" fill="#2d3a45">Time.timeScale is 0.</text>
-<rect x="1475.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="1487.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">Attack</text>
-<text x="1487.0" y="68" font-size="11" fill="#2d3a45">MainHand action. Routed through</text>
-<text x="1487.0" y="82" font-size="11" fill="#2d3a45">OnAttack to</text>
-<text x="1487.0" y="96" font-size="11" fill="#2d3a45">CombatStateController.HandleAttackInput.</text>
-<text x="1487.0" y="110" font-size="11" fill="#2d3a45">Blocked during animations and</text>
-<text x="1487.0" y="124" font-size="11" fill="#2d3a45">cooldown.</text>
-<rect x="1915.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="1927.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">Toggle weapon</text>
-<text x="1927.0" y="68" font-size="11" fill="#2d3a45">Toggles between Sheathed and</text>
-<text x="1927.0" y="82" font-size="11" fill="#2d3a45">Unsheathed. Blocked while an attack,</text>
-<text x="1927.0" y="96" font-size="11" fill="#2d3a45">sheathe, or draw animation is playing.</text>
-<rect x="2355.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="2367.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">Talent panel</text>
-<text x="2367.0" y="68" font-size="11" fill="#2d3a45">K on the UI map. UIInputController</text>
-<text x="2367.0" y="82" font-size="11" fill="#2d3a45">calls UIManager.TogglePanel for the</text>
-<text x="2367.0" y="96" font-size="11" fill="#2d3a45">talent wheel. Also pauses time.</text>
-<rect x="2795.0" y="24" width="250" height="132" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.4"/>
-<text x="2807.0" y="48" font-size="14" font-weight="bold" fill="#1f2933">UI clicks</text>
-<text x="2807.0" y="68" font-size="11" fill="#2d3a45">Left and right mouse buttons on the UI</text>
-<text x="2807.0" y="82" font-size="11" fill="#2d3a45">map. VirtualCursor reads them each</text>
-<text x="2807.0" y="96" font-size="11" fill="#2d3a45">frame and sends synthesized clicks</text>
-<text x="2807.0" y="110" font-size="11" fill="#2d3a45">into the UI Toolkit tree.</text>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 16.1.0 (0)
+ -->
+<!-- Title: SolMap Pages: 1 -->
+<svg width="6227pt" height="2029pt"
+ viewBox="0.00 0.00 6227.00 2029.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 2025.45)">
+<title>SolMap</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-2025.45 6222.95,-2025.45 6222.95,4 -4,4"/>
+<text xml:space="preserve" text-anchor="start" x="3045.35" y="-2006.1" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">Sol: Systems Map</text>
+<text xml:space="preserve" text-anchor="start" x="2782.85" y="-1995.95" font-family="Helvetica,sans-Serif" font-size="10.00">Organizers are the centres of each system. Edges show data, direction, and type. Source: Docs/FLOWS.md, Docs/DECISION_TREES.md</text>
+<g id="clust1" class="cluster">
+<title>cluster_input</title>
+<path fill="#e3f2fd" stroke="#1565c0" d="M227.12,-1446C227.12,-1446 1018.47,-1446 1018.47,-1446 1024.47,-1446 1030.47,-1452 1030.47,-1458 1030.47,-1458 1030.47,-1788 1030.47,-1788 1030.47,-1794 1024.47,-1800 1018.47,-1800 1018.47,-1800 227.12,-1800 227.12,-1800 221.12,-1800 215.12,-1794 215.12,-1788 215.12,-1788 215.12,-1458 215.12,-1458 215.12,-1452 221.12,-1446 227.12,-1446"/>
+<text xml:space="preserve" text-anchor="start" x="600.3" y="-1784.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">INPUT</text>
+<text xml:space="preserve" text-anchor="start" x="529.8" y="-1775.45" font-family="Helvetica,sans-Serif" font-size="9.00">PlayerInput.inputactions (Main, UI maps)</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_player</title>
+<path fill="#fdecea" stroke="#c62828" d="M1398.59,-1650C1398.59,-1650 4453.19,-1650 4453.19,-1650 4459.19,-1650 4465.19,-1656 4465.19,-1662 4465.19,-1662 4465.19,-1766 4465.19,-1766 4465.19,-1772 4459.19,-1778 4453.19,-1778 4453.19,-1778 1398.59,-1778 1398.59,-1778 1392.59,-1778 1386.59,-1772 1386.59,-1766 1386.59,-1766 1386.59,-1662 1386.59,-1662 1386.59,-1656 1392.59,-1650 1398.59,-1650"/>
+<text xml:space="preserve" text-anchor="start" x="2826.89" y="-1762.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">PlayerController</text>
+<text xml:space="preserve" text-anchor="start" x="2947.64" y="-1762.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2720.02" y="-1753.45" font-family="Helvetica,sans-Serif" font-size="9.00">Routes input to player components. Implements IPlayerContext. Owns the state dictionary.</text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_move</title>
+<path fill="#fdecea" stroke="#c62828" d="M2627.43,-974C2627.43,-974 3761.52,-974 3761.52,-974 3767.52,-974 3773.52,-980 3773.52,-986 3773.52,-986 3773.52,-1180 3773.52,-1180 3773.52,-1186 3767.52,-1192 3761.52,-1192 3761.52,-1192 2627.43,-1192 2627.43,-1192 2621.43,-1192 2615.43,-1186 2615.43,-1180 2615.43,-1180 2615.43,-986 2615.43,-986 2615.43,-980 2621.43,-974 2627.43,-974"/>
+<text xml:space="preserve" text-anchor="start" x="3071.1" y="-1176.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">Movement states</text>
+<text xml:space="preserve" text-anchor="start" x="3197.1" y="-1176.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (IBaseMovement)</text>
+<text xml:space="preserve" text-anchor="start" x="3056.85" y="-1167.45" font-family="Helvetica,sans-Serif" font-size="9.00">One is active at a time. Chosen each FixedUpdate by priority.</text>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_cam</title>
+<path fill="#f3e8ff" stroke="#7e3ff2" d="M2050.89,-666C2050.89,-666 2925.1,-666 2925.1,-666 2931.1,-666 2937.1,-672 2937.1,-678 2937.1,-678 2937.1,-755 2937.1,-755 2937.1,-761 2931.1,-767 2925.1,-767 2925.1,-767 2050.89,-767 2050.89,-767 2044.89,-767 2038.89,-761 2038.89,-755 2038.89,-755 2038.89,-678 2038.89,-678 2038.89,-672 2044.89,-666 2050.89,-666"/>
+<text xml:space="preserve" text-anchor="start" x="2383.74" y="-751.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">CameraController</text>
+<text xml:space="preserve" text-anchor="start" x="2514.99" y="-751.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2362.74" y="-742.45" font-family="Helvetica,sans-Serif" font-size="9.00">Turns look input into camera rotation. Locks the cursor.</text>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_combat</title>
+<path fill="#fff1f0" stroke="#b5483c" d="M2670.93,-1481C2670.93,-1481 4986.61,-1481 4986.61,-1481 4992.61,-1481 4998.61,-1487 4998.61,-1493 4998.61,-1493 4998.61,-1630 4998.61,-1630 4998.61,-1636 4992.61,-1642 4986.61,-1642 4986.61,-1642 2670.93,-1642 2670.93,-1642 2664.93,-1642 2658.93,-1636 2658.93,-1630 2658.93,-1630 2658.93,-1493 2658.93,-1493 2658.93,-1487 2664.93,-1481 2670.93,-1481"/>
+<text xml:space="preserve" text-anchor="start" x="3705.4" y="-1626.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">CombatStateController</text>
+<text xml:space="preserve" text-anchor="start" x="3874.9" y="-1626.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="3721.9" y="-1617.45" font-family="Helvetica,sans-Serif" font-size="9.00">Weapon state, attack timing, animation phases</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_phys</title>
+<path fill="#eceff1" stroke="#455a64" d="M2666.43,-1372C2666.43,-1372 3742.02,-1372 3742.02,-1372 3748.02,-1372 3754.02,-1378 3754.02,-1384 3754.02,-1384 3754.02,-1461 3754.02,-1461 3754.02,-1467 3748.02,-1473 3742.02,-1473 3742.02,-1473 2666.43,-1473 2666.43,-1473 2660.43,-1473 2654.43,-1467 2654.43,-1461 2654.43,-1461 2654.43,-1384 2654.43,-1384 2654.43,-1378 2660.43,-1372 2666.43,-1372"/>
+<text xml:space="preserve" text-anchor="start" x="3177.23" y="-1457.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">Physics</text>
+<text xml:space="preserve" text-anchor="start" x="3132.98" y="-1448.45" font-family="Helvetica,sans-Serif" font-size="9.00">Shared Rigidbody on the Player</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_stats</title>
+<path fill="#fff3e0" stroke="#e65100" d="M1478.84,-797C1478.84,-797 4360.57,-797 4360.57,-797 4366.57,-797 4372.57,-803 4372.57,-809 4372.57,-809 4372.57,-954 4372.57,-954 4372.57,-960 4366.57,-966 4360.57,-966 4360.57,-966 1478.84,-966 1478.84,-966 1472.84,-966 1466.84,-960 1466.84,-954 1466.84,-954 1466.84,-809 1466.84,-809 1466.84,-803 1472.84,-797 1478.84,-797"/>
+<text xml:space="preserve" text-anchor="start" x="2835.33" y="-950.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">StatsService</text>
+<text xml:space="preserve" text-anchor="start" x="2926.83" y="-950.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2804.58" y="-941.45" font-family="Helvetica,sans-Serif" font-size="9.00">Single source of truth for stat values and modifiers</text>
+</g>
+<g id="clust8" class="cluster">
+<title>cluster_prog</title>
+<path fill="#e0f7fa" stroke="#00838f" d="M2038.51,-455C2038.51,-455 6198.95,-455 6198.95,-455 6204.95,-455 6210.95,-461 6210.95,-467 6210.95,-467 6210.95,-604 6210.95,-604 6210.95,-610 6204.95,-616 6198.95,-616 6198.95,-616 2038.51,-616 2038.51,-616 2032.51,-616 2026.51,-610 2026.51,-604 2026.51,-604 2026.51,-467 2026.51,-467 2026.51,-461 2032.51,-455 2038.51,-455"/>
+<text xml:space="preserve" text-anchor="start" x="3987.48" y="-600.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">TalentTreeController</text>
+<text xml:space="preserve" text-anchor="start" x="4138.98" y="-600.65" font-family="Helvetica,sans-Serif" font-size="13.00"> and progression</text>
+<text xml:space="preserve" text-anchor="start" x="4024.61" y="-591.45" font-family="Helvetica,sans-Serif" font-size="9.00">Player choices: talent nodes, points, reset</text>
+</g>
+<g id="clust9" class="cluster">
+<title>cluster_ui</title>
+<path fill="#e0f7fa" stroke="#00838f" d="M761.67,-601C761.67,-601 1773.51,-601 1773.51,-601 1779.51,-601 1785.51,-607 1785.51,-613 1785.51,-613 1785.51,-750 1785.51,-750 1785.51,-756 1779.51,-762 1773.51,-762 1773.51,-762 761.67,-762 761.67,-762 755.67,-762 749.67,-756 749.67,-750 749.67,-750 749.67,-613 749.67,-613 749.67,-607 755.67,-601 761.67,-601"/>
+<text xml:space="preserve" text-anchor="start" x="1189.22" y="-746.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">UIManager</text>
+<text xml:space="preserve" text-anchor="start" x="1268.72" y="-746.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="1124.72" y="-737.45" font-family="Helvetica,sans-Serif" font-size="9.00">Opens and closes panels. Pauses time. Requests saves on close</text>
+</g>
+<g id="clust10" class="cluster">
+<title>cluster_save</title>
+<path fill="#ede7f6" stroke="#4527a0" d="M2705.43,-117C2705.43,-117 6152.45,-117 6152.45,-117 6158.45,-117 6164.45,-123 6164.45,-129 6164.45,-129 6164.45,-274 6164.45,-274 6164.45,-280 6158.45,-286 6152.45,-286 6152.45,-286 2705.43,-286 2705.43,-286 2699.43,-286 2693.43,-280 2693.43,-274 2693.43,-274 2693.43,-129 2693.43,-129 2693.43,-123 2699.43,-117 2705.43,-117"/>
+<text xml:space="preserve" text-anchor="start" x="4340.44" y="-270.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">SaveManager</text>
+<text xml:space="preserve" text-anchor="start" x="4440.19" y="-270.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="4331.07" y="-261.45" font-family="Helvetica,sans-Serif" font-size="9.00">Decides when to save. Builds the save data</text>
+</g>
+<g id="clust11" class="cluster">
+<title>cluster_time</title>
+<path fill="#e8eaf6" stroke="#283593" d="M2060.26,-8C2060.26,-8 3023.73,-8 3023.73,-8 3029.73,-8 3035.73,-14 3035.73,-20 3035.73,-20 3035.73,-97 3035.73,-97 3035.73,-103 3029.73,-109 3023.73,-109 3023.73,-109 2060.26,-109 2060.26,-109 2054.26,-109 2048.26,-103 2048.26,-97 2048.26,-97 2048.26,-20 2048.26,-20 2048.26,-14 2054.26,-8 2060.26,-8"/>
+<text xml:space="preserve" text-anchor="start" x="2453.12" y="-93.65" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="13.00">TimeManager</text>
+<text xml:space="preserve" text-anchor="start" x="2553.62" y="-93.65" font-family="Helvetica,sans-Serif" font-size="13.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2427.62" y="-84.45" font-family="Helvetica,sans-Serif" font-size="9.00">Owns time, day, season, year. Broadcasts changes</text>
+</g>
+<!-- IN_SPACE -->
+<g id="node1" class="node">
+<title>IN_SPACE</title>
+<path fill="#ffffff" stroke="#555555" d="M1001.84,-1694C1001.84,-1694 876.92,-1694 876.92,-1694 870.92,-1694 864.92,-1688 864.92,-1682 864.92,-1682 864.92,-1670 864.92,-1670 864.92,-1664 870.92,-1658 876.92,-1658 876.92,-1658 1001.84,-1658 1001.84,-1658 1007.84,-1658 1013.84,-1664 1013.84,-1670 1013.84,-1670 1013.84,-1682 1013.84,-1682 1013.84,-1688 1007.84,-1694 1001.84,-1694"/>
+<text xml:space="preserve" text-anchor="start" x="903.38" y="-1676.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Space</text>
+<text xml:space="preserve" text-anchor="start" x="940.88" y="-1676.55" font-family="Helvetica,sans-Serif" font-size="11.00"> &#160;Jump</text>
+<text xml:space="preserve" text-anchor="start" x="877.88" y="-1667.45" font-family="Helvetica,sans-Serif" font-size="9.00">&lt;Keyboard&gt;/space, Button</text>
+</g>
+<!-- PC -->
+<g id="node8" class="node">
+<title>PC</title>
+<path fill="#ffffff" stroke="#555555" d="M1812.76,-1694C1812.76,-1694 1406.59,-1694 1406.59,-1694 1400.59,-1694 1394.59,-1688 1394.59,-1682 1394.59,-1682 1394.59,-1670 1394.59,-1670 1394.59,-1664 1400.59,-1658 1406.59,-1658 1406.59,-1658 1812.76,-1658 1812.76,-1658 1818.76,-1658 1824.76,-1664 1824.76,-1670 1824.76,-1670 1824.76,-1682 1824.76,-1682 1824.76,-1688 1818.76,-1694 1812.76,-1694"/>
+<text xml:space="preserve" text-anchor="start" x="1559.43" y="-1676.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">PlayerController</text>
+<text xml:space="preserve" text-anchor="start" x="1407.55" y="-1667.45" font-family="Helvetica,sans-Serif" font-size="9.00">MonoBehaviour on Player. OnJump, OnMove, OnRun, OnLook, OnAttack, OnToggleWeapon</text>
+</g>
+<!-- IN_SPACE&#45;&gt;PC -->
+<g id="edge1" class="edge">
+<title>IN_SPACE&#45;&gt;PC</title>
+<path fill="none" stroke="#555555" d="M1014.13,-1676C1103.15,-1676 1256.95,-1676 1385.82,-1676"/>
+<polygon fill="#555555" stroke="#555555" points="1385.76,-1678.45 1392.76,-1676 1385.76,-1673.55 1385.76,-1678.45"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1689.95" font-family="Helvetica,sans-Serif" font-size="9.00">Button event</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1678.7" font-family="Helvetica,sans-Serif" font-size="9.00">(OnJump)</text>
+</g>
+<!-- IN_WASD -->
+<g id="node2" class="node">
+<title>IN_WASD</title>
+<path fill="#ffffff" stroke="#555555" d="M1010.47,-1626C1010.47,-1626 868.3,-1626 868.3,-1626 862.3,-1626 856.3,-1620 856.3,-1614 856.3,-1614 856.3,-1602 856.3,-1602 856.3,-1596 862.3,-1590 868.3,-1590 868.3,-1590 1010.47,-1590 1010.47,-1590 1016.47,-1590 1022.47,-1596 1022.47,-1602 1022.47,-1602 1022.47,-1614 1022.47,-1614 1022.47,-1620 1016.47,-1626 1010.47,-1626"/>
+<text xml:space="preserve" text-anchor="start" x="887.63" y="-1608.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">WASD</text>
+<text xml:space="preserve" text-anchor="start" x="925.13" y="-1608.55" font-family="Helvetica,sans-Serif" font-size="11.00"> &#160;Move, Run</text>
+<text xml:space="preserve" text-anchor="start" x="869.26" y="-1599.45" font-family="Helvetica,sans-Serif" font-size="9.00">2DVector composite, Shift held</text>
+</g>
+<!-- IN_WASD&#45;&gt;PC -->
+<g id="edge2" class="edge">
+<title>IN_WASD&#45;&gt;PC</title>
+<path fill="none" stroke="#555555" d="M1022.58,-1614.73C1106.2,-1621.74 1239.52,-1633.39 1354.59,-1645.5 1386.36,-1648.84 1420.33,-1652.72 1452.76,-1656.56"/>
+<polygon fill="#555555" stroke="#555555" points="1452.22,-1658.96 1459.46,-1657.35 1452.8,-1654.09 1452.22,-1658.96"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1659.45" font-family="Helvetica,sans-Serif" font-size="9.00">Vector2 + bool</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1648.2" font-family="Helvetica,sans-Serif" font-size="9.00">(OnMove, OnRun)</text>
+</g>
+<!-- IN_MOUSE -->
+<g id="node3" class="node">
+<title>IN_MOUSE</title>
+<path fill="#ffffff" stroke="#555555" d="M977.09,-1558C977.09,-1558 901.67,-1558 901.67,-1558 895.67,-1558 889.67,-1552 889.67,-1546 889.67,-1546 889.67,-1534 889.67,-1534 889.67,-1528 895.67,-1522 901.67,-1522 901.67,-1522 977.09,-1522 977.09,-1522 983.09,-1522 989.09,-1528 989.09,-1534 989.09,-1534 989.09,-1546 989.09,-1546 989.09,-1552 983.09,-1558 977.09,-1558"/>
+<text xml:space="preserve" text-anchor="start" x="902.63" y="-1540.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Mouse</text>
+<text xml:space="preserve" text-anchor="start" x="943.13" y="-1540.55" font-family="Helvetica,sans-Serif" font-size="11.00"> &#160;Look</text>
+<text xml:space="preserve" text-anchor="start" x="909.38" y="-1531.45" font-family="Helvetica,sans-Serif" font-size="9.00">Vector2 delta</text>
+</g>
+<!-- IN_MOUSE&#45;&gt;PC -->
+<g id="edge3" class="edge">
+<title>IN_MOUSE&#45;&gt;PC</title>
+<path fill="none" stroke="#555555" d="M989.31,-1544C1067.29,-1550.96 1224.25,-1567.43 1354.59,-1596.5 1423.11,-1611.78 1499.75,-1636.91 1550.77,-1654.83"/>
+<polygon fill="#555555" stroke="#555555" points="1549.89,-1657.11 1557.3,-1657.13 1551.52,-1652.49 1549.89,-1657.11"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1610.45" font-family="Helvetica,sans-Serif" font-size="9.00">Vector2</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1599.2" font-family="Helvetica,sans-Serif" font-size="9.00">(OnLook)</text>
+</g>
+<!-- IN_ATK -->
+<g id="node4" class="node">
+<title>IN_ATK</title>
+<path fill="#ffffff" stroke="#555555" d="M992.47,-1490C992.47,-1490 886.3,-1490 886.3,-1490 880.3,-1490 874.3,-1484 874.3,-1478 874.3,-1478 874.3,-1466 874.3,-1466 874.3,-1460 880.3,-1454 886.3,-1454 886.3,-1454 992.47,-1454 992.47,-1454 998.47,-1454 1004.47,-1460 1004.47,-1466 1004.47,-1466 1004.47,-1478 1004.47,-1478 1004.47,-1484 998.47,-1490 992.47,-1490"/>
+<text xml:space="preserve" text-anchor="start" x="887.26" y="-1472.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">MainHand</text>
+<text xml:space="preserve" text-anchor="start" x="948.76" y="-1472.55" font-family="Helvetica,sans-Serif" font-size="11.00"> &#160;Attack</text>
+<text xml:space="preserve" text-anchor="start" x="906.01" y="-1463.45" font-family="Helvetica,sans-Serif" font-size="9.00">Button, mouse</text>
+</g>
+<!-- IN_ATK&#45;&gt;PC -->
+<g id="edge4" class="edge">
+<title>IN_ATK&#45;&gt;PC</title>
+<path fill="none" stroke="#555555" d="M1004.89,-1474.1C1087.86,-1478.45 1235.46,-1491.75 1354.59,-1532.5 1440.31,-1561.82 1530.25,-1620.2 1576.69,-1652.73"/>
+<polygon fill="#555555" stroke="#555555" points="1575.12,-1654.62 1582.26,-1656.66 1577.95,-1650.62 1575.12,-1654.62"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1546.45" font-family="Helvetica,sans-Serif" font-size="9.00">Button event</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1535.2" font-family="Helvetica,sans-Serif" font-size="9.00">(OnAttack)</text>
+</g>
+<!-- IN_TW -->
+<g id="node5" class="node">
+<title>IN_TW</title>
+<path fill="#ffffff" stroke="#555555" d="M984.97,-1762C984.97,-1762 893.8,-1762 893.8,-1762 887.8,-1762 881.8,-1756 881.8,-1750 881.8,-1750 881.8,-1738 881.8,-1738 881.8,-1732 887.8,-1726 893.8,-1726 893.8,-1726 984.97,-1726 984.97,-1726 990.97,-1726 996.97,-1732 996.97,-1738 996.97,-1738 996.97,-1750 996.97,-1750 996.97,-1756 990.97,-1762 984.97,-1762"/>
+<text xml:space="preserve" text-anchor="start" x="894.76" y="-1744.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">ToggleWeapon</text>
+<text xml:space="preserve" text-anchor="start" x="924.01" y="-1735.45" font-family="Helvetica,sans-Serif" font-size="9.00">Button</text>
+</g>
+<!-- IN_TW&#45;&gt;PC -->
+<g id="edge5" class="edge">
+<title>IN_TW&#45;&gt;PC</title>
+<path fill="none" stroke="#555555" d="M997.35,-1738.74C1077.23,-1731.32 1227.03,-1717.19 1354.59,-1704 1380.79,-1701.29 1408.51,-1698.33 1435.62,-1695.39"/>
+<polygon fill="#555555" stroke="#555555" points="1435.81,-1697.83 1442.51,-1694.64 1435.28,-1692.96 1435.81,-1697.83"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1737.13" font-family="Helvetica,sans-Serif" font-size="9.00">Button event</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-1725.88" font-family="Helvetica,sans-Serif" font-size="9.00">(OnToggleWeapon)</text>
+</g>
+<!-- IN_K -->
+<g id="node6" class="node">
+<title>IN_K</title>
+<path fill="#ffffff" stroke="#555555" d="M341.67,-1558C341.67,-1558 237.75,-1558 237.75,-1558 231.75,-1558 225.75,-1552 225.75,-1546 225.75,-1546 225.75,-1534 225.75,-1534 225.75,-1528 231.75,-1522 237.75,-1522 237.75,-1522 341.67,-1522 341.67,-1522 347.67,-1522 353.67,-1528 353.67,-1534 353.67,-1534 353.67,-1546 353.67,-1546 353.67,-1552 347.67,-1558 341.67,-1558"/>
+<text xml:space="preserve" text-anchor="start" x="248.46" y="-1540.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">K</text>
+<text xml:space="preserve" text-anchor="start" x="256.71" y="-1540.55" font-family="Helvetica,sans-Serif" font-size="11.00"> &#160;Talent panel</text>
+<text xml:space="preserve" text-anchor="start" x="238.71" y="-1531.45" font-family="Helvetica,sans-Serif" font-size="9.00">&lt;Keyboard&gt;/k, Button</text>
+</g>
+<!-- UIIN -->
+<g id="node34" class="node">
+<title>UIIN</title>
+<path fill="#ffffff" stroke="#555555" d="M1008.97,-724C1008.97,-724 869.8,-724 869.8,-724 863.8,-724 857.8,-718 857.8,-712 857.8,-712 857.8,-700 857.8,-700 857.8,-694 863.8,-688 869.8,-688 869.8,-688 1008.97,-688 1008.97,-688 1014.97,-688 1020.97,-694 1020.97,-700 1020.97,-700 1020.97,-712 1020.97,-712 1020.97,-718 1014.97,-724 1008.97,-724"/>
+<text xml:space="preserve" text-anchor="start" x="886.51" y="-706.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">UIInputController</text>
+<text xml:space="preserve" text-anchor="start" x="870.76" y="-697.45" font-family="Helvetica,sans-Serif" font-size="9.00">Listens for K. Calls TogglePanel</text>
+</g>
+<!-- IN_K&#45;&gt;UIIN -->
+<g id="edge6" class="edge">
+<title>IN_K&#45;&gt;UIIN</title>
+<path fill="none" stroke="#555555" d="M354,-1549.34C417.21,-1555.12 514.12,-1553.93 579.42,-1506 853.03,-1305.2 922.32,-847.41 935.66,-732.53"/>
+<polygon fill="#555555" stroke="#555555" points="938.07,-732.99 936.42,-725.76 933.2,-732.45 938.07,-732.99"/>
+<text xml:space="preserve" text-anchor="middle" x="668.55" y="-1474.98" font-family="Helvetica,sans-Serif" font-size="9.00">Button event</text>
+<text xml:space="preserve" text-anchor="middle" x="668.55" y="-1463.73" font-family="Helvetica,sans-Serif" font-size="9.00">(OnOpenTalentWheel)</text>
+</g>
+<!-- IN_CLICK -->
+<g id="node7" class="node">
+<title>IN_CLICK</title>
+<path fill="#ffffff" stroke="#555555" d="M344.3,-1490C344.3,-1490 235.13,-1490 235.13,-1490 229.13,-1490 223.13,-1484 223.13,-1478 223.13,-1478 223.13,-1466 223.13,-1466 223.13,-1460 229.13,-1454 235.13,-1454 235.13,-1454 344.3,-1454 344.3,-1454 350.3,-1454 356.3,-1460 356.3,-1466 356.3,-1466 356.3,-1478 356.3,-1478 356.3,-1484 350.3,-1490 344.3,-1490"/>
+<text xml:space="preserve" text-anchor="start" x="239.09" y="-1472.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Left / Right Click</text>
+<text xml:space="preserve" text-anchor="start" x="236.09" y="-1463.45" font-family="Helvetica,sans-Serif" font-size="9.00">UI map, mouse buttons</text>
+</g>
+<!-- VC -->
+<g id="node36" class="node">
+<title>VC</title>
+<path fill="#ffffff" stroke="#555555" d="M1109.09,-656C1109.09,-656 769.67,-656 769.67,-656 763.67,-656 757.67,-650 757.67,-644 757.67,-644 757.67,-632 757.67,-632 757.67,-626 763.67,-620 769.67,-620 769.67,-620 1109.09,-620 1109.09,-620 1115.09,-620 1121.09,-626 1121.09,-632 1121.09,-632 1121.09,-644 1121.09,-644 1121.09,-650 1115.09,-656 1109.09,-656"/>
+<text xml:space="preserve" text-anchor="start" x="898.51" y="-638.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">VirtualCursor</text>
+<text xml:space="preserve" text-anchor="start" x="770.63" y="-629.45" font-family="Helvetica,sans-Serif" font-size="9.00">Moves a cursor from mouse or navigation. Synthesizes clicks into UI Toolkit</text>
+</g>
+<!-- IN_CLICK&#45;&gt;VC -->
+<g id="edge7" class="edge">
+<title>IN_CLICK&#45;&gt;VC</title>
+<path fill="none" stroke="#555555" d="M295.11,-1453.59C319.77,-1354.65 450.64,-882.83 749.67,-672 756.2,-667.4 763.16,-663.36 770.42,-659.82"/>
+<polygon fill="#555555" stroke="#555555" points="771.06,-662.22 776.4,-657.07 769.02,-657.77 771.06,-662.22"/>
+<text xml:space="preserve" text-anchor="middle" x="668.55" y="-801.97" font-family="Helvetica,sans-Serif" font-size="9.00">Mouse button state</text>
+<text xml:space="preserve" text-anchor="middle" x="668.55" y="-790.72" font-family="Helvetica,sans-Serif" font-size="9.00">(polled per frame)</text>
+</g>
+<!-- PCSTATE -->
+<g id="node9" class="node">
+<title>PCSTATE</title>
+<path fill="#fff8e1" stroke="#b28704" d="M4457.19,-1701.35C4457.19,-1703.72 4367,-1705.65 4255.98,-1705.65 4144.96,-1705.65 4054.77,-1703.72 4054.77,-1701.35 4054.77,-1701.35 4054.77,-1662.65 4054.77,-1662.65 4054.77,-1660.28 4144.96,-1658.35 4255.98,-1658.35 4367,-1658.35 4457.19,-1660.28 4457.19,-1662.65 4457.19,-1662.65 4457.19,-1701.35 4457.19,-1701.35"/>
+<path fill="none" stroke="#b28704" d="M4457.19,-1701.35C4457.19,-1698.98 4367,-1697.05 4255.98,-1697.05 4144.96,-1697.05 4054.77,-1698.98 4054.77,-1701.35"/>
+<text xml:space="preserve" text-anchor="start" x="4206.11" y="-1682.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">State dictionary</text>
+<text xml:space="preserve" text-anchor="start" x="4067.73" y="-1673.45" font-family="Helvetica,sans-Serif" font-size="9.00">string to object. JumpPriority, IsGrounded, IsRunning, IsWeaponDrawn, IsAttacking</text>
+</g>
+<!-- PC&#45;&gt;PCSTATE -->
+<g id="edge8" class="edge">
+<title>PC&#45;&gt;PCSTATE</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M1673.43,-1694.47C1724.45,-1708.47 1798.55,-1726.54 1864.76,-1734 1920.08,-1740.23 1934.35,-1734.46 1990.01,-1734 2587.22,-1729.11 2736.55,-1726.61 3333.6,-1712 3578.36,-1706.01 3859.61,-1696.47 4046.34,-1689.76"/>
+<polygon fill="#555555" stroke="#555555" points="4046.18,-1692.21 4053.09,-1689.51 4046.01,-1687.32 4046.18,-1692.21"/>
+<text xml:space="preserve" text-anchor="middle" x="2835.52" y="-1741.33" font-family="Helvetica,sans-Serif" font-size="9.00">SetStateValue</text>
+<text xml:space="preserve" text-anchor="middle" x="2835.52" y="-1730.08" font-family="Helvetica,sans-Serif" font-size="9.00">(bool, int, float)</text>
+</g>
+<!-- PCSVC -->
+<g id="node10" class="node">
+<title>PCSVC</title>
+<path fill="#fff8e1" stroke="#b28704" d="M2323.31,-1701.35C2323.31,-1703.72 2271.78,-1705.65 2208.35,-1705.65 2144.91,-1705.65 2093.39,-1703.72 2093.39,-1701.35 2093.39,-1701.35 2093.39,-1662.65 2093.39,-1662.65 2093.39,-1660.28 2144.91,-1658.35 2208.35,-1658.35 2271.78,-1658.35 2323.31,-1660.28 2323.31,-1662.65 2323.31,-1662.65 2323.31,-1701.35 2323.31,-1701.35"/>
+<path fill="none" stroke="#b28704" d="M2323.31,-1701.35C2323.31,-1698.98 2271.78,-1697.05 2208.35,-1697.05 2144.91,-1697.05 2093.39,-1698.98 2093.39,-1701.35"/>
+<text xml:space="preserve" text-anchor="start" x="2141.6" y="-1682.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Local service registry</text>
+<text xml:space="preserve" text-anchor="start" x="2106.35" y="-1673.45" font-family="Helvetica,sans-Serif" font-size="9.00">Type to service. GetService T for components</text>
+</g>
+<!-- PC&#45;&gt;PCSVC -->
+<g id="edge10" class="edge">
+<title>PC&#45;&gt;PCSVC</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M1825.24,-1678.16C1912.6,-1679.04 2010.39,-1680.02 2085.17,-1680.77"/>
+<polygon fill="#555555" stroke="#555555" points="2084.71,-1683.22 2091.73,-1680.84 2084.76,-1678.32 2084.71,-1683.22"/>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-1693.66" font-family="Helvetica,sans-Serif" font-size="9.00">RegisterService</text>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-1682.41" font-family="Helvetica,sans-Serif" font-size="9.00">(at Awake)</text>
+</g>
+<!-- JUMP -->
+<g id="node11" class="node">
+<title>JUMP</title>
+<path fill="#ffffff" stroke="#555555" d="M2998.85,-1154C2998.85,-1154 2672.18,-1154 2672.18,-1154 2666.18,-1154 2660.18,-1148 2660.18,-1142 2660.18,-1142 2660.18,-1130 2660.18,-1130 2660.18,-1124 2666.18,-1118 2672.18,-1118 2672.18,-1118 2998.85,-1118 2998.85,-1118 3004.85,-1118 3010.85,-1124 3010.85,-1130 3010.85,-1130 3010.85,-1142 3010.85,-1142 3010.85,-1148 3004.85,-1154 2998.85,-1154"/>
+<text xml:space="preserve" text-anchor="start" x="2811.14" y="-1136.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Jumping</text>
+<text xml:space="preserve" text-anchor="start" x="2673.14" y="-1127.45" font-family="Helvetica,sans-Serif" font-size="9.00">Impulse jump and double jump. Cooldown 0.1 s, priority window 0.15 s</text>
+</g>
+<!-- PC&#45;&gt;JUMP -->
+<g id="edge11" class="edge">
+<title>PC&#45;&gt;JUMP</title>
+<path fill="none" stroke="#555555" d="M1643.74,-1657.64C1753.06,-1597.39 2113.76,-1402.14 2426.68,-1273 2542.23,-1225.31 2680.99,-1181.43 2763.24,-1156.75"/>
+<polygon fill="#555555" stroke="#555555" points="2763.56,-1159.21 2769.57,-1154.86 2762.16,-1154.52 2763.56,-1159.21"/>
+<text xml:space="preserve" text-anchor="middle" x="2208.35" y="-1465.97" font-family="Helvetica,sans-Serif" font-size="9.00">HandleJumpInput()</text>
+<text xml:space="preserve" text-anchor="middle" x="2208.35" y="-1454.72" font-family="Helvetica,sans-Serif" font-size="9.00">(direct call)</text>
+</g>
+<!-- MOVE -->
+<g id="node12" class="node">
+<title>MOVE</title>
+<path fill="#ffffff" stroke="#555555" d="M3035.6,-1086C3035.6,-1086 2635.43,-1086 2635.43,-1086 2629.43,-1086 2623.43,-1080 2623.43,-1074 2623.43,-1074 2623.43,-1062 2623.43,-1062 2623.43,-1056 2629.43,-1050 2635.43,-1050 2635.43,-1050 3035.6,-1050 3035.6,-1050 3041.6,-1050 3047.6,-1056 3047.6,-1062 3047.6,-1062 3047.6,-1074 3047.6,-1074 3047.6,-1080 3041.6,-1086 3035.6,-1086"/>
+<text xml:space="preserve" text-anchor="start" x="2802.89" y="-1068.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Movement</text>
+<text xml:space="preserve" text-anchor="start" x="2636.39" y="-1059.45" font-family="Helvetica,sans-Serif" font-size="9.00">Grounded and air movement. Sets Rigidbody.linearVelocity. Sticky force when grounded</text>
+</g>
+<!-- PC&#45;&gt;MOVE -->
+<g id="edge12" class="edge">
+<title>PC&#45;&gt;MOVE</title>
+<path fill="none" stroke="#555555" d="M1623.39,-1657.89C1669.53,-1593.56 1835.51,-1374.01 2026.51,-1263.5 2208.42,-1158.25 2444.81,-1109.48 2614.85,-1086.99"/>
+<polygon fill="#555555" stroke="#555555" points="2615.02,-1089.44 2621.65,-1086.11 2614.39,-1084.58 2615.02,-1089.44"/>
+<text xml:space="preserve" text-anchor="middle" x="2208.35" y="-1277.45" font-family="Helvetica,sans-Serif" font-size="9.00">ProcessMovement()</text>
+<text xml:space="preserve" text-anchor="middle" x="2208.35" y="-1266.2" font-family="Helvetica,sans-Serif" font-size="9.00">(FixedUpdate, active state)</text>
+</g>
+<!-- CAM -->
+<g id="node15" class="node">
+<title>CAM</title>
+<path fill="#ffffff" stroke="#555555" d="M2357.81,-729C2357.81,-729 2058.89,-729 2058.89,-729 2052.89,-729 2046.89,-723 2046.89,-717 2046.89,-717 2046.89,-705 2046.89,-705 2046.89,-699 2052.89,-693 2058.89,-693 2058.89,-693 2357.81,-693 2357.81,-693 2363.81,-693 2369.81,-699 2369.81,-705 2369.81,-705 2369.81,-717 2369.81,-717 2369.81,-723 2363.81,-729 2357.81,-729"/>
+<text xml:space="preserve" text-anchor="start" x="2153.97" y="-711.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">CameraController</text>
+<text xml:space="preserve" text-anchor="start" x="2059.85" y="-702.45" font-family="Helvetica,sans-Serif" font-size="9.00">ICameraController. Pitch clamp &#45;80 to 80. Yaw used by Movement</text>
+</g>
+<!-- PC&#45;&gt;CAM -->
+<g id="edge21" class="edge">
+<title>PC&#45;&gt;CAM</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M1624.44,-1650.34C1662.53,-1579.37 1772.59,-1374.46 1864.76,-1204.5 1920.16,-1102.35 1950.53,-1084.29 1990.01,-975 2018.63,-895.77 1973.63,-854.58 2026.51,-789 2050.23,-759.59 2087.16,-741.04 2121.48,-729.45"/>
+<polygon fill="#555555" stroke="#555555" points="1622.43,-1648.9 1621.28,-1656.22 1626.75,-1651.21 1622.43,-1648.9"/>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-1218.45" font-family="Helvetica,sans-Serif" font-size="9.00">GetLookInput()</text>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-1207.2" font-family="Helvetica,sans-Serif" font-size="9.00">(Vector2, polled)</text>
+</g>
+<!-- CSC -->
+<g id="node17" class="node">
+<title>CSC</title>
+<path fill="#ffffff" stroke="#555555" d="M3766.65,-1569C3766.65,-1569 3413.73,-1569 3413.73,-1569 3407.73,-1569 3401.73,-1563 3401.73,-1557 3401.73,-1557 3401.73,-1545 3401.73,-1545 3401.73,-1539 3407.73,-1533 3413.73,-1533 3413.73,-1533 3766.65,-1533 3766.65,-1533 3772.65,-1533 3778.65,-1539 3778.65,-1545 3778.65,-1545 3778.65,-1557 3778.65,-1557 3778.65,-1563 3772.65,-1569 3766.65,-1569"/>
+<text xml:space="preserve" text-anchor="start" x="3518.94" y="-1551.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">CombatStateController</text>
+<text xml:space="preserve" text-anchor="start" x="3414.69" y="-1542.45" font-family="Helvetica,sans-Serif" font-size="9.00">ICombatController. Sheathed, Unsheathed, transitions. Attack cooldown 0.8 s</text>
+</g>
+<!-- PC&#45;&gt;CSC -->
+<g id="edge25" class="edge">
+<title>PC&#45;&gt;CSC</title>
+<path fill="none" stroke="#555555" d="M1723.27,-1657.56C1908.64,-1628.22 2290.02,-1572.17 2615.43,-1552 2884.49,-1535.32 3196.17,-1539.03 3392.98,-1544.2"/>
+<polygon fill="#555555" stroke="#555555" points="3392.81,-1546.65 3399.88,-1544.39 3392.94,-1541.75 3392.81,-1546.65"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1591.26" font-family="Helvetica,sans-Serif" font-size="9.00">HandleAttackInput()</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1580.01" font-family="Helvetica,sans-Serif" font-size="9.00">ToggleWeaponState()</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1568.76" font-family="Helvetica,sans-Serif" font-size="9.00">(direct call)</text>
+</g>
+<!-- PAC -->
+<g id="node19" class="node">
+<title>PAC</title>
+<path fill="#ffffff" stroke="#555555" d="M4978.61,-1601C4978.61,-1601 4769.69,-1601 4769.69,-1601 4763.69,-1601 4757.69,-1595 4757.69,-1589 4757.69,-1589 4757.69,-1577 4757.69,-1577 4757.69,-1571 4763.69,-1565 4769.69,-1565 4769.69,-1565 4978.61,-1565 4978.61,-1565 4984.61,-1565 4990.61,-1571 4990.61,-1577 4990.61,-1577 4990.61,-1589 4990.61,-1589 4990.61,-1595 4984.61,-1601 4978.61,-1601"/>
+<text xml:space="preserve" text-anchor="start" x="4792.78" y="-1583.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">PlayerAnimationController</text>
+<text xml:space="preserve" text-anchor="start" x="4770.65" y="-1574.45" font-family="Helvetica,sans-Serif" font-size="9.00">Writes animator parameters from state values</text>
+</g>
+<!-- PCSTATE&#45;&gt;PAC -->
+<g id="edge9" class="edge">
+<title>PCSTATE&#45;&gt;PAC</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M4417.76,-1657.46C4433.79,-1654.96 4449.81,-1652.44 4465.19,-1650 4566.02,-1633.97 4680.76,-1615.07 4762.82,-1601.44"/>
+<polygon fill="#555555" stroke="#555555" points="4417.42,-1655.03 4410.88,-1658.53 4418.17,-1659.87 4417.42,-1655.03"/>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-1658.67" font-family="Helvetica,sans-Serif" font-size="9.00">GetStateValue</text>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-1647.42" font-family="Helvetica,sans-Serif" font-size="9.00">(read by animator)</text>
+</g>
+<!-- GC -->
+<g id="node14" class="node">
+<title>GC</title>
+<path fill="#e8f5e9" stroke="#2e7d32" d="M3753.52,-1149C3753.52,-1149 3426.85,-1149 3426.85,-1149 3420.85,-1149 3414.85,-1143 3414.85,-1137 3414.85,-1137 3414.85,-1125 3414.85,-1125 3414.85,-1119 3420.85,-1113 3426.85,-1113 3426.85,-1113 3753.52,-1113 3753.52,-1113 3759.52,-1113 3765.52,-1119 3765.52,-1125 3765.52,-1125 3765.52,-1137 3765.52,-1137 3765.52,-1143 3759.52,-1149 3753.52,-1149"/>
+<text xml:space="preserve" text-anchor="start" x="3543.31" y="-1131.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">GroundChecker</text>
+<text xml:space="preserve" text-anchor="start" x="3427.81" y="-1122.45" font-family="Helvetica,sans-Serif" font-size="9.00">Sphere or ray cast each FixedUpdate. Coyote 0.15 s. Writes IsGrounded</text>
+</g>
+<!-- JUMP&#45;&gt;GC -->
+<g id="edge17" class="edge">
+<title>JUMP&#45;&gt;GC</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M3019.32,-1134.79C3139.56,-1133.99 3296.03,-1132.95 3414.59,-1132.16"/>
+<polygon fill="#555555" stroke="#555555" points="3019.58,-1132.33 3012.6,-1134.83 3019.61,-1137.23 3019.58,-1132.33"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1148.19" font-family="Helvetica,sans-Serif" font-size="9.00">IsGrounded</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1136.94" font-family="Helvetica,sans-Serif" font-size="9.00">(bool, read)</text>
+</g>
+<!-- RB -->
+<g id="node22" class="node">
+<title>RB</title>
+<path fill="#cfd8dc" stroke="#555555" d="M3746.02,-1426.35C3746.02,-1428.72 3676.17,-1430.65 3590.19,-1430.65 3504.2,-1430.65 3434.35,-1428.72 3434.35,-1426.35 3434.35,-1426.35 3434.35,-1387.65 3434.35,-1387.65 3434.35,-1385.28 3504.2,-1383.35 3590.19,-1383.35 3676.17,-1383.35 3746.02,-1385.28 3746.02,-1387.65 3746.02,-1387.65 3746.02,-1426.35 3746.02,-1426.35"/>
+<path fill="none" stroke="#555555" d="M3746.02,-1426.35C3746.02,-1423.98 3676.17,-1422.05 3590.19,-1422.05 3504.2,-1422.05 3434.35,-1423.98 3434.35,-1426.35"/>
+<text xml:space="preserve" text-anchor="start" x="3559.81" y="-1407.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Rigidbody</text>
+<text xml:space="preserve" text-anchor="start" x="3447.31" y="-1398.45" font-family="Helvetica,sans-Serif" font-size="9.00">linearVelocity, AddForce. Written by 4 components (finding F2)</text>
+</g>
+<!-- JUMP&#45;&gt;RB -->
+<g id="edge13" class="edge">
+<title>JUMP&#45;&gt;RB</title>
+<path fill="none" stroke="#555555" d="M2855.48,-1154.27C2895.04,-1191.26 2990.8,-1274.99 3087.6,-1316 3119.76,-1329.62 3302.97,-1361.05 3438.73,-1383.14"/>
+<polygon fill="#555555" stroke="#555555" points="3437.98,-1385.5 3445.29,-1384.2 3438.77,-1380.66 3437.98,-1385.5"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1378.89" font-family="Helvetica,sans-Serif" font-size="9.00">AddForce Impulse</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1367.64" font-family="Helvetica,sans-Serif" font-size="9.00">(Vector3, force)</text>
+</g>
+<!-- MOVE&#45;&gt;GC -->
+<g id="edge18" class="edge">
+<title>MOVE&#45;&gt;GC</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M3056.34,-1081.27C3142.82,-1087.02 3242.94,-1094.3 3333.6,-1102.5 3365.73,-1105.4 3400.08,-1108.94 3432.84,-1112.52"/>
+<polygon fill="#555555" stroke="#555555" points="3056.67,-1078.84 3049.52,-1080.82 3056.34,-1083.73 3056.67,-1078.84"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1116.45" font-family="Helvetica,sans-Serif" font-size="9.00">IsGrounded</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1105.2" font-family="Helvetica,sans-Serif" font-size="9.00">(bool, read)</text>
+</g>
+<!-- MOVE&#45;&gt;RB -->
+<g id="edge14" class="edge">
+<title>MOVE&#45;&gt;RB</title>
+<path fill="none" stroke="#555555" d="M3026.15,-1086.39C3033.8,-1090.84 3041.01,-1096.01 3047.6,-1102 3099.91,-1149.59 3034.34,-1209.48 3087.6,-1256 3129.07,-1292.22 3280.71,-1270.2 3333.6,-1285.5 3410.07,-1307.62 3492.13,-1350.41 3542.07,-1378.85"/>
+<polygon fill="#555555" stroke="#555555" points="3540.59,-1380.83 3547.88,-1382.18 3543.03,-1376.57 3540.59,-1380.83"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1299.45" font-family="Helvetica,sans-Serif" font-size="9.00">linearVelocity</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1288.2" font-family="Helvetica,sans-Serif" font-size="9.00">(Vector3, direction x speed)</text>
+</g>
+<!-- SS -->
+<g id="node23" class="node">
+<title>SS</title>
+<path fill="#ffffff" stroke="#555555" d="M3794.77,-855C3794.77,-855 3385.6,-855 3385.6,-855 3379.6,-855 3373.6,-849 3373.6,-843 3373.6,-843 3373.6,-831 3373.6,-831 3373.6,-825 3379.6,-819 3385.6,-819 3385.6,-819 3794.77,-819 3794.77,-819 3800.77,-819 3806.77,-825 3806.77,-831 3806.77,-831 3806.77,-843 3806.77,-843 3806.77,-849 3800.77,-855 3794.77,-855"/>
+<text xml:space="preserve" text-anchor="start" x="3550.44" y="-837.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">StatsService</text>
+<text xml:space="preserve" text-anchor="start" x="3386.56" y="-828.45" font-family="Helvetica,sans-Serif" font-size="9.00">IStatsService. GetStat, ApplyOrReplaceModifier, RemoveModifiersFromSource. Dirty cache</text>
+</g>
+<!-- MOVE&#45;&gt;SS -->
+<g id="edge20" class="edge">
+<title>MOVE&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M2966.66,-1048.16C2993.47,-1043.76 3021.49,-1038.93 3047.6,-1034 3175.41,-1009.87 3211.41,-1016.56 3333.6,-972 3420.58,-940.28 3514.94,-884.16 3560.87,-855.29"/>
+<polygon fill="#555555" stroke="#555555" points="2966.38,-1045.73 2959.87,-1049.27 2967.17,-1050.56 2966.38,-1045.73"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1040.45" font-family="Helvetica,sans-Serif" font-size="9.00">GetStat MoveSpeed</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1029.2" font-family="Helvetica,sans-Serif" font-size="9.00">(float, read)</text>
+</g>
+<!-- RUNMOD -->
+<g id="node13" class="node">
+<title>RUNMOD</title>
+<path fill="#ffffff" stroke="#555555" d="M2988.35,-1018C2988.35,-1018 2682.68,-1018 2682.68,-1018 2676.68,-1018 2670.68,-1012 2670.68,-1006 2670.68,-1006 2670.68,-994 2670.68,-994 2670.68,-988 2676.68,-982 2682.68,-982 2682.68,-982 2988.35,-982 2988.35,-982 2994.35,-982 3000.35,-988 3000.35,-994 3000.35,-994 3000.35,-1006 3000.35,-1006 3000.35,-1012 2994.35,-1018 2988.35,-1018"/>
+<text xml:space="preserve" text-anchor="start" x="2796.52" y="-1000.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Run modifier</text>
+<text xml:space="preserve" text-anchor="start" x="2683.64" y="-991.45" font-family="Helvetica,sans-Serif" font-size="9.00">Adds MoveSpeed modifier while run is held (source PlayerRunning)</text>
+</g>
+<!-- RUNMOD&#45;&gt;SS -->
+<g id="edge19" class="edge">
+<title>RUNMOD&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" d="M3000.72,-987.97C3016.84,-984.36 3032.72,-979.79 3047.6,-974 3067.95,-966.09 3067.37,-953.7 3087.6,-945.5 3190.09,-903.95 3225.46,-931.18 3333.6,-908 3398.46,-894.1 3471.25,-873.36 3522.51,-857.88"/>
+<polygon fill="#555555" stroke="#555555" points="3523.11,-860.26 3529.1,-855.89 3521.69,-855.57 3523.11,-860.26"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-959.45" font-family="Helvetica,sans-Serif" font-size="9.00">ApplyOrReplaceModifier</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-948.2" font-family="Helvetica,sans-Serif" font-size="9.00">(StatModifier)</text>
+</g>
+<!-- GC&#45;&gt;PCSTATE -->
+<g id="edge16" class="edge">
+<title>GC&#45;&gt;PCSTATE</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M3632.59,-1149.45C3718.91,-1190.22 3918.07,-1296.68 4014.77,-1450.5 4062.9,-1527.06 3989.58,-1587.33 4054.77,-1650 4056.49,-1651.66 4058.27,-1653.25 4060.09,-1654.78"/>
+<polygon fill="#555555" stroke="#555555" points="4058.23,-1656.44 4065.25,-1658.81 4061.24,-1652.57 4058.23,-1656.44"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1464.45" font-family="Helvetica,sans-Serif" font-size="9.00">SetStateValue IsGrounded</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1453.2" font-family="Helvetica,sans-Serif" font-size="9.00">(bool)</text>
+</g>
+<!-- CAM&#45;&gt;MOVE -->
+<g id="edge23" class="edge">
+<title>CAM&#45;&gt;MOVE</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M2266.74,-729.49C2303.06,-742.77 2349.92,-762.92 2386.68,-789 2508.18,-875.2 2483.76,-964.31 2615.43,-1034 2624.71,-1038.91 2634.51,-1043.17 2644.6,-1046.84"/>
+<polygon fill="#555555" stroke="#555555" points="2643.53,-1049.06 2650.94,-1049.05 2645.14,-1044.44 2643.53,-1049.06"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1026.48" font-family="Helvetica,sans-Serif" font-size="9.00">GetCameraYaw()</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1015.23" font-family="Helvetica,sans-Serif" font-size="9.00">(float, polled)</text>
+</g>
+<!-- CINE -->
+<g id="node16" class="node">
+<title>CINE</title>
+<path fill="#ffffff" stroke="#555555" d="M2917.1,-726C2917.1,-726 2753.93,-726 2753.93,-726 2747.93,-726 2741.93,-720 2741.93,-714 2741.93,-714 2741.93,-702 2741.93,-702 2741.93,-696 2747.93,-690 2753.93,-690 2753.93,-690 2917.1,-690 2917.1,-690 2923.1,-690 2929.1,-696 2929.1,-702 2929.1,-702 2929.1,-714 2929.1,-714 2929.1,-720 2923.1,-726 2917.1,-726"/>
+<text xml:space="preserve" text-anchor="start" x="2772.52" y="-708.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">CinemachineCamera</text>
+<text xml:space="preserve" text-anchor="start" x="2754.89" y="-699.45" font-family="Helvetica,sans-Serif" font-size="9.00">Scene object. Follows CameraTarget</text>
+</g>
+<!-- CAM&#45;&gt;CINE -->
+<g id="edge22" class="edge">
+<title>CAM&#45;&gt;CINE</title>
+<path fill="none" stroke="#555555" d="M2370.15,-704.83C2389.2,-704.28 2408.37,-703.82 2426.68,-703.5 2531.23,-701.7 2650.88,-703.47 2733.41,-705.3"/>
+<polygon fill="#555555" stroke="#555555" points="2733.21,-707.74 2740.27,-705.45 2733.32,-702.84 2733.21,-707.74"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-717.45" font-family="Helvetica,sans-Serif" font-size="9.00">Rotation</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-706.2" font-family="Helvetica,sans-Serif" font-size="9.00">(Quaternion, Transform)</text>
+</g>
+<!-- CSC&#45;&gt;PCSTATE -->
+<g id="edge29" class="edge">
+<title>CSC&#45;&gt;PCSTATE</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M3671.33,-1569.44C3763.55,-1590.34 3919.66,-1624.79 4054.77,-1650 4068.15,-1652.5 4082.05,-1654.97 4096.02,-1657.37"/>
+<polygon fill="#555555" stroke="#555555" points="4095.44,-1659.75 4102.75,-1658.51 4096.26,-1654.92 4095.44,-1659.75"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1654.3" font-family="Helvetica,sans-Serif" font-size="9.00">IsWeaponDrawn, IsAttacking</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1643.05" font-family="Helvetica,sans-Serif" font-size="9.00">(bool)</text>
+</g>
+<!-- ADISP -->
+<g id="node18" class="node">
+<title>ADISP</title>
+<path fill="#ffffff" stroke="#555555" d="M4388.94,-1599C4388.94,-1599 4123.02,-1599 4123.02,-1599 4117.02,-1599 4111.02,-1593 4111.02,-1587 4111.02,-1587 4111.02,-1575 4111.02,-1575 4111.02,-1569 4117.02,-1563 4123.02,-1563 4123.02,-1563 4388.94,-1563 4388.94,-1563 4394.94,-1563 4400.94,-1569 4400.94,-1575 4400.94,-1575 4400.94,-1587 4400.94,-1587 4400.94,-1593 4394.94,-1599 4388.94,-1599"/>
+<text xml:space="preserve" text-anchor="start" x="4173.86" y="-1581.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">AnimationEventDispatcher</text>
+<text xml:space="preserve" text-anchor="start" x="4123.98" y="-1572.45" font-family="Helvetica,sans-Serif" font-size="9.00">Routes animator event names to IAnimationEventReceiver</text>
+</g>
+<!-- CSC&#45;&gt;ADISP -->
+<g id="edge26" class="edge">
+<title>CSC&#45;&gt;ADISP</title>
+<path fill="none" stroke="#555555" d="M3686.94,-1532.56C3772.97,-1518.63 3902.65,-1504.15 4014.77,-1518.5 4076.19,-1526.36 4144.33,-1545.09 4192.31,-1560"/>
+<polygon fill="#555555" stroke="#555555" points="4191.57,-1562.34 4198.98,-1562.1 4193.04,-1557.67 4191.57,-1562.34"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1532.45" font-family="Helvetica,sans-Serif" font-size="9.00">SetTrigger Attack</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1521.2" font-family="Helvetica,sans-Serif" font-size="9.00">(animator parameter)</text>
+</g>
+<!-- ADISP&#45;&gt;CSC -->
+<g id="edge27" class="edge">
+<title>ADISP&#45;&gt;CSC</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M4110.56,-1574.47C4015.83,-1570.19 3890.77,-1564.54 3787.11,-1559.85"/>
+<polygon fill="#555555" stroke="#555555" points="3787.36,-1557.41 3780.25,-1559.54 3787.13,-1562.31 3787.36,-1557.41"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1583.52" font-family="Helvetica,sans-Serif" font-size="9.00">OnAnimationEvent(name)</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-1572.27" font-family="Helvetica,sans-Serif" font-size="9.00">(string)</text>
+</g>
+<!-- ADISP&#45;&gt;PAC -->
+<g id="edge28" class="edge">
+<title>ADISP&#45;&gt;PAC</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M4401.06,-1581.47C4506.57,-1581.81 4648.3,-1582.27 4748.86,-1582.6"/>
+<polygon fill="#555555" stroke="#555555" points="4748.72,-1585.05 4755.73,-1582.62 4748.73,-1580.15 4748.72,-1585.05"/>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-1596.13" font-family="Helvetica,sans-Serif" font-size="9.00">OnAnimationEvent(name)</text>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-1584.88" font-family="Helvetica,sans-Serif" font-size="9.00">(string)</text>
+</g>
+<!-- AEH -->
+<g id="node20" class="node">
+<title>AEH</title>
+<path fill="#ffffff" stroke="#555555" stroke-dasharray="5,2" d="M2992.1,-1604C2992.1,-1604 2678.93,-1604 2678.93,-1604 2672.93,-1604 2666.93,-1598 2666.93,-1592 2666.93,-1592 2666.93,-1580 2666.93,-1580 2666.93,-1574 2672.93,-1568 2678.93,-1568 2678.93,-1568 2992.1,-1568 2992.1,-1568 2998.1,-1568 3004.1,-1574 3004.1,-1580 3004.1,-1580 3004.1,-1592 3004.1,-1592 3004.1,-1598 2998.1,-1604 2992.1,-1604"/>
+<text xml:space="preserve" text-anchor="start" x="2751.14" y="-1586.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">AttackEventHandler</text>
+<text xml:space="preserve" text-anchor="start" x="2874.89" y="-1586.55" font-family="Helvetica,sans-Serif" font-size="11.00"> [scene]</text>
+<text xml:space="preserve" text-anchor="start" x="2679.89" y="-1577.45" font-family="Helvetica,sans-Serif" font-size="9.00">Animation events only. Hits come from WeaponHitbox (blade trigger)</text>
+</g>
+<!-- AEH&#45;&gt;RB -->
+<g id="edge30" class="edge">
+<title>AEH&#45;&gt;RB</title>
+<path fill="none" stroke="#555555" stroke-dasharray="1,5" d="M2922.45,-1565.56C3062.81,-1532.18 3340.5,-1466.14 3489.37,-1430.74"/>
+<polygon fill="#555555" stroke="#555555" points="2921.94,-1563.16 2915.7,-1567.17 2923.08,-1567.93 2921.94,-1563.16"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1536.94" font-family="Helvetica,sans-Serif" font-size="9.00">WeaponHitbox</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1525.69" font-family="Helvetica,sans-Serif" font-size="9.00">(blade trigger)</text>
+</g>
+<!-- GRAV -->
+<g id="node21" class="node">
+<title>GRAV</title>
+<path fill="#ffffff" stroke="#555555" d="M2996.6,-1416C2996.6,-1416 2674.43,-1416 2674.43,-1416 2668.43,-1416 2662.43,-1410 2662.43,-1404 2662.43,-1404 2662.43,-1392 2662.43,-1392 2662.43,-1386 2668.43,-1380 2674.43,-1380 2674.43,-1380 2996.6,-1380 2996.6,-1380 3002.6,-1380 3008.6,-1386 3008.6,-1392 3008.6,-1392 3008.6,-1404 3008.6,-1404 3008.6,-1410 3002.6,-1416 2996.6,-1416"/>
+<text xml:space="preserve" text-anchor="start" x="2749.64" y="-1398.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">GravityController</text>
+<text xml:space="preserve" text-anchor="start" x="2856.89" y="-1398.55" font-family="Helvetica,sans-Serif" font-size="11.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2675.39" y="-1389.45" font-family="Helvetica,sans-Serif" font-size="9.00">Applies gravity each FixedUpdate. Terminal velocity clamp. Reads stats</text>
+</g>
+<!-- GRAV&#45;&gt;RB -->
+<g id="edge15" class="edge">
+<title>GRAV&#45;&gt;RB</title>
+<path fill="none" stroke="#555555" d="M3008.72,-1400.06C3133.96,-1401.56 3302.46,-1403.57 3425.64,-1405.04"/>
+<polygon fill="#555555" stroke="#555555" points="3425.52,-1407.49 3432.55,-1405.13 3425.58,-1402.59 3425.52,-1407.49"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1417.78" font-family="Helvetica,sans-Serif" font-size="9.00">AddForce Acceleration</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1406.53" font-family="Helvetica,sans-Serif" font-size="9.00">(Vector3, gravity)</text>
+</g>
+<!-- GRAV&#45;&gt;SS -->
+<g id="edge35" class="edge">
+<title>GRAV&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M2861.95,-1374.12C2904.76,-1335.51 2995.58,-1260.21 3087.6,-1225.5 3139.12,-1206.07 3293.65,-1233.89 3333.6,-1196 3408.88,-1124.6 3314.85,-1051.52 3373.6,-966 3411.88,-910.27 3482.84,-874.74 3532.87,-855.37"/>
+<polygon fill="#555555" stroke="#555555" points="2860.4,-1372.22 2856.87,-1378.75 2863.69,-1375.85 2860.4,-1372.22"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1239.45" font-family="Helvetica,sans-Serif" font-size="9.00">GetStat GravityMultiplier, TerminalVelocity</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-1228.2" font-family="Helvetica,sans-Serif" font-size="9.00">(float, read)</text>
+</g>
+<!-- SPD -->
+<g id="node27" class="node">
+<title>SPD</title>
+<path fill="#ffffff" stroke="#555555" d="M4352.57,-855C4352.57,-855 4159.4,-855 4159.4,-855 4153.4,-855 4147.4,-849 4147.4,-843 4147.4,-843 4147.4,-831 4147.4,-831 4147.4,-825 4153.4,-819 4159.4,-819 4159.4,-819 4352.57,-819 4352.57,-819 4358.57,-819 4364.57,-825 4364.57,-831 4364.57,-831 4364.57,-843 4364.57,-843 4364.57,-849 4358.57,-855 4352.57,-855"/>
+<text xml:space="preserve" text-anchor="start" x="4206.48" y="-837.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">SpeedVisualizer</text>
+<text xml:space="preserve" text-anchor="start" x="4160.36" y="-828.45" font-family="Helvetica,sans-Serif" font-size="9.00">Particles and FOV from GetSpeedMultiplier</text>
+</g>
+<!-- SS&#45;&gt;SPD -->
+<g id="edge36" class="edge">
+<title>SS&#45;&gt;SPD</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M3815.52,-837C3927.42,-837 4057.61,-837 4147.08,-837"/>
+<polygon fill="#555555" stroke="#555555" points="3815.67,-834.55 3808.67,-837 3815.67,-839.45 3815.67,-834.55"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-850.95" font-family="Helvetica,sans-Serif" font-size="9.00">GetSpeedMultiplier</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-839.7" font-family="Helvetica,sans-Serif" font-size="9.00">(float, polled)</text>
+</g>
+<!-- GL -->
+<g id="node37" class="node">
+<title>GL</title>
+<path fill="#ffffff" stroke="#555555" stroke-dasharray="5,2" d="M4401.32,-248C4401.32,-248 4110.65,-248 4110.65,-248 4104.65,-248 4098.65,-242 4098.65,-236 4098.65,-236 4098.65,-224 4098.65,-224 4098.65,-218 4104.65,-212 4110.65,-212 4110.65,-212 4401.32,-212 4401.32,-212 4407.32,-212 4413.32,-218 4413.32,-224 4413.32,-224 4413.32,-236 4413.32,-236 4413.32,-242 4407.32,-248 4401.32,-248"/>
+<text xml:space="preserve" text-anchor="start" x="4173.11" y="-230.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">GameEventListener</text>
+<text xml:space="preserve" text-anchor="start" x="4293.86" y="-230.55" font-family="Helvetica,sans-Serif" font-size="11.00"> [scene]</text>
+<text xml:space="preserve" text-anchor="start" x="4111.61" y="-221.45" font-family="Helvetica,sans-Serif" font-size="9.00">MonoBehaviour. Listens to a GameEvent, calls RequestLazySave</text>
+</g>
+<!-- SS&#45;&gt;GL -->
+<g id="edge37" class="edge">
+<title>SS&#45;&gt;GL</title>
+<path fill="none" stroke="#555555" d="M3598.03,-818.83C3622.45,-756.1 3711.21,-545.9 3846.77,-424.5 3946.15,-335.49 4093.48,-278.95 4181.3,-250.99"/>
+<polygon fill="#555555" stroke="#555555" points="4181.96,-253.35 4187.9,-248.91 4180.49,-248.67 4181.96,-253.35"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-438.45" font-family="Helvetica,sans-Serif" font-size="9.00">OnStatsChanged</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-427.2" font-family="Helvetica,sans-Serif" font-size="9.00">(GameEvent, ScriptableObject)</text>
+</g>
+<!-- MODG -->
+<g id="node24" class="node">
+<title>MODG</title>
+<path fill="#ffffff" stroke="#555555" d="M2374.68,-857C2374.68,-857 2042.01,-857 2042.01,-857 2036.01,-857 2030.01,-851 2030.01,-845 2030.01,-845 2030.01,-833 2030.01,-833 2030.01,-827 2036.01,-821 2042.01,-821 2042.01,-821 2374.68,-821 2374.68,-821 2380.68,-821 2386.68,-827 2386.68,-833 2386.68,-833 2386.68,-845 2386.68,-845 2386.68,-851 2380.68,-857 2374.68,-857"/>
+<text xml:space="preserve" text-anchor="start" x="2162.6" y="-839.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Gravity trigger</text>
+<text xml:space="preserve" text-anchor="start" x="2042.97" y="-830.45" font-family="Helvetica,sans-Serif" font-size="9.00">Collider trigger. Adds GravityMultiplier modifier on enter, removes on exit</text>
+</g>
+<!-- MODG&#45;&gt;GRAV -->
+<g id="edge32" class="edge">
+<title>MODG&#45;&gt;GRAV</title>
+<path fill="none" stroke="#555555" stroke-dasharray="1,5" d="M2356.71,-860.46C2367.24,-864.76 2377.37,-869.89 2386.68,-876 2534.04,-972.73 2498.49,-1068.1 2615.43,-1200 2679.88,-1272.7 2768.96,-1346.26 2810.89,-1379.58"/>
+<polygon fill="#555555" stroke="#555555" points="2357.79,-858.25 2350.38,-858.02 2356.02,-862.82 2357.79,-858.25"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1167.98" font-family="Helvetica,sans-Serif" font-size="9.00">Trigger enter/exit</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1156.73" font-family="Helvetica,sans-Serif" font-size="9.00">(Collider, tag Player)</text>
+</g>
+<!-- MODG&#45;&gt;SS -->
+<g id="edge31" class="edge">
+<title>MODG&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" d="M2386.91,-838.74C2636.71,-838.38 3091.82,-837.72 3364.76,-837.33"/>
+<polygon fill="#555555" stroke="#555555" points="3364.67,-839.78 3371.67,-837.32 3364.66,-834.88 3364.67,-839.78"/>
+<text xml:space="preserve" text-anchor="middle" x="2835.52" y="-852.34" font-family="Helvetica,sans-Serif" font-size="9.00">ApplyOrReplaceModifier</text>
+<text xml:space="preserve" text-anchor="middle" x="2835.52" y="-841.09" font-family="Helvetica,sans-Serif" font-size="9.00">(StatModifier, sourceId)</text>
+</g>
+<!-- MODZ -->
+<g id="node25" class="node">
+<title>MODZ</title>
+<path fill="#ffffff" stroke="#555555" d="M2312.06,-928C2312.06,-928 2104.64,-928 2104.64,-928 2098.64,-928 2092.64,-922 2092.64,-916 2092.64,-916 2092.64,-904 2092.64,-904 2092.64,-898 2098.64,-892 2104.64,-892 2104.64,-892 2312.06,-892 2312.06,-892 2318.06,-892 2324.06,-898 2324.06,-904 2324.06,-904 2324.06,-916 2324.06,-916 2324.06,-922 2318.06,-928 2312.06,-928"/>
+<text xml:space="preserve" text-anchor="start" x="2168.97" y="-910.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Gravity zone</text>
+<text xml:space="preserve" text-anchor="start" x="2105.6" y="-901.45" font-family="Helvetica,sans-Serif" font-size="9.00">Collider trigger. Sets custom gravity direction</text>
+</g>
+<!-- MODZ&#45;&gt;GRAV -->
+<g id="edge33" class="edge">
+<title>MODZ&#45;&gt;GRAV</title>
+<path fill="none" stroke="#555555" d="M2236.28,-928.38C2276.41,-957.39 2350.98,-1017.84 2386.68,-1089 2440.29,-1195.86 2340.3,-1272.35 2426.68,-1355 2508.83,-1433.59 2647.17,-1430.87 2739.64,-1417.7"/>
+<polygon fill="#555555" stroke="#555555" points="2739.83,-1420.15 2746.39,-1416.7 2739.11,-1415.3 2739.83,-1420.15"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1433.8" font-family="Helvetica,sans-Serif" font-size="9.00">SetGravityScale / custom direction</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-1422.55" font-family="Helvetica,sans-Serif" font-size="9.00">(Vector3)</text>
+</g>
+<!-- MODS -->
+<g id="node26" class="node">
+<title>MODS</title>
+<path fill="#ffffff" stroke="#555555" d="M2974.48,-928C2974.48,-928 2696.56,-928 2696.56,-928 2690.56,-928 2684.56,-922 2684.56,-916 2684.56,-916 2684.56,-904 2684.56,-904 2684.56,-898 2690.56,-892 2696.56,-892 2696.56,-892 2974.48,-892 2974.48,-892 2980.48,-892 2986.48,-898 2986.48,-904 2986.48,-904 2986.48,-916 2986.48,-916 2986.48,-922 2980.48,-928 2974.48,-928"/>
+<text xml:space="preserve" text-anchor="start" x="2774.39" y="-910.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Speed boost trigger</text>
+<text xml:space="preserve" text-anchor="start" x="2697.52" y="-901.45" font-family="Helvetica,sans-Serif" font-size="9.00">Collider trigger. Adds MoveSpeed modifier from RunMultiplier</text>
+</g>
+<!-- MODS&#45;&gt;SS -->
+<g id="edge34" class="edge">
+<title>MODS&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" d="M2986.81,-892.33C3019.99,-888.6 3054.97,-884.8 3087.6,-881.5 3178.29,-872.33 3278.3,-863.25 3365.01,-855.71"/>
+<polygon fill="#555555" stroke="#555555" points="3365.09,-858.16 3371.85,-855.11 3364.66,-853.28 3365.09,-858.16"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-895.45" font-family="Helvetica,sans-Serif" font-size="9.00">ApplyOrReplaceModifier</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-884.2" font-family="Helvetica,sans-Serif" font-size="9.00">(StatModifier, RunMultiplier)</text>
+</g>
+<!-- ROT -->
+<g id="node28" class="node">
+<title>ROT</title>
+<path fill="#ffffff" stroke="#555555" d="M1732.51,-841C1732.51,-841 1486.84,-841 1486.84,-841 1480.84,-841 1474.84,-835 1474.84,-829 1474.84,-829 1474.84,-817 1474.84,-817 1474.84,-811 1480.84,-805 1486.84,-805 1486.84,-805 1732.51,-805 1732.51,-805 1738.51,-805 1744.51,-811 1744.51,-817 1744.51,-817 1744.51,-829 1744.51,-829 1744.51,-835 1738.51,-841 1732.51,-841"/>
+<text xml:space="preserve" text-anchor="start" x="1586.43" y="-823.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Rotator</text>
+<text xml:space="preserve" text-anchor="start" x="1487.8" y="-814.45" font-family="Helvetica,sans-Serif" font-size="9.00">Spins props, optionally faces camera. Not player state</text>
+</g>
+<!-- ROT&#45;&gt;CAM -->
+<g id="edge38" class="edge">
+<title>ROT&#45;&gt;CAM</title>
+<path fill="none" stroke="#555555" stroke-dasharray="1,5" d="M1717.43,-802.96C1828.61,-782.09 2001.29,-749.68 2109.17,-729.43"/>
+<polygon fill="#555555" stroke="#555555" points="1717.12,-800.53 1710.69,-804.23 1718.02,-805.34 1717.12,-800.53"/>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-787.66" font-family="Helvetica,sans-Serif" font-size="9.00">Faces camera</text>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-776.41" font-family="Helvetica,sans-Serif" font-size="9.00">(Transform, optional)</text>
+</g>
+<!-- TTC -->
+<g id="node29" class="node">
+<title>TTC</title>
+<path fill="#ffffff" stroke="#555555" d="M2370.18,-560C2370.18,-560 2046.51,-560 2046.51,-560 2040.51,-560 2034.51,-554 2034.51,-548 2034.51,-548 2034.51,-536 2034.51,-536 2034.51,-530 2040.51,-524 2046.51,-524 2046.51,-524 2370.18,-524 2370.18,-524 2376.18,-524 2382.18,-530 2382.18,-536 2382.18,-536 2382.18,-548 2382.18,-548 2382.18,-554 2376.18,-560 2370.18,-560"/>
+<text xml:space="preserve" text-anchor="start" x="2113.47" y="-542.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">TalentTreeController</text>
+<text xml:space="preserve" text-anchor="start" x="2238.72" y="-542.55" font-family="Helvetica,sans-Serif" font-size="11.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2047.47" y="-533.45" font-family="Helvetica,sans-Serif" font-size="9.00">Click handling for talent nodes. Enforces prerequisites and dependents</text>
+</g>
+<!-- PS -->
+<g id="node30" class="node">
+<title>PS</title>
+<path fill="#ffffff" stroke="#555555" d="M5717.53,-499C5717.53,-499 5309.11,-499 5309.11,-499 5303.11,-499 5297.11,-493 5297.11,-487 5297.11,-487 5297.11,-475 5297.11,-475 5297.11,-469 5303.11,-463 5309.11,-463 5309.11,-463 5717.53,-463 5717.53,-463 5723.53,-463 5729.53,-469 5729.53,-475 5729.53,-475 5729.53,-487 5729.53,-487 5729.53,-493 5723.53,-499 5717.53,-499"/>
+<text xml:space="preserve" text-anchor="start" x="5453.32" y="-481.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">ProgressionService</text>
+<text xml:space="preserve" text-anchor="start" x="5310.07" y="-472.45" font-family="Helvetica,sans-Serif" font-size="9.00">IProgressionService. Talent pool and attribute points. SpendTalentPoint, RefundTalentPoint</text>
+</g>
+<!-- TTC&#45;&gt;PS -->
+<g id="edge40" class="edge">
+<title>TTC&#45;&gt;PS</title>
+<path fill="none" stroke="#555555" d="M2368.26,-523.52C2387.91,-521.73 2407.74,-520.15 2426.68,-519 2510.43,-513.91 2531.54,-517.19 2615.43,-516 3162.68,-508.21 3299.48,-504.12 3846.77,-500.5 4193.84,-498.2 4280.64,-503.84 4627.69,-500 4852.61,-497.51 5109.65,-491.65 5288.47,-487.1"/>
+<polygon fill="#555555" stroke="#555555" points="5288.48,-489.55 5295.42,-486.92 5288.36,-484.65 5288.48,-489.55"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-514.45" font-family="Helvetica,sans-Serif" font-size="9.00">SpendTalentPoint / RefundTalentPoint</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-503.2" font-family="Helvetica,sans-Serif" font-size="9.00">(bool, pool count)</text>
+</g>
+<!-- TSS -->
+<g id="node31" class="node">
+<title>TSS</title>
+<path fill="#ffffff" stroke="#555555" d="M5677.41,-567C5677.41,-567 5349.24,-567 5349.24,-567 5343.24,-567 5337.24,-561 5337.24,-555 5337.24,-555 5337.24,-543 5337.24,-543 5337.24,-537 5343.24,-531 5349.24,-531 5349.24,-531 5677.41,-531 5677.41,-531 5683.41,-531 5689.41,-537 5689.41,-543 5689.41,-543 5689.41,-555 5689.41,-555 5689.41,-561 5683.41,-567 5677.41,-567"/>
+<text xml:space="preserve" text-anchor="start" x="5454.45" y="-549.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">TalentStateService</text>
+<text xml:space="preserve" text-anchor="start" x="5350.2" y="-540.45" font-family="Helvetica,sans-Serif" font-size="9.00">ITalentStateService. Allocated points per node. Raises talent GameEvent</text>
+</g>
+<!-- TTC&#45;&gt;TSS -->
+<g id="edge41" class="edge">
+<title>TTC&#45;&gt;TSS</title>
+<path fill="none" stroke="#555555" d="M2382.2,-533.69C2454.29,-530.61 2538.89,-527.51 2615.43,-526 2807.47,-522.22 2855.53,-525.1 3047.6,-526 3900.24,-529.98 4918.74,-541.7 5328.38,-546.7"/>
+<polygon fill="#555555" stroke="#555555" points="5328.21,-549.15 5335.24,-546.78 5328.27,-544.25 5328.21,-549.15"/>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-546.6" font-family="Helvetica,sans-Serif" font-size="9.00">TryAllocatePoint / TryRemovePoint</text>
+<text xml:space="preserve" text-anchor="middle" x="3930.77" y="-535.35" font-family="Helvetica,sans-Serif" font-size="9.00">(nodeId string, bool)</text>
+</g>
+<!-- TTG -->
+<g id="node32" class="node">
+<title>TTG</title>
+<path fill="#ffffff" stroke="#555555" d="M2981.23,-578C2981.23,-578 2689.81,-578 2689.81,-578 2683.81,-578 2677.81,-572 2677.81,-566 2677.81,-566 2677.81,-554 2677.81,-554 2677.81,-548 2683.81,-542 2689.81,-542 2689.81,-542 2981.23,-542 2981.23,-542 2987.23,-542 2993.23,-548 2993.23,-554 2993.23,-554 2993.23,-566 2993.23,-566 2993.23,-572 2987.23,-578 2981.23,-578"/>
+<text xml:space="preserve" text-anchor="start" x="2772.52" y="-560.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">TalentTreeGenerator</text>
+<text xml:space="preserve" text-anchor="start" x="2690.77" y="-551.45" font-family="Helvetica,sans-Serif" font-size="9.00">ITalentTreeGenerator. Node data (TalentNodeDataSO) and layout</text>
+</g>
+<!-- TTC&#45;&gt;TTG -->
+<g id="edge42" class="edge">
+<title>TTC&#45;&gt;TTG</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M2391.1,-547.23C2481.79,-549.84 2590.41,-552.97 2677.44,-555.48"/>
+<polygon fill="#555555" stroke="#555555" points="2391.24,-544.79 2384.17,-547.03 2391.1,-549.68 2391.24,-544.79"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-566.56" font-family="Helvetica,sans-Serif" font-size="9.00">GetNodeData(nodeId)</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-555.31" font-family="Helvetica,sans-Serif" font-size="9.00">(TalentNodeDataSO)</text>
+</g>
+<!-- PS&#45;&gt;SS -->
+<g id="edge45" class="edge">
+<title>PS&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M5369.09,-499.48C5344.89,-503.78 5320.15,-508.93 5297.11,-515 5278.75,-519.84 5275.41,-524.93 5257.11,-530 5106.5,-571.76 4057.32,-755.85 3705.72,-817.1"/>
+<polygon fill="#555555" stroke="#555555" points="3705.51,-814.65 3699.04,-818.27 3706.35,-819.48 3705.51,-814.65"/>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-690.12" font-family="Helvetica,sans-Serif" font-size="9.00">SetBaseStat</text>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-678.87" font-family="Helvetica,sans-Serif" font-size="9.00">(attribute value)</text>
+</g>
+<!-- TSS&#45;&gt;SS -->
+<g id="edge44" class="edge">
+<title>TSS&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M5477.09,-567.43C5428.85,-591.78 5338.9,-634.01 5257.11,-655 4989.97,-723.56 4204.84,-790.39 3815.44,-820.45"/>
+<polygon fill="#555555" stroke="#555555" points="3815.47,-817.99 3808.68,-820.97 3815.85,-822.88 3815.47,-817.99"/>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-774.76" font-family="Helvetica,sans-Serif" font-size="9.00">RemoveModifiersFromSource</text>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-763.51" font-family="Helvetica,sans-Serif" font-size="9.00">(sourceId, reset only)</text>
+</g>
+<!-- TEV -->
+<g id="node33" class="node">
+<title>TEV</title>
+<polygon fill="#fff8e1" stroke="#b28704" points="6196.95,-519 5950.53,-519 5950.53,-483 6202.95,-483 6202.95,-513 6196.95,-519"/>
+<polyline fill="none" stroke="#b28704" points="6196.95,-519 6196.95,-513"/>
+<polyline fill="none" stroke="#b28704" points="6202.95,-513 6196.95,-513"/>
+<text xml:space="preserve" text-anchor="start" x="6020.87" y="-501.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Talent GameEvent</text>
+<text xml:space="preserve" text-anchor="start" x="5963.49" y="-492.45" font-family="Helvetica,sans-Serif" font-size="9.00">ScriptableObject. Raised on any allocation change</text>
+</g>
+<!-- TSS&#45;&gt;TEV -->
+<g id="edge43" class="edge">
+<title>TSS&#45;&gt;TEV</title>
+<path fill="none" stroke="#555555" d="M5689.65,-534.01C5771.13,-527.04 5866.48,-518.89 5942.03,-512.43"/>
+<polygon fill="#555555" stroke="#555555" points="5941.94,-514.9 5948.7,-511.86 5941.52,-510.02 5941.94,-514.9"/>
+<text xml:space="preserve" text-anchor="middle" x="5840.03" y="-540.39" font-family="Helvetica,sans-Serif" font-size="9.00">Raise()</text>
+<text xml:space="preserve" text-anchor="middle" x="5840.03" y="-529.14" font-family="Helvetica,sans-Serif" font-size="9.00">(GameEvent, ScriptableObject)</text>
+</g>
+<!-- TEV&#45;&gt;GL -->
+<g id="edge46" class="edge">
+<title>TEV&#45;&gt;GL</title>
+<path fill="none" stroke="#555555" d="M6062.16,-482.54C6036.91,-447.47 5982.42,-368.07 5950.53,-294 5924.09,-232.6 5962.98,-190.45 5910.53,-149 5855.54,-105.54 5387.19,-109.43 5120.61,-125.5 4855.98,-141.45 4548.2,-184.66 4380.87,-210.25"/>
+<polygon fill="#555555" stroke="#555555" points="4380.56,-207.82 4374.02,-211.3 4381.31,-212.66 4380.56,-207.82"/>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-139.45" font-family="Helvetica,sans-Serif" font-size="9.00">OnEventRaised()</text>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-128.2" font-family="Helvetica,sans-Serif" font-size="9.00">(GameEvent to listener)</text>
+</g>
+<!-- UIM -->
+<g id="node35" class="node">
+<title>UIM</title>
+<path fill="#ffffff" stroke="#555555" d="M1765.51,-659C1765.51,-659 1453.84,-659 1453.84,-659 1447.84,-659 1441.84,-653 1441.84,-647 1441.84,-647 1441.84,-635 1441.84,-635 1441.84,-629 1447.84,-623 1453.84,-623 1453.84,-623 1765.51,-623 1765.51,-623 1771.51,-623 1777.51,-629 1777.51,-635 1777.51,-635 1777.51,-647 1777.51,-647 1777.51,-653 1771.51,-659 1765.51,-659"/>
+<text xml:space="preserve" text-anchor="start" x="1576.3" y="-641.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">UIManager</text>
+<text xml:space="preserve" text-anchor="start" x="1454.8" y="-632.45" font-family="Helvetica,sans-Serif" font-size="9.00">IUIManager. TogglePanel, OpenPanel, ClosePanel, InitializeTalentPanel</text>
+</g>
+<!-- UIIN&#45;&gt;UIM -->
+<g id="edge47" class="edge">
+<title>UIIN&#45;&gt;UIM</title>
+<path fill="none" stroke="#555555" d="M1021.32,-698.13C1122.93,-688.24 1300.03,-671.02 1433.26,-658.06"/>
+<polygon fill="#555555" stroke="#555555" points="1433.33,-660.52 1440.06,-657.4 1432.86,-655.64 1433.33,-660.52"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-697.07" font-family="Helvetica,sans-Serif" font-size="9.00">TogglePanel(name)</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-685.82" font-family="Helvetica,sans-Serif" font-size="9.00">(string)</text>
+</g>
+<!-- UIM&#45;&gt;CAM -->
+<g id="edge24" class="edge">
+<title>UIM&#45;&gt;CAM</title>
+<path fill="none" stroke="#555555" d="M1768.22,-659.48C1852.43,-669.36 1956.05,-681.52 2041.48,-691.54"/>
+<polygon fill="#555555" stroke="#555555" points="2040.95,-693.95 2048.19,-692.33 2041.52,-689.08 2040.95,-693.95"/>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-698.28" font-family="Helvetica,sans-Serif" font-size="9.00">OnDeactivate / OnActivate</text>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-687.03" font-family="Helvetica,sans-Serif" font-size="9.00">(lock cursor, bool)</text>
+</g>
+<!-- UIM&#45;&gt;TTC -->
+<g id="edge39" class="edge">
+<title>UIM&#45;&gt;TTC</title>
+<path fill="none" stroke="#555555" d="M1704.95,-622.55C1752.76,-613.4 1811.77,-602.43 1864.76,-593.5 1931.74,-582.21 2006.29,-570.86 2068.7,-561.7"/>
+<polygon fill="#555555" stroke="#555555" points="2068.96,-564.13 2075.53,-560.7 2068.25,-559.29 2068.96,-564.13"/>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-607.45" font-family="Helvetica,sans-Serif" font-size="9.00">InitializeTalentPanel</text>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-596.2" font-family="Helvetica,sans-Serif" font-size="9.00">(Generate, AddComponent)</text>
+</g>
+<!-- SM -->
+<g id="node38" class="node">
+<title>SM</title>
+<path fill="#ffffff" stroke="#555555" d="M5068.61,-248C5068.61,-248 4679.69,-248 4679.69,-248 4673.69,-248 4667.69,-242 4667.69,-236 4667.69,-236 4667.69,-224 4667.69,-224 4667.69,-218 4673.69,-212 4679.69,-212 4679.69,-212 5068.61,-212 5068.61,-212 5074.61,-212 5080.61,-218 5080.61,-224 5080.61,-224 5080.61,-236 5080.61,-236 5080.61,-242 5074.61,-248 5068.61,-248"/>
+<text xml:space="preserve" text-anchor="start" x="4831.78" y="-230.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">SaveManager</text>
+<text xml:space="preserve" text-anchor="start" x="4680.65" y="-221.45" font-family="Helvetica,sans-Serif" font-size="9.00">ISaveManager. 2 s debounce for lazy saves. Immediate on panel close. BuildSaveData</text>
+</g>
+<!-- UIM&#45;&gt;SM -->
+<g id="edge54" class="edge">
+<title>UIM&#45;&gt;SM</title>
+<path fill="none" stroke="#555555" d="M1778.01,-643.72C2102.67,-648.14 2807.27,-653.33 3047.6,-620 3506.53,-556.35 3601.05,-444.81 4054.77,-351 4180.06,-325.1 4527.31,-276.64 4726.91,-249.57"/>
+<polygon fill="#555555" stroke="#555555" points="4727.02,-252.03 4733.62,-248.66 4726.36,-247.18 4727.02,-252.03"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-627.43" font-family="Helvetica,sans-Serif" font-size="9.00">RequestImmediateSave()</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-616.18" font-family="Helvetica,sans-Serif" font-size="9.00">(void, immediate)</text>
+</g>
+<!-- TM -->
+<g id="node42" class="node">
+<title>TM</title>
+<path fill="#ffffff" stroke="#555555" d="M2348.43,-66C2348.43,-66 2068.26,-66 2068.26,-66 2062.26,-66 2056.26,-60 2056.26,-54 2056.26,-54 2056.26,-42 2056.26,-42 2056.26,-36 2062.26,-30 2068.26,-30 2068.26,-30 2348.43,-30 2348.43,-30 2354.43,-30 2360.43,-36 2360.43,-42 2360.43,-42 2360.43,-54 2360.43,-54 2360.43,-60 2354.43,-66 2348.43,-66"/>
+<text xml:space="preserve" text-anchor="start" x="2166.35" y="-48.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">TimeManager</text>
+<text xml:space="preserve" text-anchor="start" x="2069.22" y="-39.45" font-family="Helvetica,sans-Serif" font-size="9.00">ITimeManager. CelestialTime, pause, day, season, year events</text>
+</g>
+<!-- UIM&#45;&gt;TM -->
+<g id="edge48" class="edge">
+<title>UIM&#45;&gt;TM</title>
+<path fill="none" stroke="#555555" d="M1712.94,-622.55C1750.55,-612.3 1791.93,-596.65 1824.76,-573 2020.89,-431.7 2156.79,-158.99 2195.83,-73.96"/>
+<polygon fill="#555555" stroke="#555555" points="2198,-75.1 2198.67,-67.71 2193.54,-73.07 2198,-75.1"/>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-554.67" font-family="Helvetica,sans-Serif" font-size="9.00">TogglePause()</text>
+<text xml:space="preserve" text-anchor="middle" x="1927.39" y="-543.42" font-family="Helvetica,sans-Serif" font-size="9.00">(bool, time scale)</text>
+</g>
+<!-- VC&#45;&gt;TTC -->
+<g id="edge50" class="edge">
+<title>VC&#45;&gt;TTC</title>
+<path fill="none" stroke="#555555" d="M1074.38,-619.54C1162.86,-607.94 1281.45,-593.51 1386.59,-584.5 1606.08,-565.68 1859.35,-554.1 2025.83,-547.88"/>
+<polygon fill="#555555" stroke="#555555" points="2025.77,-550.33 2032.67,-547.62 2025.58,-545.43 2025.77,-550.33"/>
+<text xml:space="preserve" text-anchor="middle" x="1609.68" y="-598.45" font-family="Helvetica,sans-Serif" font-size="9.00">Synthesized MouseDownEvent</text>
+<text xml:space="preserve" text-anchor="middle" x="1609.68" y="-587.2" font-family="Helvetica,sans-Serif" font-size="9.00">(button 0 or 1)</text>
+</g>
+<!-- VC&#45;&gt;UIM -->
+<g id="edge49" class="edge">
+<title>VC&#45;&gt;UIM</title>
+<path fill="none" stroke="#555555" d="M1121.59,-637.88C1194.05,-637.92 1278.28,-638.08 1354.59,-638.5 1380.08,-638.64 1407,-638.85 1433.41,-639.08"/>
+<polygon fill="#555555" stroke="#555555" points="1433.06,-641.52 1440.08,-639.14 1433.1,-636.62 1433.06,-641.52"/>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-652.45" font-family="Helvetica,sans-Serif" font-size="9.00">SetActiveDocument / UnregisterDocument</text>
+<text xml:space="preserve" text-anchor="middle" x="1257.84" y="-641.2" font-family="Helvetica,sans-Serif" font-size="9.00">(UIDocument)</text>
+</g>
+<!-- GL&#45;&gt;SM -->
+<g id="edge53" class="edge">
+<title>GL&#45;&gt;SM</title>
+<path fill="none" stroke="#555555" d="M4413.66,-230C4488.12,-230 4578.28,-230 4658.94,-230"/>
+<polygon fill="#555555" stroke="#555555" points="4658.7,-232.45 4665.7,-230 4658.7,-227.55 4658.7,-232.45"/>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-243.95" font-family="Helvetica,sans-Serif" font-size="9.00">RequestLazySave()</text>
+<text xml:space="preserve" text-anchor="middle" x="4562.44" y="-232.7" font-family="Helvetica,sans-Serif" font-size="9.00">(void, debounced 2 s)</text>
+</g>
+<!-- SM&#45;&gt;PS -->
+<g id="edge63" class="edge">
+<title>SM&#45;&gt;PS</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M4983.26,-250.13C5061.2,-266.62 5167.93,-293.31 5257.11,-330.5 5346.36,-367.72 5442.16,-431.44 5486.76,-462.66"/>
+<polygon fill="#555555" stroke="#555555" points="4984.17,-247.81 4976.82,-248.77 4983.16,-252.61 4984.17,-247.81"/>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-344.45" font-family="Helvetica,sans-Serif" font-size="9.00">GetLevel, GetTotalTalentPoints</text>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-333.2" font-family="Helvetica,sans-Serif" font-size="9.00">(read for save)</text>
+</g>
+<!-- SM&#45;&gt;TSS -->
+<g id="edge62" class="edge">
+<title>SM&#45;&gt;TSS</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M4916.37,-252.4C4965,-278.74 5048.39,-323.61 5120.61,-361 5180.89,-392.2 5209.78,-380.85 5257.11,-429.5 5286.36,-459.57 5263.58,-489.78 5297.11,-515 5309.13,-524.04 5322.6,-531.09 5336.79,-536.55"/>
+<polygon fill="#555555" stroke="#555555" points="4917.81,-250.4 4910.49,-249.22 4915.47,-254.71 4917.81,-250.4"/>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-443.45" font-family="Helvetica,sans-Serif" font-size="9.00">GetAllocatedNodeIds</text>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-432.2" font-family="Helvetica,sans-Serif" font-size="9.00">(read for save)</text>
+</g>
+<!-- SV -->
+<g id="node39" class="node">
+<title>SV</title>
+<path fill="#ffffff" stroke="#555555" d="M5647.41,-210C5647.41,-210 5379.24,-210 5379.24,-210 5373.24,-210 5367.24,-204 5367.24,-198 5367.24,-198 5367.24,-186 5367.24,-186 5367.24,-180 5373.24,-174 5379.24,-174 5379.24,-174 5647.41,-174 5647.41,-174 5653.41,-174 5659.41,-180 5659.41,-186 5659.41,-186 5659.41,-198 5659.41,-198 5659.41,-204 5653.41,-210 5647.41,-210"/>
+<text xml:space="preserve" text-anchor="start" x="5474.7" y="-192.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">SaveService</text>
+<text xml:space="preserve" text-anchor="start" x="5380.2" y="-183.45" font-family="Helvetica,sans-Serif" font-size="9.00">ISaveService. JsonUtility to persistentDataPath, slot default</text>
+</g>
+<!-- SM&#45;&gt;SV -->
+<g id="edge55" class="edge">
+<title>SM&#45;&gt;SV</title>
+<path fill="none" stroke="#555555" d="M5080.7,-217.74C5170.98,-212.36 5275.18,-206.14 5358.57,-201.17"/>
+<polygon fill="#555555" stroke="#555555" points="5358.48,-203.63 5365.32,-200.77 5358.19,-198.74 5358.48,-203.63"/>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-228.35" font-family="Helvetica,sans-Serif" font-size="9.00">Save(PlayerSaveData, default)</text>
+<text xml:space="preserve" text-anchor="middle" x="5188.86" y="-217.1" font-family="Helvetica,sans-Serif" font-size="9.00">(JSON)</text>
+</g>
+<!-- DISK -->
+<g id="node40" class="node">
+<title>DISK</title>
+<path fill="#cfd8dc" stroke="#555555" d="M6156.45,-212.35C6156.45,-214.72 6120.72,-216.65 6076.74,-216.65 6032.76,-216.65 5997.03,-214.72 5997.03,-212.35 5997.03,-212.35 5997.03,-173.65 5997.03,-173.65 5997.03,-171.28 6032.76,-169.35 6076.74,-169.35 6120.72,-169.35 6156.45,-171.28 6156.45,-173.65 6156.45,-173.65 6156.45,-212.35 6156.45,-212.35"/>
+<path fill="none" stroke="#555555" d="M6156.45,-212.35C6156.45,-209.98 6120.72,-208.05 6076.74,-208.05 6032.76,-208.05 5997.03,-209.98 5997.03,-212.35"/>
+<text xml:space="preserve" text-anchor="start" x="6049.74" y="-193.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Save file</text>
+<text xml:space="preserve" text-anchor="start" x="6009.99" y="-184.45" font-family="Helvetica,sans-Serif" font-size="9.00">JSON on disk. PlayerSaveData</text>
+</g>
+<!-- SV&#45;&gt;DISK -->
+<g id="edge56" class="edge">
+<title>SV&#45;&gt;DISK</title>
+<path fill="none" stroke="#555555" d="M5619.52,-173.53C5699.42,-161.96 5811.98,-150.9 5910.53,-160.5 5936.13,-162.99 5963.64,-167.61 5988.73,-172.6"/>
+<polygon fill="#555555" stroke="#555555" points="5987.96,-174.94 5995.31,-173.93 5988.93,-170.14 5987.96,-174.94"/>
+<text xml:space="preserve" text-anchor="middle" x="5840.03" y="-174.45" font-family="Helvetica,sans-Serif" font-size="9.00">Write JSON</text>
+<text xml:space="preserve" text-anchor="middle" x="5840.03" y="-163.2" font-family="Helvetica,sans-Serif" font-size="9.00">(persistentDataPath)</text>
+</g>
+<!-- DISK&#45;&gt;SV -->
+<g id="edge57" class="edge">
+<title>DISK&#45;&gt;SV</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M5996.82,-192.86C5911.79,-192.71 5774.37,-192.46 5667.89,-192.27"/>
+<polygon fill="#555555" stroke="#555555" points="5668.15,-189.82 5661.14,-192.26 5668.14,-194.72 5668.15,-189.82"/>
+<text xml:space="preserve" text-anchor="middle" x="5840.03" y="-206.65" font-family="Helvetica,sans-Serif" font-size="9.00">Read JSON</text>
+<text xml:space="preserve" text-anchor="middle" x="5840.03" y="-195.4" font-family="Helvetica,sans-Serif" font-size="9.00">(on load)</text>
+</g>
+<!-- GI -->
+<g id="node41" class="node">
+<title>GI</title>
+<path fill="#ffffff" stroke="#555555" d="M2957.6,-248C2957.6,-248 2713.43,-248 2713.43,-248 2707.43,-248 2701.43,-242 2701.43,-236 2701.43,-236 2701.43,-224 2701.43,-224 2701.43,-218 2707.43,-212 2713.43,-212 2713.43,-212 2957.6,-212 2957.6,-212 2963.6,-212 2969.6,-218 2969.6,-224 2969.6,-224 2969.6,-236 2969.6,-236 2969.6,-242 2963.6,-248 2957.6,-248"/>
+<text xml:space="preserve" text-anchor="start" x="2756.39" y="-230.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">GameInitializer</text>
+<text xml:space="preserve" text-anchor="start" x="2850.14" y="-230.55" font-family="Helvetica,sans-Serif" font-size="11.00"> (organizer)</text>
+<text xml:space="preserve" text-anchor="start" x="2714.39" y="-221.45" font-family="Helvetica,sans-Serif" font-size="9.00">Start: load or create save, then initialize every service</text>
+</g>
+<!-- GI&#45;&gt;SS -->
+<g id="edge61" class="edge">
+<title>GI&#45;&gt;SS</title>
+<path fill="none" stroke="#555555" d="M2862.74,-248.33C2908.58,-281.92 3002.64,-358.13 3047.6,-447 3096.42,-543.49 3016.08,-605.89 3087.6,-687 3138.53,-744.76 3341.8,-791.78 3473.42,-816.96"/>
+<polygon fill="#555555" stroke="#555555" points="3472.77,-819.33 3480.11,-818.23 3473.69,-814.52 3472.77,-819.33"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-798.64" font-family="Helvetica,sans-Serif" font-size="9.00">Initialize(stats)</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-787.39" font-family="Helvetica,sans-Serif" font-size="9.00">(base values)</text>
+</g>
+<!-- GI&#45;&gt;PS -->
+<g id="edge59" class="edge">
+<title>GI&#45;&gt;PS</title>
+<path fill="none" stroke="#555555" d="M2956.67,-248.5C3145.6,-276.76 3523.88,-330.04 3846.77,-355 4472.03,-403.33 4639.14,-292.26 5257.11,-399 5329.37,-411.48 5409.36,-439.66 5460.19,-459.49"/>
+<polygon fill="#555555" stroke="#555555" points="5459.28,-461.76 5466.69,-462.04 5461.07,-457.2 5459.28,-461.76"/>
+<text xml:space="preserve" text-anchor="middle" x="4255.98" y="-381.84" font-family="Helvetica,sans-Serif" font-size="9.00">Initialize + ReloadAllBaseStats</text>
+<text xml:space="preserve" text-anchor="middle" x="4255.98" y="-370.59" font-family="Helvetica,sans-Serif" font-size="9.00">(progression, level)</text>
+</g>
+<!-- GI&#45;&gt;TSS -->
+<g id="edge60" class="edge">
+<title>GI&#45;&gt;TSS</title>
+<path fill="none" stroke="#555555" d="M2887.35,-248.45C2937.64,-266.11 3017.08,-292.46 3087.6,-309 3212.87,-338.39 3245.91,-338.15 3373.6,-354 4094.93,-443.54 4957.93,-509.79 5328.51,-536.3"/>
+<polygon fill="#555555" stroke="#555555" points="5328.24,-538.73 5335.39,-536.79 5328.59,-533.84 5328.24,-538.73"/>
+<text xml:space="preserve" text-anchor="middle" x="4255.98" y="-480.23" font-family="Helvetica,sans-Serif" font-size="9.00">Initialize(saveData)</text>
+<text xml:space="preserve" text-anchor="middle" x="4255.98" y="-468.98" font-family="Helvetica,sans-Serif" font-size="9.00">(allocations)</text>
+</g>
+<!-- GI&#45;&gt;SV -->
+<g id="edge58" class="edge">
+<title>GI&#45;&gt;SV</title>
+<path fill="none" stroke="#555555" d="M2953.83,-211.53C3101.61,-189.91 3363.54,-157 3589.19,-157 3589.19,-157 3589.19,-157 4875.15,-157 5040.47,-157 5229.55,-168.89 5358.53,-178.81"/>
+<polygon fill="#555555" stroke="#555555" points="5358.26,-181.25 5365.43,-179.35 5358.63,-176.36 5358.26,-181.25"/>
+<text xml:space="preserve" text-anchor="middle" x="4255.98" y="-170.95" font-family="Helvetica,sans-Serif" font-size="9.00">Load / Delete</text>
+<text xml:space="preserve" text-anchor="middle" x="4255.98" y="-159.7" font-family="Helvetica,sans-Serif" font-size="9.00">(PlayerSaveData)</text>
+</g>
+<!-- TM&#45;&gt;GL -->
+<g id="edge51" class="edge">
+<title>TM&#45;&gt;GL</title>
+<path fill="none" stroke="#555555" d="M2360.59,-34.63C2436.93,-28.53 2531.02,-22.01 2615.43,-19 2807.38,-12.15 2856.24,-2.41 3047.6,-19 3264.13,-37.78 3903.91,-160.94 4153.57,-209.94"/>
+<polygon fill="#555555" stroke="#555555" points="4152.74,-212.28 4160.08,-211.22 4153.68,-207.47 4152.74,-212.28"/>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-72.99" font-family="Helvetica,sans-Serif" font-size="9.00">OnDayChanged / OnSeasonChanged / OnYearChanged</text>
+<text xml:space="preserve" text-anchor="middle" x="3210.6" y="-61.74" font-family="Helvetica,sans-Serif" font-size="9.00">(GameEvent, ScriptableObject)</text>
+</g>
+<!-- WORLD -->
+<g id="node43" class="node">
+<title>WORLD</title>
+<path fill="#ffffff" stroke="#555555" d="M3015.73,-71C3015.73,-71 2655.31,-71 2655.31,-71 2649.31,-71 2643.31,-65 2643.31,-59 2643.31,-59 2643.31,-47 2643.31,-47 2643.31,-41 2649.31,-35 2655.31,-35 2655.31,-35 3015.73,-35 3015.73,-35 3021.73,-35 3027.73,-41 3027.73,-47 3027.73,-47 3027.73,-59 3027.73,-59 3027.73,-65 3021.73,-71 3015.73,-71"/>
+<text xml:space="preserve" text-anchor="start" x="2794.64" y="-53.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">World scripts</text>
+<text xml:space="preserve" text-anchor="start" x="2656.27" y="-44.45" font-family="Helvetica,sans-Serif" font-size="9.00">CelestialRotator, CloudController, WindController, SkyboxRotator, ClockAndDate</text>
+</g>
+<!-- TM&#45;&gt;WORLD -->
+<g id="edge52" class="edge">
+<title>TM&#45;&gt;WORLD</title>
+<path fill="none" stroke="#555555" stroke-dasharray="5,2" d="M2360.68,-49.21C2443.03,-49.87 2545.94,-50.69 2634.8,-51.4"/>
+<polygon fill="#555555" stroke="#555555" points="2634.55,-53.85 2641.57,-51.46 2634.59,-48.95 2634.55,-53.85"/>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-64.9" font-family="Helvetica,sans-Serif" font-size="9.00">CelestialTime, CurrentSeasonIndex</text>
+<text xml:space="preserve" text-anchor="middle" x="2505.06" y="-53.65" font-family="Helvetica,sans-Serif" font-size="9.00">(float, int, polled)</text>
+</g>
+<!-- LEG -->
+<g id="node44" class="node">
+<title>LEG</title>
+<path fill="#ffffff" stroke="none" d="M567.42,-1990.45C567.42,-1990.45 12,-1990.45 12,-1990.45 6,-1990.45 0,-1984.45 0,-1978.45 0,-1978.45 0,-1819.55 0,-1819.55 0,-1813.55 6,-1807.55 12,-1807.55 12,-1807.55 567.42,-1807.55 567.42,-1807.55 573.42,-1807.55 579.42,-1813.55 579.42,-1819.55 579.42,-1819.55 579.42,-1978.45 579.42,-1978.45 579.42,-1984.45 573.42,-1990.45 567.42,-1990.45"/>
+<polygon fill="#ffffff" stroke="none" points="12.96,-1814.75 12.96,-1983.25 566.46,-1983.25 566.46,-1814.75 12.96,-1814.75"/>
+<polygon fill="none" stroke="#555555" points="12.96,-1814.75 12.96,-1983.25 566.46,-1983.25 566.46,-1814.75 12.96,-1814.75"/>
+<text xml:space="preserve" text-anchor="start" x="267.59" y="-1966.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Legend</text>
+<text xml:space="preserve" text-anchor="start" x="27.09" y="-1942.25" font-family="Helvetica,sans-Serif" font-size="11.00">solid arrow</text>
+<text xml:space="preserve" text-anchor="start" x="257.21" y="-1942.25" font-family="Helvetica,sans-Serif" font-size="11.00">direct method call or event</text>
+<text xml:space="preserve" text-anchor="start" x="19.96" y="-1918.75" font-family="Helvetica,sans-Serif" font-size="11.00">dashed arrow</text>
+<text xml:space="preserve" text-anchor="start" x="227.96" y="-1918.75" font-family="Helvetica,sans-Serif" font-size="11.00">state dictionary, polled value, or read</text>
+<text xml:space="preserve" text-anchor="start" x="21.84" y="-1895.25" font-family="Helvetica,sans-Serif" font-size="11.00">dotted arrow</text>
+<text xml:space="preserve" text-anchor="start" x="245.21" y="-1895.25" font-family="Helvetica,sans-Serif" font-size="11.00">collider, trigger, or scene query</text>
+<text xml:space="preserve" text-anchor="start" x="35.71" y="-1871.75" font-family="Helvetica,sans-Serif" font-size="11.00">cylinder</text>
+<text xml:space="preserve" text-anchor="start" x="212.59" y="-1871.75" font-family="Helvetica,sans-Serif" font-size="11.00">data store (state, registry, Rigidbody, disk)</text>
+<text xml:space="preserve" text-anchor="start" x="45.09" y="-1848.25" font-family="Helvetica,sans-Serif" font-size="11.00">note</text>
+<text xml:space="preserve" text-anchor="start" x="253.09" y="-1848.25" font-family="Helvetica,sans-Serif" font-size="11.00">ScriptableObject GameEvent</text>
+<text xml:space="preserve" text-anchor="start" x="28.21" y="-1824.75" font-family="Helvetica,sans-Serif" font-size="11.00">arrowhead</text>
+<text xml:space="preserve" text-anchor="start" x="104.96" y="-1824.75" font-family="Helvetica,sans-Serif" font-size="11.00">points to the receiver of the data (dir=back means the arrow points at the owner)</text>
+</g>
+</g>
 </svg>

@@ -40,7 +40,7 @@ digraph SolMap {
     CSC    [label=<<B>CombatStateController</B><BR/><FONT POINT-SIZE="9">ICombatController. Sheathed, Unsheathed, transitions. Attack cooldown 0.8 s</FONT>>];
     ADISP  [label=<<B>AnimationEventDispatcher</B><BR/><FONT POINT-SIZE="9">Routes animator event names to IAnimationEventReceiver</FONT>>];
     PAC    [label=<<B>PlayerAnimationController</B><BR/><FONT POINT-SIZE="9">Writes animator parameters from state values</FONT>>];
-    AEH    [label=<<B>AttackEventHandler</B> [scene]<BR/><FONT POINT-SIZE="9">OverlapSphere in front. Calls IDamageable.TakeDamage (no implementers yet)</FONT>>, style="rounded,filled,dashed", fillcolor="#ffffff"];
+    AEH    [label=<<B>AttackEventHandler</B> [scene]<BR/><FONT POINT-SIZE="9">Animation events only. Hits come from WeaponHitbox (blade trigger)</FONT>>, style="rounded,filled,dashed", fillcolor="#ffffff"];
   }
 
   subgraph cluster_phys {
@@ -128,7 +128,7 @@ digraph SolMap {
   ADISP -> CSC    [label="OnAnimationEvent(name)\n(string)", style=dashed];
   ADISP -> PAC    [label="OnAnimationEvent(name)\n(string)", style=dashed];
   CSC -> PCSTATE  [label="IsWeaponDrawn, IsAttacking\n(bool)", style=dashed];
-  AEH -> RB       [label="OverlapSphere\n(collider query)", style=dotted, dir=back];
+  AEH -> RB       [label="WeaponHitbox\n(blade trigger)", style=dotted, dir=back];
 
   // ---- Stats and environment ----
   MODG -> SS      [label="ApplyOrReplaceModifier\n(StatModifier, sourceId)"];

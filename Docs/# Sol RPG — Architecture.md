@@ -1,6 +1,6 @@
-# Sol RPG — Architecture Knowledgebase
+# Sol RPG — Architecture
 
-**Last Updated:** October 2026
+**Last Updated:** November 2026
 **Engine:** Unity (C#)
 **Namespace:** `Sol`
 **Project Type:** Skyrim-like open-world action RPG with unique design deviations
@@ -13,6 +13,8 @@
 3. [Progress Summary — Where We Are](#3-progress-summary--where-we-are)
 4. [Active Task — What We Are Doing Right Now](#4-active-task--what-we-are-doing-right-now)
 5. [Global Architecture Rules](#5-global-architecture-rules)
+5a. [Damage & Status System](#5a-damage--status-system)
+5b. [Melee Combo System](#5b-melee-combo-system)
 6. [Scene & Initialization Architecture](#6-scene--initialization-architecture)
 7. [Service Locator Pattern](#7-service-locator-pattern)
 8. [SO-Based GameEvent System](#8-so-based-gameevent-system)
@@ -25,6 +27,7 @@
 15. [Known Bugs & Watch-Outs](#15-known-bugs--watch-outs)
 16. [Completed Work Checklist](#16-completed-work-checklist)
 17. [Remaining Roadmap & Next Steps](#17-remaining-roadmap--next-steps)
+18. [Architecture Map (layers and services)](#18-architecture-map-layers-and-services)
 
 ---
 
@@ -47,7 +50,7 @@ The roadmap from scratch to a working character pipeline, in the order it was bu
 
 ### Phase 1 — Core Infrastructure (DONE)
 - Service Locator, SO-based GameEvent system, `GameInitializer` composition root with strict Awake/Start split
-- `SaveService` / `ISaveManager` with lazy (debounced) and immediate save
+- `SaveService` / `ISaveManager` with `SaveCoordinator`: one save at a time, requests queue, gameplay never writes on each change
 - `PlayerSaveData` schema (stable, append-only enums; see §12)
 
 ### Phase 2 — Physics & Movement (DONE)
@@ -78,18 +81,20 @@ The roadmap from scratch to a working character pipeline, in the order it was bu
 - Menu hides the HUD while open
 
 ### Phase 7 — Damage & Status (DONE)
-- Damage is typed data: `DamageSO` (content only) builds `DamageInfo`, delivered via `IDamageReceiver`
+- Damage is typed data: `DamageProfileSO` (content only) builds `DamageInfo`, delivered via `IDamageReceiver`
 - One shared `DamageTypeTableSO` behind `IDamageTypeTable`, registered by `GameInitializer`, validated at startup
 - Mitigation is one curve for every type, physical included: `100 / (100 + effective)`, with effective = resistance − penetration, capped at 400 points (80% maximum)
 - Status effects are data: `IStatusEffect`, `StatusEffectSO` base, and per-variant subclasses (`StaggerEffectSO`, `BleedEffectSO`)
-- `StatusController` (on the player) owns active statuses, locks, knockback and ticks; it only knows `IStatusEffect`
-- Stagger: 0.5 s movement and combat lock, 15 energy cost, knockback from the attacker's root, attack cancel
+- One shared `StatusController` (`Core/Status`) runs on the player and on every target. It only knows `IStatusEffect` and `IStatusTarget`
+- Proc rolls are shared too: `StatusRoller` rolls and logs stagger and bleed for any receiver
+- Stagger: 0.5 s movement and combat lock, 30 energy cost, knockback from the attacker's root, attack cancel
 - Status procs: attacker base chance from doctrine + attacker bonus, minus receiver resistance, floored at 5%, rolled once
 - `IChanceRoller`: the single source of randomness for every chance
 - Bleed: timed, stackable status, one tick per second of scaled time (pauses with the game)
 - Targets: `TargetHealth` with a world-space health bar; `Projectile` and `ProjectileTurret`
 - Combat log visibility: player damage always, other damage within 20 m (`LogRules`)
-- Player weapon hits use a `DamageSO` through `AttackEventHandler`, with the player's penetration
+- Player weapon hits: the blade's `WeaponHitbox` delivers `DamageInfo` through `IDamageReceiver` (see §5a)
+- Legacy `IDamageable` and `WeaponService` removed; the overlap-sphere hit path is gone
 
 ### Phase 8 — Inventory & Equipment (IN PROGRESS: playtested for drag, persistence, slots and icons; weapon combat not yet built)
 - Equipment: `IEquipmentService` writes `Equipment` modifiers keyed by item instance ID; unequip removes them
@@ -104,9 +109,10 @@ The roadmap from scratch to a working character pipeline, in the order it was bu
 - Equipment sets `RigidWeight` / `FlexWeight` and pushes `Equipment` modifiers
 - `sourceId = itemInstanceId`; on unequip, `RemoveModifiersFromSource`
 
-### Phase 9 — Enemies & Actors (PLANNED)
-- `ActorStatSO` for NPCs (aggression, hearing, vision, behaviour, personality, profession, interests)
-- Until then, targets have zero mitigation
+### Phase 9 — Enemies & Actors (IN PROGRESS: stat foundation and status targets built; no enemy AI)
+- `ActorStatSO` holds base stats and per-kind status immunities (`immunities`, `StatusKind` flags). `ActorStats` and `EnemyStats` read it
+- `TargetHealth` implements `IStatusTarget` and gets its own `StatusController` through `Initialize`
+- Aggression, hearing, vision, behaviour, personality, profession and interests are still to design
 - Enemy AI is a dedicated future task
 
 ### Phase 10 — Main Menu & Full Save/Load (PLANNED)
@@ -124,7 +130,7 @@ This is a status board for re-orientation after a break.
 | Service Locator | ✅ Complete | `TryGet` for per-frame lookups that must not log |
 | GameEvent SO system | ✅ Complete | |
 | GameInitializer Awake/Start split | ✅ Complete | Validates the damage table at startup |
-| SaveService / ISaveManager | ✅ Complete | Lazy (2 s debounce) and immediate; skipped while the repair prompt is open |
+| SaveService / ISaveManager | ✅ Complete | `RequestSave(SaveReason)` through `SaveCoordinator`; autosave every 600 s of unpaused play; skipped while the repair prompt is open |
 | PlayerSaveData schema | ✅ Complete | Attribute allocations now saved |
 | Save validation + repair prompt | ✅ Complete | Repairs broken talent pools. An unreadable save is never repaired: the player chooses Start new game (manual slot backed up first) or Keep file (saves blocked for the session). |
 | Stat system | ✅ Complete | Append-only `StatTypeEnum` |
@@ -134,14 +140,15 @@ This is a status board for re-orientation after a break.
 | K menu + tab system | ✅ Complete | Talents and Player Stats tabs |
 | Virtual cursor owns OS cursor | ✅ Complete | Camera cannot unlock it while active |
 | Damage pipeline | ✅ Complete | Mitigation curve, penetration, caps, doctrine chances |
-| Stagger / bleed | ✅ Complete | Verified in play: energy cost, lock, knockback, bleed ticks |
-| Status controller | ✅ Complete | `StatusController` with `IStatusEffect` and effect SO variants |
+| Stagger / bleed | ✅ Complete | Verified in play on the player: energy cost, lock, knockback, bleed ticks |
+| Status controller | ✅ Complete | Shared `StatusController` for player and targets, verified in play on the player |
 | Target health + world bar | ✅ Complete | Verified on the dummy |
 | Projectiles | ✅ Complete | Verified against the player and the target |
-| Player weapon hits (DamageSO) | 🟡 Partial | Wired and penetration applied; needs attack animations to test swings |
+| Player weapon hits (blade trigger) | 🟡 Partial | `WeaponHitbox` delivers hits with penetration; needs attack animations to test swings |
 | Weight and plate/flex/cloth counts | 🟡 Partial | Derived into resistances and deflection; equipment does not set them yet |
 | Armour stat screen | ✅ Complete | Caps shown as `x/400`; piece counts shown as `n/5` |
-| Enemy stats (ActorStatSO) | ⬜ Not started | Targets have zero mitigation until then |
+| Enemy stats (ActorStatSO) | 🟡 Foundation | Base stats and per-kind immunities exist. Enemies are not built yet |
+| Enemy status procs | ⬜ Untested | No enemy prefab yet. Dummy procs did not show in play (see §5a) |
 | Inventory / equipment | 🟡 First draft | Grid, silhouette, drag and drop, rotation, save and restore. Not playtested yet |
 | Equipment and inventory save | 🟡 First draft | Restored through `ItemRegistry` on load; re-equip rebuilds stat modifiers |
 | Weapons equipping | ⬜ Not started | `EquipmentService` only takes armour today |
@@ -152,12 +159,13 @@ This is a status board for re-orientation after a break.
 
 ## 4. Active Task — What We Are Doing Right Now
 
-**Current focus: Phase 8, Inventory & Equipment (playtested).** Phase 7 is closed. Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play. Inventory, equipment, world item moves across cells, save and load, and the repair prompts are playtested.
+**Current focus: Phase 8, Inventory & Equipment (playtested), then the swing animation prototype.** Phase 7 is closed. Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play. Inventory, equipment, world item moves across cells, save and load, and the repair prompts are playtested.
 
 Open items, carried into Phase 8:
 1. Set bonuses for full plate, flex and cloth (see the armour doc).
-2. Player weapon swings need attack animations to be fully tested.
+2. Player weapon swings need attack animations to be fully tested. The next step is an IK swing prototype (§5a).
 3. The temporary harnesses come out once animations exist. The swing path itself stays.
+4. Second and third swings: not built. Needs the prototype first.
 
 Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
 
@@ -175,7 +183,7 @@ Design sections (§5 to §14) describe the rules as currently understood, and ar
 ### Plain C# vs MonoBehaviour
 - **Services needing Unity lifecycle:** `MonoBehaviour` on the `[Services]` GameObject.
 - **Pure logic services:** Plain C# classes, factory-created in a host `MonoBehaviour`'s `Awake()`.
-- **ScriptableObjects:** Design-time data and GameEvent system only. Never runtime mutable state.
+- **ScriptableObjects:** Read-only at runtime. They hold design-time data and the GameEvent system. A value that changes during play is copied into a plain C# service at startup, and only the copy is written. The save stores the player's delta from the SO default, never the SO itself (see §5a and "Save Delta Rule" in §10, which uses Brawn as the example).
 
 ### Awake / Start Split — CRITICAL RULE
 ```
@@ -198,7 +206,12 @@ This rule exists because Unity does NOT guarantee `Start()` execution order acro
 - `ServiceLocator.Get<T>()` — only in `Start()` or later.
 
 ### Initialization Ownership Rule
-`GameInitializer` is the **sole composition root**. It is the only class permitted to:
+There are two composition roots. Each owns its own scope, and nothing else builds or initialises those services.
+- **`GameInitializer`** (persistent scene) owns global services: save, progression, talents, stats, the damage table, the chance roller, inventory and equipment.
+- **`PlayerController`** (player) owns player components and the player's adapters: `AimService`, `PlayerStatusAdapter`, and the `Initialize(context)` push into each `IPlayerComponent`.
+- **`TargetHealth`** (each target) pushes itself into its own `StatusController`. That is the only self-wiring exception, and it is per target, not global.
+
+`GameInitializer` is the only class permitted to:
 - Call `Initialize()` on services.
 - Cast to concrete types for initialization sequencing (e.g., `as TalentStateService`).
 - Pass cross-service dependencies (e.g., `IStatsService` into `TalentStateService.Initialize`).
@@ -215,6 +228,103 @@ When a system must implement a contract it does not own, write a **plain C# adap
 
 ### GameEvent Rule
 All cross-system events must use the SO `GameEvent` system. C# `Action<T>` is not used for cross-system notifications. Events are parameterless — listeners pull data themselves via `GetStat()` / service reads.
+
+## 5a. Damage & Status System
+
+Rules for hits, mitigation and status effects. The sequence through the code is in `FLOWS.md` 3.5.
+
+### Hit path
+1. An attacker builds a `DamageInfo` through `DamageProfileSO.Build` (or `WeaponHitbox` for blades). It carries type, tags, amount, source, hit point and a `StatusAttack`.
+2. The receiver (`PlayerVitals` or `TargetHealth`) implements `IDamageReceiver.ReceiveHit`.
+3. `DamageCalculator.Calculate` applies deflection (physical only), mitigation, environmental resistance, and the status chances.
+4. `StatusRoller.Roll` rolls each status the hit carries, logs the outcome, and calls `StatusController.Apply`.
+5. `StatusController` applies the effect through its `IStatusTarget`, unless the target is immune.
+
+### Damage types and tags
+- `DamageType` and `DamageTag` are append-only (see §15, saved enums).
+- Mitigation is one curve for every type: `100 / (100 + effective)`, with effective = resistance − penetration, capped at 400 points.
+- Status chances come from the doctrine, not from data: `StatusChanceCalculator` holds the base values. Stagger: 20% base, +15% for the Blunt tag. Bleed: 25% base, +20% for the Blade or Piercing tag. Both need a physical hit.
+- The attacker's bonus is added in points, converted once in `DamageProfileSO.Build`.
+- The receiver's resistance subtracts from the attacker's chance, with a 5% floor.
+
+### Status effects
+- `IStatusEffect` describes an effect. `StatusEffectSO` is the base asset; `StaggerEffectSO` and `BleedEffectSO` are variants.
+- `StatusKind` (flags: `Stagger`, `Bleed`) identifies the kind of effect, for immunities.
+- The shared `StatusController` (`Core/Status`) owns active effects, locks, knockback and ticks. It runs on scaled time, so effects pause with the game.
+- A target gets its controller by `Initialize(IStatusTarget)` from its composition root (§5), not by searching for it.
+- Only the player's controller is registered globally as `IStatusController`, because many systems read it without a reference.
+
+### Targets: `IStatusTarget`
+Every target that can receive statuses implements `IStatusTarget`: `StatusName`, `ApplyHealthDelta`, `ApplyEnergyDelta`, `SetAnimatorTrigger`, `CancelCombat`, and `IsImmuneTo`.
+- **Player:** `PlayerStatusAdapter` (plain C#, see the Adapter Rule). Immunity is from temporary modifiers, not a type flag, so `IsImmuneTo` returns false until those exist.
+- **Enemies and dummies:** `TargetHealth` implements the contract directly. Immunity comes from `ActorStatSO.immunities`, through `EnemyStats.IsImmuneTo`.
+
+### Stagger
+- 0.5 s movement and combat lock (`StaggerEffectSO`).
+- Energy cost on apply: 30 (`Stagger_M` asset). Targets without energy ignore it.
+- Knockback is from the attacker's root, not the weapon. The hit point is kept for effects.
+- Applying it cancels an attack in progress.
+
+### Bleed
+- Timed and stackable (`BleedEffectSO`). One tick per second of scaled time.
+- Damage per tick is a fraction of the raw hit (`DamageFractionOfRaw`), split across the ticks of one life.
+
+### Immunity
+- Per kind, from `ActorStatSO.immunities`. An immune target refuses the effect and the roll is logged as "blocked (immune)" rather than "applied".
+- Player immunities are reserved for temporary modifiers (potions, talents).
+
+### Logging
+- Every proc roll is logged with its chance, hit or miss, through `LogRules`. Player-caused events always show. Others show within 20 m.
+
+### Open items
+- **Dummy procs:** the training dummies did not apply bleed or stagger in play, while the player's procs work. The data and code path were checked and look correct. Cause not yet found; the combat log lines will show whether rolls run and miss, or never run.
+- **Two adapter-like seams remain:** `DamageProfileSO` still stores its own status effects and tags, separate from weapons. Consider a shared source later.
+
+---
+
+## 5b. Melee Combo System
+
+The rules for the one-handed combo. The sequence is in `FLOWS.md` 3.4, and the decision tree in `DECISION_TREES.md` 4.
+
+### Principle
+A press decides the chain. The Animator never decides it. Transitions only handle the idle exits, so a clip finishing cannot race a press.
+
+### Clips and states
+- Three combo states on the `WeaponLayer`: `Melee Combo Attack 1`, `2` and `3`, in `_comboStates` on `CombatStateController`.
+- Their end events are set in each clip's importer: `OnAttackStart` near the start of the strike, `AttackRecovery` where the blade returns (about 0.68 s), `OnAttackEnd` near the end.
+- The swing duration (`_swingDuration`, 1.0 s) must match the clip. It is the window after which a stale attack flag can no longer block input.
+
+### The bool: `CanStringToCombo`
+- **False at the start of every clip** (`OnAttackStart`). A clip always begins with the combo closed.
+- **True on a press**, and only on a press. A press during a swing or during its hold opens the combo.
+- **False when the combo ends**: the hold times out, or a cancel or forced sheathe.
+- The idle exits from every combo state require `CanStringToCombo` to be **false**, with exit time at the clip end.
+
+### The sequence
+1. **Attack from idle.** `StartAttack` sets the trigger, plays swing 1 (`_comboStates[0]`), and the combo is at swing 1.
+2. **A press during the swing** sets the bool true and queues the chain. At `OnAttackEnd` the queued chain plays the next swing by name.
+3. **At `AttackRecovery`** with nothing queued, the hold starts. The animator eases to 10% speed over 0.25 s and holds for 1 s.
+4. **A press during the hold** sets the bool true, ends the hold, and plays the next swing by name.
+5. **A hold that times out** ends the combo: the bool goes false, the speed returns to normal, and the idle exit runs.
+6. **The last swing** does not chain. A press after it starts a new combo from swing 1.
+
+### Why chaining is by name, not by transition
+The first version chained by Animator transition with `ComboIndex` and triggers. Each swing's exit to idle and its chain transition were both ready at the same moment, so the wrong one could win, and a press could be lost or taken twice. Playing the next state directly (`PlayState`, a short crossfade on the weapon layer) removes the race. The Animator only has to hold the three states and their idle exits.
+
+### Tuning values (inspector, `CombatStateController`)
+| Value | Default | Effect |
+|---|---|---|
+| `_comboHoldSeconds` | 1.0 | How long the hold waits for a press |
+| `_comboSlowSpeed` | 0.1 | Animator speed during the hold (0.1 = 10%) |
+| `_comboEaseSeconds` | 0.25 | How long the speed takes to ease down and back up |
+| `_comboCrossFade` | 0.05 | Blend time when a press chains into the next swing |
+| `_swingDuration` | 1.0 | One swing, start to finish. Match the clip |
+| `_comboLayerIndex` | 1 | Animator layer the combo states live on |
+
+### Known limits
+- The clips still look stiff in first person. The combo timing is solid, but the motion itself needs work (see the rig reach plan in §17).
+- The hold's slow-down is driven by `Animator.speed`, so animation events fire at the slower speed too. This is intended.
+- The weapon rig keeps the hand on while an attack or a hold is active (`IsAttacking()` includes the hold), so the arm does not drop during the slow-down.
 
 ---
 
@@ -813,10 +923,16 @@ public class AttributeAllocationEntry
 ```csharp
 public interface ISaveManager
 {
-    void RequestLazySave();      // Debounced 2s. For frequent changes (talent allocation).
-    void RequestImmediateSave(); // Bypasses debounce. For critical moments (respec, level-up, quit).
+    bool RequestSave(SaveReason reason); // Quicksave, Autosave, ManualSave, SaveAndQuit, Repair
+    void SetPlayerTransform(Transform player);
 }
 ```
+
+**Rules**
+- Gameplay changes state. It does not save on each change. The next quicksave, autosave or save-and-quit writes it.
+- Slots: `quicksave`, `autosave`, `default` (manual) and `repair`.
+- Autosave counts unpaused play time (`AutosaveTimer`, default `_autosaveIntervalSeconds = 600`). It asks `CanAutosave()` first, which returns true today.
+- Only one save runs at a time. A request made during a save is queued.
 
 ### Load Round-Trip Order
 ```
@@ -933,7 +1049,7 @@ public class RespecController : MonoBehaviour
         prog?.ResetAllAttributes();
 
         // 4. Save immediately
-        ServiceLocator.Get<ISaveManager>()?.RequestImmediateSave();
+        ServiceLocator.Get<ISaveManager>()?.RequestSave(SaveReason.Quicksave);
     }
 }
 ```
@@ -996,6 +1112,12 @@ Grouping a list by the previous row's name creates a second column when another 
 ### 🟡 WATCH-OUT: Saved enums are stored as integers
 Confirmed by test: `JsonUtility` writes enums as their integer value (`"statType":4`). New members go only at the end of `StatTypeEnum`, `DamageType` and `DamageTag`. Never insert, reorder, or rename.
 
+### 🟡 WATCH-OUT: Scene references to deleted scripts go silently null
+When a script is deleted or replaced, scene and prefab components that referenced its GUID become Missing. A field that points at the old script can look set in the Inspector and still register null at runtime. Symptom: `IStatusController` registered as null after the status refactor. Fix: remove the broken component and re-add the current script, then check the console on play.
+
+### 🟡 WATCH-OUT: Scene bindings to removed save methods
+`Persistant Scene.unity` still has two `UnityEvent` bindings, `RequestLazySave` and `RequestImmediateSave`, on the objects at the talent and panel triggers. Those methods were removed when saving moved to `SaveCoordinator`. The bindings now fail at runtime, so talent and panel changes do not trigger a save from those triggers. Fix: rebind the events to `SaveManager.RequestSave` with the matching `SaveReason` (for example Quicksave), or remove them. Check the console when the talent panel closes.
+
 ### 🟡 WATCH-OUT: Trigger messages need a Rigidbody
 Unity routes `OnTriggerEnter/Stay/Exit` to the object that owns the collider's Rigidbody, or to the collider's own object if there is none. A trigger on a child, or a moving projectile, needs a Rigidbody (kinematic) on the object that should receive the message. `Projectile` adds its own in `Awake`.
 
@@ -1038,7 +1160,7 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 | UI | HUD (vitals bars) and combat log, hidden while the menu is open | ✅ |
 | UI | Virtual cursor owns OS cursor; camera cannot unlock it while active | ✅ |
 | UI | Modal dialog via `IUIManager.ShowModal` | ✅ |
-| Damage | `DamageType` (append-only), `DamageTag`, `DamageSO`, `DamageInfo` | ✅ |
+| Damage | `DamageType` (append-only), `DamageTag`, `DamageProfileSO`, `DamageInfo` | ✅ |
 | Damage | `IDamageReceiver` implemented by player, targets | ✅ |
 | Damage | `DamageTypeTableSO` as one shared table behind `IDamageTypeTable` | ✅ |
 | Damage | Startup validation of the table (missing and duplicate rows) | ✅ |
@@ -1046,9 +1168,13 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 | Damage | `IChanceRoller`: single source of randomness | ✅ |
 | Damage | `StatusChanceCalculator` (subtractive armour rules, 5% floor) | ✅ |
 | Damage | Bleed: stackable, one tick per second of scaled time | ✅ |
-| Damage | Stagger: 0.5 s lock, 15 energy, knockback from attacker root, attack cancel | ✅ |
+| Damage | Stagger: 0.5 s lock, 30 energy (`Stagger_M`), knockback from attacker root, attack cancel | ✅ |
 | Damage | `IStatusEffect` + `StatusEffectSO` base, `StaggerEffectSO`, `BleedEffectSO` | ✅ |
-| Damage | `StatusController` owns statuses, locks, knockback, ticks | ✅ |
+| Damage | Shared `StatusController` in `Core/Status`, with `IStatusTarget` and `Initialize` push | ✅ |
+| Damage | `StatusRoller`: shared proc roll for player and targets, logged with chance | ✅ |
+| Damage | `PlayerStatusAdapter` (plain C#) and `TargetHealth : IStatusTarget` | ✅ |
+| Damage | Per-kind immunities on `ActorStatSO` (`StatusKind` flags) | ✅ |
+| Damage | `IDamageable` and `WeaponService` removed (dead code) | ✅ |
 | Damage | Mitigation curve `100 / (100 + x)` for every type, with penetration | ✅ |
 | Damage | `StatCaps`: 400-point cap on penetration and resistances, applied to the stacked total | ✅ |
 | Damage | `StatusAttack`: attacker base chance and effect carried on `DamageInfo` | ✅ |
@@ -1064,7 +1190,9 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 | Combat | `LogRules`: player always shown, others within 20 m | ✅ |
 | Combat | `TargetHealth` + `WorldHealthBar` on the training dummy | ✅ |
 | Combat | `Projectile` (adds its own kinematic Rigidbody) and `ProjectileTurret` | ✅ |
-| Combat | Sword swings use `DamageSO` when assigned | 🟡 (needs animations) |
+| Combat | Blade hits via `WeaponHitbox` (trigger on the held blade) | ✅ |
+| Combat | Melee combo: three swings, press-to-chain, hold with slow-down | ✅ Logic. Motion needs tuning |
+| Combat | Swing animation motion and first-person reach (rig retargeting) | ⬜ |
 | Init | `GameInitializer` orchestration; `ReloadAllBaseStats` after Progression init | ✅ |
 
 ---
@@ -1075,6 +1203,7 @@ If `PersistentGameScene` ever loads additively a second time, `GameInitializer.S
 The character pipeline is working end to end, and Phase 7 (damage and status) is closed. Phase 8 (inventory and equipment) has a first draft built and needs a playtest. What's left after it is Phases 9 and 10.
 
 ### Phase 7 — Damage & Status: closed
+- Status refactor (shared controller, `IStatusTarget`, `StatusRoller`, immunities) verified in Unity on the player.
 - Stagger, bleed, the mitigation curve, penetration, caps and the stats screen are built and verified in play.
 - The remaining Phase 7 work is carried into Phase 8. Player weapon swings need attack animations to be fully tested.
 - Temporary harnesses are removed once animations exist. The swing path itself stays.
@@ -1095,7 +1224,8 @@ The character pipeline is working end to end, and Phase 7 (damage and status) is
 - Set bonuses for full plate, flex and cloth (dodge, spell power, mobility). They need the set system and the talent layer.
 
 ### After Phase 8
-- **Phase 9: Enemies & Actors.** `ActorStatSO` for NPCs, so targets get real mitigation. Enemy AI is a separate task.
+- **Swing prototype (next).** An IK-driven forward slash on the held weapon, with the arm solved by Two Bone IK and the blade angle set by an override rotation. Timing and the hitbox window come from code. Second and third swings are parameters of the same path, after the first one works in first person.
+- **Phase 9: Enemies & Actors.** `ActorStatSO` is in place. Next: enemy prefabs with `StatusController` and `TargetHealth`, and real mitigation. Enemy AI is a separate task.
 - **Phase 10: Main Menu.** Separate scene, New Game / Continue / Load, and a full character round-trip check.
 
 ### Deferred to the design bible
@@ -1106,3 +1236,118 @@ The character pipeline is working end to end, and Phase 7 (damage and status) is
 
 ---
 
+---
+
+## 18. Architecture Map (layers and services)
+
+This section was merged from the former `ARCHITECTURE.md`. Where it disagreed with the code, the code was used.
+
+### 18.1 Layers
+
+```
+BOOTSTRAP (Persistant Scene)
+  ServiceLocator      static registry, DontDestroyOnLoad, DefaultExecutionOrder(-100)
+  GameInitializer     Awake: create SaveService, ProgressionService, damage table, chance roller, world store
+                      Start: load or create save, init stats, progression, talents
+
+CORE SERVICES (MonoBehaviours or plain C#)
+  Time/World : TimeManager (ITimeManager), CelestialCalculator (ICelestialCalculator)
+  Stats      : StatsService (IStatsService)
+  Progression: ProgressionService (IProgressionService, plain C#)
+  Talents    : TalentTreeGenerator (ITalentTreeGenerator)
+               TalentStateService (ITalentStateService, plain C#)
+  Save       : SaveManager (ISaveManager) -> SaveService (ISaveService, plain C#)
+  Combat     : CombatLog (ICombatLog), DamageCalculator (static), StatusRoller (static)
+  UI         : UIStateService, UIManager, VirtualCursor (+ VirtualCursorController),
+               UIInputController, TalentTreeController
+
+EVENT BUS (ScriptableObject)
+  GameEvent.Raise() -> GameEventListener.OnEventRaised() -> UnityEvent
+  Assets: OnDayChanged, OnSeasonChanged, OnYearChanged, OnStatsChanged,
+          OnTalentChanged, OnGameStateChanged, OnImmediateSaveRequest,
+          TalentWheelToggle, TalentWheelReady
+
+DATA (ScriptableObjects, read-only at runtime)
+  Time    : WorldTimeData, SeasonalData, WeatherData
+  Stats   : PlayerStatSO, PlayerProgressionSO, ActorStatSO
+  Items   : WeaponDataSO, EquipmentDataSO, OffhandDataSO, WearableDataSO
+  Damage  : DamageProfileSO, DamageTypeTableSO
+  Status  : StatusEffectSO (StaggerEffectSO, BleedEffectSO)
+  Talents : TalentNodeDataSO, TreeLayoutSO, TreeLayoutCollectionSO, TalentTreeSettingsSO
+  UI      : UIState
+
+PLAYER (PlayerController implements IPlayerContext)
+  PlayerController    input routing, movement-state selection, local service dictionary,
+                      composition root for the player (see §5)
+  Locomotion          Movement, Jumping, GravityController, GroundChecker,
+                      CameraController, PlayerAnimationController
+  Combat              CombatStateController, AnimationEventDispatcher, WeaponHitbox,
+                      WeaponVisualManager, WeaponRigController
+  Status              StatusController (shared), PlayerStatusAdapter (plain C#)
+  Modifiers           Modifier_MovementSpeedBoost, Modifier_GravityDirectionZone,
+                      Modifier_GravityMultiplierTrigger (use IStatsService)
+
+TARGETS (enemies and dummies)
+  TargetHealth        IDamageReceiver, IStatusTarget. Owns health and its StatusController
+  StatusController    shared, pushed a TargetHealth through Initialize
+  EnemyDamageSource   trigger that hits the player from a DamageProfileSO
+
+WORLD / PRESENTATION
+  CelestialRotator, SkyboxRotator, CloudController, WindController,
+  SkyAndFogController (HDRP Volume), SnowCoverController, Rotator,
+  SpeedVisualizer, ClockAndDate
+```
+
+### 18.2 Service registry
+
+Global registry, through `ServiceLocator.RegisterService<I>()` and `ServiceLocator.Get<I>()` / `TryGet<I>()`:
+
+| Interface | Implementation | Registered in | Consumers |
+|---|---|---|---|
+| `ISaveService` | `SaveService` (plain C#) | `GameInitializer.Awake` | `SaveManager`, `GameInitializer` |
+| `IProgressionService` | `ProgressionService` (plain C#) | `GameInitializer.Awake` | `SaveManager`, `TalentTreeController` |
+| `IChanceRoller` | `ChanceRoller` (plain C#) | `GameInitializer.Awake` | `DamageCalculator`, `StatusRoller`, `TargetHealth`, `PlayerVitals` |
+| `IDamageTypeTable` | `DamageTypeTableSO` | `GameInitializer` | `DamageCalculator` |
+| `IEquipmentService`, `IInventoryService` | plain C# | `GameInitializer` | `CombatStateController`, inventory UI |
+| `ITimeManager` | `TimeManager` | `TimeManager.Awake` | `PlayerController`, `CelestialRotator`, `CloudController`, `UIManager` |
+| `ICelestialCalculator` | `CelestialCalculator` | `TimeManager.Awake` | `CelestialRotator` |
+| `ICombatLog` | `CombatLog` | `CombatLog.Awake` | `LogRules`, `StatusController`, `PlayerVitals` |
+| `IStatsService` | `StatsService` | `StatsService.Awake` | `Movement`, `GravityController`, the 3 `Modifier_*` scripts, `TalentTreeController`, `WeaponHitbox` |
+| `ITalentTreeGenerator` | `TalentTreeGenerator` | `TalentTreeGenerator.Awake` | `GameInitializer`, `TalentTreeController`, `UIManager` |
+| `ITalentStateService` | `TalentStateService` (plain C#) | `TalentTreeGenerator.Awake` | `SaveManager`, `GameInitializer`, `TalentTreeController`, `UIManager` |
+| `IPlayerVitals` | `PlayerVitals` | `PlayerVitals.Awake` | `StatusRoller` callers, `PlayerStatusAdapter`, `LogRules` |
+| `IStatusController` | `StatusController` (player only) | `PlayerController.Awake` | `StatusRoller`, `CombatStateController`, `WeaponHitbox` |
+| `IAimService` | `AimService` (plain C#) | `PlayerController.Awake` | pickup, archery, spells |
+| `IPlayerPickup` | `PlayerPickup` | `PlayerController.Awake` | `PlayerController` |
+| `ISaveManager` | `SaveManager` | `SaveManager.Awake` | `UIManager` |
+| `IUIStateService` | `UIStateService` | `UIStateService.Awake` | `UIManager` |
+| `IUIManager` | `UIManager` | `UIManager.Awake` | `UIInputController` |
+| `IVirtualCursor` | `VirtualCursor` (plain C#) | `VirtualCursorController` | `UIManager` |
+| `ICameraController` | `CameraController` | `CameraController.Awake` | `UIManager`, `Movement` |
+
+Local registry: `PlayerController` fills a `Dictionary<Type, object>` in its own `Awake`, and player components call `context.GetService<T>()`. It covers `IGroundChecker`, `IAnimationController`, `ICameraController`, `ICombatController`, `IStatusController` (also global), and `IGravityController`.
+
+Targets do not use the global registry for their status controller. Each target pushes its `StatusController` through `Initialize` (see §5).
+
+### 18.3 Key data flows
+
+1. **Startup:** `GameInitializer.Awake` creates and registers the core services. `Start` loads or creates the save, then initialises `StatsService`, `ProgressionService`, `TalentTreeGenerator.LoadData()`, and `TalentStateService`, and sets the spent-points count.
+2. **Save:** Gameplay changes state and does not save on each change. Quicksave and save-and-quit call `ISaveManager.RequestSave`. `SaveManager` hands the request to `SaveCoordinator`, which writes through `SaveService`. Autosave runs every 600 s of unpaused play.
+3. **Time:** `TimeManager` raises `OnDayChanged`, `OnSeasonChanged`, and `OnYearChanged`. Other systems poll its properties (`CelestialTime`, `CurrentSeasonIndex`) and read `WorldTimeData`.
+4. **Input:** The Input System calls `PlayerController.OnAttack`, `OnJump`, and related handlers, which forward to the player components. `DetermineActiveMovementState()` picks the active movement state each frame from the `IBaseMovement.CanBeActivated()` priority list.
+5. **Stats:** Modifiers call `IStatsService` to apply effects. `StatsService` marks its cache dirty and raises `OnStatsChanged`.
+6. **Hits:** A `WeaponHitbox` or `EnemyDamageSource` builds a `DamageInfo`, the receiver runs `DamageCalculator`, `StatusRoller` rolls procs, and `StatusController` applies them (see §5a and `FLOWS.md` 3.5).
+7. **UI:** `UIInputController` -> `UIManager` -> `UIStateService` / `VirtualCursor` / `TalentTreeController`. `UIManager` pauses time through `ITimeManager.TogglePause()`.
+
+### 18.4 Scenes and assemblies
+
+- **Scenes:** `Persistant Scene.unity` holds the bootstrap objects. `OutdoorsScene`, `CharacterCreation`, and `Test Scene` are gameplay scenes. `OutdoorsScene.unity` has none of the core class names, so it depends on the persistent scene being loaded with it.
+- **Assemblies:** `Assets/_Project/Scripts/Sol_Scripts.asmdef` is the only asmdef in the project. Code elsewhere (for example `Assets/_Project/Systems/PlayerInput.cs`, `Assets/Editor/*`) is outside it.
+
+### 18.5 Risks and notes
+
+- **Global locator:** Most systems find each other through `ServiceLocator`, so the persistent scene must load first. `Get` returns null and logs an error if a service is not registered yet.
+- **Init-order coupling:** `GameInitializer` depends on `Awake` order across several objects.
+- **Mixed patterns:** Interfaces, events, the global locator, the local player registry, and direct `[SerializeField]` references are all in use.
+- **Inactive code:** `WeatherManager.cs` is commented out. `WeaponService.cs` and `IDamageable.cs` were removed. Other files may still hold commented-out code.
+- **Stray files:** `Assets/SnowCover.cs` sits outside `_Project`. Several `_oldBackup`, `_Recovery`, and `Untitled` folders exist.

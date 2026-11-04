@@ -1,7 +1,7 @@
 # Sol RPG — World State Persistence
 
 Status: **Design agreed and written (Phase 0 done). Implementation starts at Phase 1.**
-Read with `# Sol RPG — Architecture Knowledgebase.md` §12 and §13.
+Read with `# Sol RPG — Architecture.md` §12 and §13.
 
 ---
 

@@ -100,6 +100,15 @@ Inventory sits **after** the character-stat pipeline, before the Main Menu:
 
 ---
 
+### 2.6 Offhands are not weapons (decided)
+Weapon hits come from the blade's trigger (`WeaponHitbox`), and every damage part is built from weapon data. Offhand items do not use that path, and must not be made to. Their data (`OffhandDataSO`) holds only a type and a footprint, with no damage or status fields, so an offhand cannot "hit" through the weapon system by accident.
+
+Planned: a **shield bash** uses an **overlap sphere** from the shield, checked at a set moment in the bash, and not a trigger collider. That makes it a different action, with its own parameters, not a weapon hit. Its damage and status values will be set on the shield's own action, not borrowed from a weapon profile. See the Architecture doc §5a for the damage rules any bash result will go through.
+
+Unarmed and offhand actions wait on the swing animations.
+
+---
+
 ## 3. The Grid Inventory Design (Formalized Here)
 
 ### 3.1 Core model: spatial grid, not slot list

@@ -34,8 +34,8 @@ ModelImporter:
       name: Melee Combo Attack 1
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 21
-      lastFrame: 49
+      firstFrame: 10
+      lastFrame: 45
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -62,14 +62,14 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.82251084
+      - time: 0.82873493
         functionName: AttackRecovery
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 1
+      - time: 0.9190871
         functionName: OnAttackEnd
         data: 
         objectReferenceParameter: {instanceID: 0}

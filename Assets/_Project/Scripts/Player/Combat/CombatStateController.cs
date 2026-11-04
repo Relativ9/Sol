@@ -15,10 +15,35 @@ namespace Sol
         [Header("Attack Settings")]
         [SerializeField] private float _attackCooldown = 0.8f;
         [SerializeField] private string _attackTrigger = "Attack";
+
+        [Header("Combo")]
+        [Tooltip("Animator bool. True from the start of a swing until its hold ends. The idle exits need it false.")]
+        [SerializeField] private string _canStringToComboParam = "CanStringToCombo";
+        [Tooltip("Animator state names for the combo swings, in order. A press in the hold plays the next one by name.")]
+        [SerializeField] private string[] _comboStates = { "Melee Combo Attack 1", "Melee Combo Attack 2", "Melee Combo Attack 3" };
+        [Tooltip("Animator layer the combo states live on (the weapon layer).")]
+        [SerializeField] private int _comboLayerIndex = 1;
+        [Tooltip("Seconds of crossfade when a press chains into the next swing.")]
+        [SerializeField] private float _comboCrossFade = 0.05f;
+        [Tooltip("Seconds the swing eases down to the slow speed after it ends, waiting for the next press. A press in this time continues the combo.")]
+        [SerializeField] private float _comboHoldSeconds = 1f;
+        [Tooltip("Animator speed during the hold. 0.1 is 10% speed. The swing eases down to it rather than stopping.")]
+        [Range(0.01f, 1f)] [SerializeField] private float _comboSlowSpeed = 0.1f;
+        [Tooltip("Seconds the speed takes to ease between normal and the slow hold speed.")]
+        [SerializeField] private float _comboEaseSeconds = 0.25f;
+
+        private bool _comboHolding;
+        private float _comboHoldEndsAt = -10f;
+        private float _animatorSpeed = 1f;
+        private float _animatorSpeedTarget = 1f;
+        private bool _comboQueued;
+        private int _comboStage = 0; // index into _comboStates of the swing that is running, or -1 when none
         
         [Header("Animation Events")]
         [SerializeField] private string _attackStartEvent = "OnAttackStart";
         [SerializeField] private string _attackEndEvent = "OnAttackEnd";
+        [Tooltip("Starts the combo hold. Fired while the blade is returning, before the clip exits, so the hold begins before the idle exit can fire.")]
+        [SerializeField] private string _attackRecoveryEvent = "AttackRecovery";
         [SerializeField] private string _beginSheatheEvent = "OnBeginSheathe";
         [SerializeField] private string _sheatheWeaponEvent = "OnSheatheWeapon";
         [SerializeField] private string _beginUnsheatheEvent = "OnBeginUnsheathe";
@@ -47,8 +72,9 @@ namespace Sol
         // The swing window. The attack clip has no animation events, so the combat controller owns when a swing is in
         // progress. The weapon rig releases the hand for this window. Set this to the clip's length.
         [Header("Swing")]
-        [Tooltip("Seconds the attack takes, from the start of the swing until the hand is held again. Match it to the attack clip.")]
-        [SerializeField] private float _swingDuration = 0.8f;
+        [Tooltip("Seconds one swing takes, from its start to its end. Match it to the combo clip length (1.0 s for the combo clips). " +
+                 "After this window, a stale attack flag can no longer block input.")]
+        [SerializeField] private float _swingDuration = 1f;
         private float _swingEndTime = -10f;
         
         public void Initialize(IPlayerContext context)
@@ -84,6 +110,7 @@ namespace Sol
             // Register for animation events
             _eventDispatcher.RegisterReceiver(this, _attackStartEvent);
             _eventDispatcher.RegisterReceiver(this, _attackEndEvent);
+            _eventDispatcher.RegisterReceiver(this, _attackRecoveryEvent);
             _eventDispatcher.RegisterReceiver(this, _beginSheatheEvent);
             _eventDispatcher.RegisterReceiver(this, _sheatheWeaponEvent);
             _eventDispatcher.RegisterReceiver(this, _beginUnsheatheEvent);
@@ -103,6 +130,11 @@ namespace Sol
             Debug.Log("Combat State Controller initialized in Sheathed state");
         }
         
+        private void Update()
+        {
+            UpdateComboHold();
+        }
+
         // IAnimationEventReceiver implementation
         public void OnAnimationEvent(string eventName)
         {
@@ -115,6 +147,8 @@ namespace Sol
             if (eventName == _attackStartEvent)
             {
                 _isAttackAnimationPlaying = true;
+                // Every clip starts with the combo closed. Only a press sets it true again.
+                SetCanStringToCombo(false);
             }
             else if (eventName == _attackEndEvent)
             {
@@ -127,6 +161,29 @@ namespace Sol
                 {
                     Debug.Log("Attack completed");
                 }
+
+                // A press during the swing continues the combo straight into the next clip, with no pause.
+                if (_comboQueued)
+                {
+                    _comboQueued = false;
+                    StartChainedSwing();
+                }
+                else
+                {
+                    // Nothing queued. The hold already started at AttackRecovery.
+                }
+            }
+            else if (eventName == _attackRecoveryEvent)
+            {
+                // The strike is done and the blade is returning. Decide here: a queued press continues the combo,
+                // otherwise hold now, before the clip exits to idle.
+                if (_comboQueued)
+                {
+                    // The queued swing starts at OnAttackEnd, so nothing to do yet. Keep the queue for that event.
+                    return;
+                }
+
+                BeginComboHold();
             }
             // Handle sheathe/unsheathe events
             else if (eventName == _beginSheatheEvent)
@@ -219,6 +276,33 @@ public void HandleAttackInput()
         return;
     }
 
+    // An attack whose end event never arrived (the Animator left the state early) must not block input forever.
+    // Once its swing window has passed, the attack is over, whatever the animation did.
+    if (_isAttackAnimationPlaying && Time.time >= _swingEndTime)
+    {
+        _isAttackAnimationPlaying = false;
+        _isAttacking = false;
+        _context.SetStateValue("IsAttacking", false);
+    }
+
+    // A press during the hold continues the combo straight away: the animator returns to normal speed and the next swing starts.
+    if (_comboHolding)
+    {
+        // A press opens the combo, then the next swing plays by name.
+        SetCanStringToCombo(true);
+        EndComboHold(resumeNormalSpeed: true);
+        StartChainedSwing();
+        return;
+    }
+
+    // A press during a swing queues the next swing in the combo. The queued swing starts when this one ends.
+    if (_isAttackAnimationPlaying && _currentState == CombatState.Unsheathed)
+    {
+        SetCanStringToCombo(true);
+        _comboQueued = true;
+        return;
+    }
+
     // Check if any animation is playing that would prevent attacking
     if (_isAttackAnimationPlaying || _isSheatheAnimationPlaying || _isUnsheatheAnimationPlaying)
     {
@@ -254,6 +338,77 @@ public void HandleAttackInput()
     StartAttack();
 }
 
+// Sets the Animator bool that gates the combo. True lets a press chain into the next swing; false lets the idle exit run.
+private void SetCanStringToCombo(bool value)
+{
+    _animationController?.SetBool(_canStringToComboParam, value);
+}
+
+// Plays the next combo swing by its state name, so the chain does not depend on Animator transitions or triggers.
+// The stage moves to the swing that is now playing. Chaining stops after the last swing in the list.
+private void StartChainedSwing()
+{
+    int next = _comboStage + 1;
+    if (next >= _comboStates.Length)
+    {
+        EndCombo();
+        return;
+    }
+
+    _comboStage = next;
+    _isAttacking = true;
+    _lastAttackTime = Time.time;
+    _swingEndTime = Time.time + _swingDuration;
+
+    _animationController?.PlayState(_comboStates[_comboStage], _comboLayerIndex, _comboCrossFade);
+    _context.SetStateValue("IsAttacking", true);
+
+    if (_debugCombat)
+    {
+        Debug.Log($"[Combo] chained to {_comboStates[_comboStage]}");
+    }
+}
+
+// Starts the hold after a swing ends with nothing queued. The animator eases to the slow speed, and a press in the window continues the combo.
+private void BeginComboHold()
+{
+    _comboHolding = true;
+    _comboHoldEndsAt = Time.time + _comboHoldSeconds;
+    _animatorSpeedTarget = _comboSlowSpeed;
+}
+
+// Ends the hold. Returns the animator to normal speed, and optionally keeps it slow when a continuing press has already started.
+private void EndComboHold(bool resumeNormalSpeed)
+{
+    if (!_comboHolding) return;
+    _comboHolding = false;
+    if (resumeNormalSpeed) _animatorSpeedTarget = 1f;
+}
+
+// Ends the combo: the hold is over and no press continued it. Clears the bool so the idle exit can run.
+private void EndCombo()
+{
+    EndComboHold(resumeNormalSpeed: true);
+    SetCanStringToCombo(false);
+}
+
+// Runs every frame. Eases the animator speed toward its target on unscaled time, and ends the combo when the hold runs out.
+private void UpdateComboHold()
+{
+    if (!Mathf.Approximately(_animatorSpeed, _animatorSpeedTarget))
+    {
+        float step = Time.unscaledDeltaTime / Mathf.Max(0.01f, _comboEaseSeconds) * (1f - _comboSlowSpeed);
+        _animatorSpeed = Mathf.MoveTowards(_animatorSpeed, _animatorSpeedTarget, step);
+        _animationController?.SetAnimatorSpeed(_animatorSpeed);
+    }
+
+    if (!_comboHolding) return;
+    if (Time.time < _comboHoldEndsAt) return;
+
+    // The hold ran out with no press: the combo is over.
+    EndCombo();
+}
+
 private void StartAttack()
 {
     // Set attack state
@@ -261,11 +416,13 @@ private void StartAttack()
     _lastAttackTime = Time.time;
     _swingEndTime = Time.time + _swingDuration;
     
-    // Set animation trigger
+    // Clear any trigger left over from an attack the Animator never took, so it cannot fire later out of sequence.
     if (_animationController != null)
     {
+        _animationController.ResetTrigger(_attackTrigger);
         _animationController.SetTrigger(_attackTrigger);
     }
+    _comboStage = 0;
     
     // Set context state for other components
     _context.SetStateValue("IsAttacking", true);
@@ -409,6 +566,8 @@ private IEnumerator CompleteSheathe()
 
 private void ForceSheatheWeapon()
 {
+    EndCombo();
+
     // Reset all animation states
     _isAttackAnimationPlaying = false;
     _isSheatheAnimationPlaying = false;
@@ -457,6 +616,9 @@ private void SetCombatState(CombatState newState)
 // Cancels an attack in progress (e.g. when staggered). Safe to call when not attacking.
 public void CancelAttack()
 {
+    // A cancel ends any hold too, so the idle exit is never blocked by a stale bool.
+    EndCombo();
+
     if (!_isAttacking && !_isAttackAnimationPlaying) return;
 
     _isAttacking = false;
@@ -478,7 +640,7 @@ public bool IsSwinging()
 // Helper method to check if player is currently in an attack
 public bool IsAttacking()
 {
-    return _isAttackAnimationPlaying || IsSwinging();
+    return _isAttackAnimationPlaying || IsSwinging() || _comboHolding;
 }
 
 // Debug visualization

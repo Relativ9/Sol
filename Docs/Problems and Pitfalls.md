@@ -69,6 +69,7 @@ ProbeSkin = 0.4
 - **A partly applied edit** can leave some references converted and others not. After any rename or refactor, grep for the old name before reporting it done.
 - **"Reverted the code" did not revert the scene.** Scene and prefab files carry their own serialised values, so `git status` should be checked for `.unity` and `.prefab` changes as well as `.cs`.
 - **Keep single edits under about 6000 characters.** A larger write is rejected. Split long documents into parts.
+- **A long multi-edit script can fail partway and leave a duplicate or half-applied section.** A duplicated heading appeared in the knowledgebase this way. Check for duplicate headings after any scripted edit, and grep for the new text.
 
 ---
 
@@ -78,6 +79,41 @@ ProbeSkin = 0.4
 - **A corrupt player file loaded as an empty save**, and the next autosave overwrote the damaged file. *Fixed:* the player file is written through `AtomicFile`, and `Load` falls back to the `.bak`.
 - **A failed write was reported as a success.** `SaveService.Save` returned `void`. *Fixed:* it returns `bool`, and `SaveManager` stops before writing any cell if the player file fails.
 - **`SaveLocation.Directory` is a hard-coded personal path.** It does not follow the design doc (`persistentDataPath`) and will fail on other machines. *Open:* needs a decision on migrating existing saves.
+
+---
+
+## 4a. Silent null registrations after a script is replaced
+
+- **A deleted script leaves its scene and prefab components as Missing, and the field can still look set.** After the status refactor, the player's `Status Controller` pointed at the deleted script's GUID. `PlayerController` then registered `IStatusController` as null, with no error from the scene itself.
+  - *Symptom:* the console shows `Attempted to register null service` or a later null reference, far from the cause.
+  - *Fix:* remove the broken component, re-add the current script, and check the console on play.
+  - *Recognise it again:* a component shows "Missing Script", or a service is null after a refactor. Search the scene for the old GUID before changing code.
+
+- **A bug that looks like a scripting fault can be a setup fault.** The training dummies did not apply bleed or stagger, while the player's procs worked. Every script and asset checked out, so the setup was not the cause. The open question is whether rolls ran and missed, or never ran. The combat log settles it: check the `applied`, `resisted` and `blocked` lines during a dummy hit.
+  - *Status:* open. Left for later.
+
+---
+
+## 4b. Scene bindings to removed methods
+
+- **`UnityEvent` bindings in a scene keep the old method name after the method is removed.** `Persistant Scene.unity` still calls `SaveManager.RequestLazySave` and `RequestImmediateSave`, which no longer exist. The code compiles, so nothing warns about it.
+  - *Symptom:* a console error when the talent panel opens or closes, and no save from that trigger.
+  - *Fix:* rebind the event to `SaveManager.RequestSave` with a `SaveReason`, or remove it.
+  - *Recognise it again:* after removing or renaming a public method, search the `.unity` and `.prefab` files for its name (`m_MethodName`).
+
+---
+
+## 4c. Animator chains that race the idle exit
+
+- **A combo that exits to idle after one press, or that never chains.** Each swing's exit to idle and its chain transition were ready at the same moment, so the wrong one could win. A press could also be lost or taken twice.
+  - *Fix:* chain in code. A press plays the next state by name (`PlayState`, a crossfade on the weapon layer). The Animator only holds the three states and their idle exits, gated by `CanStringToCombo`.
+  - *Recognise it again:* two transitions from the same state, both with exit time, and a condition that differs only by a threshold. Prefer one owner for each decision.
+
+- **A bool that is cleared before the next trigger reads it.** `CanStringToCombo` was cleared in the hold end path before the chained swing started, so the chain transition saw it false. Clear a flag only when the thing it guards has really ended.
+
+- **A stage counter that moves on every call, not on every clip that plays.** Pressing a key the Animator ignored still advanced the combo, so the index climbed to 3 without swing 2 playing. Advance a counter only from the event that proves the thing happened (`OnAttackStart`).
+
+- **Log before theorising.** The `[Combo]` lines showed which branch ran in one press. Every theory before them was wrong about the order of events.
 
 ---
 

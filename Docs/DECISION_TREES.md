@@ -75,7 +75,7 @@ flowchart TD
 
 ## 4. Attack (MainHand)
 
-Source: `PlayerController.OnAttack` → `CombatStateController.HandleAttackInput`.
+Source: `PlayerController.OnAttack` → `CombatStateController.HandleAttackInput`. Hits come from the blade, not from the attack event.
 
 ```mermaid
 flowchart TD
@@ -85,20 +85,38 @@ flowchart TD
   C -- no --> X2["Ignored: wrong combat state"]
   C -- yes --> D{"Cooldown 0.8 s passed?"}
   D -- no --> X3["Ignored: on cooldown"]
-  D -- yes --> E["StartAttack:\nIsAttacking true\nattack trigger via animation controller"]
-  E --> F["Animator fires OnAttackStart"]
-  F --> G["OnAttackImpact (AttackEventHandler) [scene-wired]"]
-  G --> H{"Overlap sphere hit\nwith IDamageable?"}
-  H -- yes --> I["TakeDamage 25"]
-  H -- no --> J["No hit"]
-  I --> K["Animator fires OnAttackEnd"]
-  J --> K
-  K --> L["IsAttacking false"]
+  D -- yes --> E["StartAttack:\nIsAttacking true\nattack trigger, swing 1"]
+  E --> F["OnAttackStart: CanStringToCombo false\n(WeaponHitbox enabled)"]
+  F --> G{"Blade trigger touches\na receiver this swing?"}
+  G -- no --> H["No contact"]
+  G -- yes --> I{"Attacker combat-locked\n(e.g. staggered)?"}
+  I -- yes --> J["Contact ignored"]
+  I -- no --> K["Build one DamageInfo per part\nReceiveHit on the receiver"]
+  K --> L["OnAttackEnd\n(WeaponHitbox disabled)"]
+  H --> L
+  J --> L
+  L --> M["IsAttacking false"]
+```
+
+### 4b. Chaining a combo
+
+See `# Sol RPG — Architecture.md` §5b for the rules. In short: a press during a swing or a hold sets `CanStringToCombo` true and plays the next swing by name. A hold that times out ends the combo.
+
+```mermaid
+flowchart TD
+  A["Press during a swing"] --> B["CanStringToCombo true, queue next"]
+  B --> C["OnAttackEnd: play next swing by name"]
+  H["AttackRecovery, nothing queued"] --> I["Hold: speed eases to 10%"]
+  I --> J{"Press within hold?"}
+  J -- yes --> K["CanStringToCombo true\nEnd hold, play next swing by name"]
+  J -- no --> L["EndCombo: CanStringToCombo false, speed back to 1"]
 ```
 
 Notes:
 
-- `IDamageable` has no implementers in the code traced, so the hit branch cannot damage anything yet (finding F9).
+- Each receiver is hit once per swing. All damage parts of a weapon arrive together, so one contact is one hit set.
+- The receiver applies its own mitigation and status rolls. See `FLOWS.md` 3.5 for the sequence and `# Sol RPG — Architecture.md` §5a for the rules.
+- Non-weapon offhands, such as a shield bash, do not use this path. They will use an overlap sphere (see the Inventory & Equipment doc).
 
 ## 5. Toggle weapon (ToggleWeapon)
 
@@ -137,7 +155,7 @@ flowchart TD
   E -- yes --> F{"TalentStateService.TryAllocatePoint"}
   F -- no --> G["RefundTalentPoint\nPool restored"]
   F -- yes --> H["Points incremented\nTalent GameEvent Raise"]
-  H --> I["Scene listener: RequestLazySave [scene-wired]"]
+  H --> I["Gameplay state changes; no save on change"]
   H --> J["Refresh node visual, dependents, points label"]
 ```
 
@@ -167,7 +185,7 @@ flowchart TD
   B --> C{"Panel currently open?\n(display Flex)"}
   C -- yes --> D["Close:\nUnregisterDocument from VirtualCursor\nCamera OnActivate (lock cursor)\nDisplay None"]
   D --> E["Talent panel only: ClearUI, destroy TalentTreeController"]
-  E --> F["RequestImmediateSave via _onImmediateSaveRequest"]
+  E --> F["Panel close: scene binding to the removed save method (see Architecture §15)"]
   C -- no --> G["Open:\nSetActiveDocument on VirtualCursor\nCamera OnDeactivate (unlock cursor)\nDisplay Flex"]
   G --> H{"First open of talent panel?"}
   H -- yes --> I["Generate nodes after GeometryChanged\nAdd TalentTreeController, Initialize"]
@@ -274,25 +292,24 @@ flowchart TD
   C --> D["TalentStateService.ResetAll:\nRemoveModifiersFromSource per node\nClear allocations\nRaise talent GameEvent"]
   D --> E["Refund the same number of points to ProgressionService"]
   E --> F["Refresh visuals and points label"]
-  F --> G["No RequestImmediateSave: reset reaches disk on next save"]
+  F --> G["No save request: reset reaches disk on the next save"]
 ```
 
 ## 15. Save triggers
 
-Source: `SaveManager.RequestLazySave`, `RequestImmediateSave`, `PerformSave`.
+Source: `SaveManager.RequestSave`, `SaveCoordinator`, `AutosaveTimer`.
 
 ```mermaid
 flowchart TD
-  A["Save request"] --> B{"Which trigger?"}
-  B -- "Talent GameEvent [scene-wired]" --> C["RequestLazySave"]
-  B -- "Panel open or close [scene-wired]" --> D["RequestImmediateSave"]
-  C --> E{"Save already queued?"}
-  E -- yes --> X1["Return, one save is enough"]
-  E -- no --> F{"Time since last save < 2 s?"}
-  F -- yes --> G["Start SaveAfterDelay for the remainder"]
-  F -- no --> D
-  G --> H["Timer ends: PerformSave"]
-  D --> I["Cancel queued save, PerformSave"]
+  A["Save request: RequestSave(reason)"] --> B{"Reason?"}
+  B -- "Quicksave hotkey" --> C["SaveCoordinator"]
+  B -- "Autosave (600 s unpaused play)" --> D{"CanAutosave()?"}
+  B -- "Save and Quit / manual" --> C
+  D -- no --> X1["Autosave skipped this time"]
+  D -- yes --> C
+  C --> E{"A save already running?"}
+  E -- yes --> X2["Queued, runs after the current save"]
+  E -- no --> H["PerformSave"]
   H --> J["BuildSaveData:\nlevel, total talent points,\ntalent allocations"]
   I --> J
   J --> K["SaveService.Save(data, default)\nJsonUtility to persistentDataPath"]
@@ -322,4 +339,4 @@ flowchart TD
   J --> K["ReloadAllBaseStats, LoadData,\nTalentState.Initialize, SetSpentTalentPoints"]
 ```
 
-- `AttackEventHandler` is reachable only if a scene wires it up `[scene-wired]`.
+- `AttackEventHandler` handles the attack animation events and no longer detects hits. Its impact check was removed.

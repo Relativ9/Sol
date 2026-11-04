@@ -1,6 +1,6 @@
 # Sol: Functional Flow Map
 
-Every player input, player choice, and system that connects through them, traced from source. Companion to `ARCHITECTURE.md` (structure) and `diagrams/master.svg` (poster view).
+Every player input, player choice, and system that connects through them, traced from source. Companion to `# Sol RPG — Architecture.md` §18 (structure) and `diagrams/master.svg` (poster view).
 
 **Confidence tags**
 
@@ -135,8 +135,8 @@ flowchart LR
   TTC -->|TryAllocatePoint| TSS
   TSS -->|talent GameEvent| GL
   PS -->|attribute stats| SS
-  GL -->|RequestLazySave| SM
-  UIM -->|RequestImmediateSave on close| SM
+  GL -.->|no longer bound: see Architecture §15| SM
+  UIM -.->|no longer bound: see Architecture §15| SM
   SM --> SV --> DISK
 
   TM -->|day, season, year events| GL
@@ -256,7 +256,19 @@ sequenceDiagram
 - `CameraController.Update` returns early when `Time.timeScale == 0`, so look input stops while the game is paused `[verified]`.
 - `CameraController.OnDeactivate` unlocks the cursor. `OnActivate` locks it. `UIManager.OpenPanel` deactivates the camera, which is why the talent panel stops mouse-look.
 
-### 3.4 Weapon toggle and attack (ToggleWeapon, MainHand) `[verified]` with `[incomplete]` animation timing
+### 3.4 Weapon toggle and attack (ToggleWeapon, MainHand) `[verified]`
+
+Combo rules are in `# Sol RPG — Architecture.md` §5b. This section is the sequence only.
+
+Combo sequence `[verified]`:
+1. `OnAttack` starts a swing from idle with the `Attack` trigger, and the combo is at swing 1.
+2. `OnAttackStart` (clip start) sets `CanStringToCombo` false.
+3. A press during the swing sets `CanStringToCombo` true and queues the next swing.
+4. `AttackRecovery` (about 0.68 s) starts the hold if nothing is queued. The animator eases to 10% speed.
+5. `OnAttackEnd` plays the queued swing by name (`PlayState`), or does nothing if there is none.
+6. A press during the hold sets `CanStringToCombo` true, ends the hold, and plays the next swing by name.
+7. A hold that times out, or a cancel or forced sheathe, sets `CanStringToCombo` false and ends the combo.
+
 
 Chain: `PlayerController.OnToggleWeapon` / `OnAttack` → `CombatStateController` → animation events → state values.
 
@@ -296,8 +308,22 @@ sequenceDiagram
 ```
 
 - `CombatStateController` registers as an `IAnimationEventReceiver`, and `AnimationEventDispatcher` routes by event name `[verified]`.
-- Damage and enemy hit logic are not in this path. `IDamageable` has no implementers in the code traced, so combat results are `[incomplete]`.
+- Hit detection is not in this path. The blade's `WeaponHitbox` (a trigger on the held weapon) is enabled on the attack start event and disabled on the attack end event by `WeaponVisualManager`. Each contact calls `IDamageReceiver.ReceiveHit` once per receiver per swing. The full hit path is in section 3.5.
 - `CombatStateController.OnDeactivate` force-sheathes the weapon when movement changes to another state `[verified]`.
+
+### 3.5 Attack hit and damage path (WeaponHitbox) `[verified]`
+
+Chain: blade trigger → `WeaponHitbox` → `DamageProfileSO` / weapon data → `IDamageReceiver.ReceiveHit` → `DamageCalculator` → `StatusRoller` → `StatusController` → `IStatusTarget`.
+
+- `WeaponHitbox.OnTriggerEnter` runs only while `_swinging` is true, and only if the attacker is not combat-locked.
+- It finds the receiver with `GetComponentInParent<IDamageReceiver>()`. Each receiver is hit once per swing.
+- It builds one `DamageInfo` per damage part: the physical part first, then one per elemental part. Each part keeps its own type.
+- The receiver runs `DamageCalculator.Calculate`, which applies deflection, mitigation and status chances.
+- `StatusRoller` rolls stagger and bleed, logs each roll (applied, resisted or blocked by immunity), and calls `StatusController.Apply`.
+- `StatusController` checks immunity through its `IStatusTarget`. The player's target is `PlayerStatusAdapter`, and enemies use `TargetHealth`.
+
+`# Sol RPG — Architecture.md` §5a has the rules. This section is the sequence only.
+
 
 ## 4. Player choices: talents, attributes, and progression
 
@@ -328,7 +354,7 @@ sequenceDiagram
     TSS->>TSS: increment allocation
     TSS->>GE: Raise() (RaiseStateChanged)
     GE->>L: OnEventRaised
-    L->>SM: RequestLazySave (2 s debounce)
+    L->>SM: RequestSave(...) (queued, one save at a time)
     TTC->>TTC: UpdateNodeVisual, RefreshDependents, UpdatePointsDisplay
   else TryAllocatePoint fails
     TTC->>PS: RefundTalentPoint() (pool +1)
@@ -340,7 +366,7 @@ Remove (RMB on a node) runs `TalentTreeController.TryRemove`. It is refused when
 
 - Talent allocation spends the progression pool first. A failed state allocation refunds it. This order is the one in the code `[verified]`.
 - `TalentStateService` gets its dependencies through its constructor, not the `ServiceLocator` `[verified]`.
-- Save wiring: the scene binds `SaveManager.RequestLazySave` and `RequestImmediateSave` `[scene-wired]`. The talent `GameEvent`'s listener is not in code, so the listener binding was not confirmed `[scene-wired]`.
+- Save wiring: `Persistant Scene.unity` still binds `SaveManager.RequestLazySave` and `RequestImmediateSave`, which no longer exist. See Architecture §15. The talent `GameEvent`'s listener is not in code, so the listener binding was not confirmed `[scene-wired]`.
 
 ### 4.2 Talent panel open and close (K) `[verified]`
 
@@ -363,12 +389,12 @@ sequenceDiagram
     UIM->>CC: OnDeactivate() (unlock cursor)
     UIM->>UIM: display Flex, first open: InitializeTalentPanel
     UIM->>TTC: AddComponent and Initialize (after GeometryChanged)
-    UIM->>SM: RequestImmediateSave()
+    UIM->>SM: (bound in scene, see Architecture §15)
   else panel open, closing
     UIM->>VC: UnregisterDocument(document)
     UIM->>CC: OnActivate() (lock cursor)
     UIM->>UIM: display None, ClearUI, destroy TalentTreeController
-    UIM->>SM: RequestImmediateSave via _onImmediateSaveRequest
+    UIM->>SM: (bound in scene, see Architecture §15)
   end
   UIM->>TM: TogglePause() (both directions)
 ```
@@ -572,12 +598,7 @@ sequenceDiagram
   participant SV as SaveService
   participant FS as JSON file
 
-  alt lazy trigger (talent change) [scene-wired]
-    TRG->>SM: RequestLazySave()
-    SM->>SM: if within 2 s of last save, start SaveAfterDelay
-  else immediate trigger (panel open or close, UI) [scene-wired]
-    TRG->>SM: RequestImmediateSave()
-  end
+  Note over TRG,SM: Gameplay does not save on change. The next quicksave or autosave writes the state.
   SM->>SM: PerformSave
   SM->>TSS: GetAllocatedNodeIds, GetAllocatedPoints
   SM->>PS: GetLevel, GetTotalTalentPoints
@@ -585,7 +606,7 @@ sequenceDiagram
   SV->>FS: write JSON to Application.persistentDataPath
 ```
 
-- `SaveManager.RequestLazySave` returns early when a save is already queued, and runs `RequestImmediateSave` when the debounce interval has passed `[verified]`.
+- `SaveManager.RequestSave` hands the request to `SaveCoordinator`, which runs one save at a time and queues requests made during a save. Autosave runs on `AutosaveTimer` (600 s of unpaused play). `[verified]`
 - `SaveService.Save` logs and swallows write errors (`Failed to save`) `[verified]`. The player is not told.
 - `SaveService.Delete` is called on a forced new game and by `DeleteSaveDebug` `[verified]`.
 
@@ -620,11 +641,11 @@ Documented only. None were fixed. "Needs editor check" items depend on Unity exe
 | F2 | Physics | Four components write to one Rigidbody: `Jumping`, `Movement`, `GravityController`, and `PlayerController.ApplyMovement`. Final velocity depends on order. | `Jumping.cs:141,165,181`, `Movement.cs:272-341`, `GravityController.cs:87,96`, `PlayerController.cs:339` | Documented |
 | F3 | Environment | Gravity and speed triggers call `other.GetComponent<IPlayerContext>()`, which only finds the component on the collider's own GameObject. If the collider is on a child, the modifier silently never applies. | `Modifier_GravityMultiplierTrigger.cs:44-50`, `Modifier_MovementSpeedBoost.cs` OnTriggerEnter | Needs editor check |
 | F4 | Jumping | Dead coroutines: `ResetJumpTrigger` and `ResetDoubleJumpTrigger` are defined and never started. `ClearJumpPriority` duplicates `ClearJumpPriorityAfterDelay`. | `Jumping.cs:203-220` | Documented |
-| F5 | Saving | `GameInitializer` comment says to wire `SaveManager.QueueSave()`, but no such method exists. The scene binds `RequestLazySave`. | `GameInitializer.cs:89` | Documented (stale comment) |
+| F5 | Saving | The scene binds `RequestLazySave` and `RequestImmediateSave`, which were removed when saving moved to `SaveCoordinator`. The bindings fail at runtime. See Architecture §15. | `GameInitializer.cs:89` | Documented (stale comment) |
 | F6 | Save data | `BuildSaveData` writes only level, total talent points, and talent allocations. Attribute allocations, vitals (`currentHealth`, `currentEnergy`), and equipment fields are never written during play. | `SaveManager.cs:74-95`, `PlayerSaveData.cs` | Documented |
 | F7 | Progression | `ProgressionService.TrySpendAttributePoint` and `TryRefundAttributePoint` have no callers, so attribute spending is not reachable from the UI. | Grep across `Assets/` | Documented |
 | F8 | Talents | Talent node stat effects are not applied anywhere in the code traced. `TalentStateService` tracks points and raises an event, but nothing turns an allocated node into a `StatModifier`. | `TalentStateService.cs`, grep for `ApplyModifier` callers | Needs check (may be in node data code not traced) |
-| F9 | Combat | `IDamageable` has one caller (`AttackEventHandler.CheckForHits`) and no implementers in the code. Attacks cannot damage anything yet. `AttackEventHandler` has no other references, so it depends on scene wiring. | `AttackEventHandler.cs:140`, grep for `IDamageable` | Documented |
+| F9 | Combat | Resolved. The old overlap-sphere path (`AttackEventHandler.CheckForHits`, `IDamageable`) was removed. Hits now come from the blade's `WeaponHitbox` through `IDamageReceiver`. | `WeaponHitbox.cs`, `AttackEventHandler.cs:116` | Resolved |
 | F10 | State | `IsStunned` and `IsInWater` are read by `Movement.CanBeActivated` but never set in the code traced. | `Movement.cs:91-92` | Documented |
 | F11 | Gravity | `GravityController` keeps an internal gravity scale and uses it when falling, while the stats `GravityMultiplier` is applied on top. Comments say stats are not involved in that decision. | `GravityController.cs:25-26,76-82` | Documented |
 | F12 | Reset | Talent reset refunds the pool and calls `ResetAll`, but does not request a save. Reset state persists only on the next save trigger. | `TalentTreeController.cs` reset method | Documented |
@@ -633,7 +654,7 @@ Documented only. None were fixed. "Needs editor check" items depend on Unity exe
 
 ## 10. Validation
 
-- Method and class names were checked with grep against source. Callers of `IDamageable`, `TrySpendAttributePoint`, `TryRefundAttributePoint`, `ResetAll`, `SetStateValue("IsInWater")`, and `SetStateValue("IsStunned")` were checked. The results support F7, F8, F9, and F10 as written.
+- Method and class names were checked with grep against source. Callers of `TrySpendAttributePoint`, `TryRefundAttributePoint`, `ResetAll`, `SetStateValue("IsInWater")`, and `SetStateValue("IsStunned")` were checked. The results support F7, F8, F9, and F10 as written.
 - Scene bindings were checked by grepping `Persistant Scene.unity` for `m_MethodName`. Other scenes were not checked.
 - All Mermaid blocks in this file were rendered with `@mermaid-js/mermaid-cli@11` and a headless Chrome shell. Each rendered with exit 0 and no error text in the log.
 
@@ -644,4 +665,4 @@ Documented only. None were fixed. "Needs editor check" items depend on Unity exe
 - Talent node data and the layout generator (`TalentTreeGenerator`, `RadialTreeGenerator`, `TreeLayoutSO`).
 - Tooltip system and the full UI Toolkit layout.
 - Scene-specific listeners, UnityEvents, and trigger colliders beyond `Persistant Scene.unity`.
-- Enemy behavior beyond the `IDamageable` interface.
+- Enemy behavior beyond the `IDamageReceiver` interface (enemy AI and attacks).

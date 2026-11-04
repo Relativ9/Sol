@@ -18,6 +18,16 @@ namespace Sol
         // attunement only, not with Melee Damage.
         public const float ElementalAttunementScale = 0.2f;
 
+        // Named children of the held weapon. Any weapon that has them works. Found once, when the weapon is built.
+        public const string TipName = "Tip";
+        public const string GripName = "Grip";
+
+        /// <summary>The blade's tip, where the strike should land. Null if the weapon has no child named Tip.</summary>
+        public Transform Tip { get; private set; }
+
+        /// <summary>The grip, where the hand holds the weapon. Null if the weapon has no child named Grip.</summary>
+        public Transform Grip { get; private set; }
+
         private readonly HashSet<IDamageReceiver> _hitThisSwing = new HashSet<IDamageReceiver>();
         private IStatsService _stats;
         private IStatusController _status;
@@ -38,6 +48,19 @@ namespace Sol
             _collider = GetComponent<Collider>();
             _collider.isTrigger = true;
             _collider.enabled = false;
+
+            Tip = FindChild(TipName);
+            Grip = FindChild(GripName);
+            if (Tip == null || Grip == null)
+                Debug.LogWarning($"[{nameof(WeaponHitbox)}] '{name}' needs child transforms named '{TipName}' and '{GripName}' " +
+                                 "for the swing reach. Without them the arm will not reach toward the aim.", this);
+        }
+
+        private Transform FindChild(string childName)
+        {
+            foreach (Transform t in GetComponentsInChildren<Transform>(true))
+                if (t != transform && t.name == childName) return t;
+            return null;
         }
 
         // Opens the hitbox for a swing. Clears the list so this swing can hit each receiver once.
