@@ -660,7 +660,7 @@ Documented only. None were fixed. "Needs editor check" items depend on Unity exe
 
 ## 11. Not covered in depth
 
-- Weapon data and visuals (`WeaponDataSO`, `WeaponRigController`, `WeaponVisualManager`, `ActiveEquipment`).
+- Weapon data and visuals (`WeaponDataSO`, `WeaponVisualManager`, `ActiveEquipment`). `WeaponRigController` was removed Nov 2026; attacks now use animation-driven motion.
 - Inventory and equipment runtime.
 - Talent node data and the layout generator (`TalentTreeGenerator`, `RadialTreeGenerator`, `TreeLayoutSO`).
 - Tooltip system and the full UI Toolkit layout.

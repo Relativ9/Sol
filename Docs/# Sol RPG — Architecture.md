@@ -163,9 +163,8 @@ This is a status board for re-orientation after a break.
 
 Open items, carried into Phase 8:
 1. Set bonuses for full plate, flex and cloth (see the armour doc).
-2. Player weapon swings need attack animations to be fully tested. The next step is an IK swing prototype (§5a).
-3. The temporary harnesses come out once animations exist. The swing path itself stays.
-4. Second and third swings: not built. Needs the prototype first.
+2. Player weapon swings use custom Blender animations. Animation Rigging procedural reach and `SwingReach` were removed Nov 2026. Attacks are now 100% driven by animation clips, with no IK adjustments.
+3. Second and third swings are chained via `ComboSystem` (in place). All three attack clips play back-to-back if inputs chain within the hold window.
 
 Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
 
@@ -1224,7 +1223,7 @@ The character pipeline is working end to end, and Phase 7 (damage and status) is
 - Set bonuses for full plate, flex and cloth (dodge, spell power, mobility). They need the set system and the talent layer.
 
 ### After Phase 8
-- **Swing prototype (next).** An IK-driven forward slash on the held weapon, with the arm solved by Two Bone IK and the blade angle set by an override rotation. Timing and the hitbox window come from code. Second and third swings are parameters of the same path, after the first one works in first person.
+- **Swing system (complete).** Attacks use custom Blender animations played through `ComboSystem`. Three swings chain on input timing (hold window). Animation Rigging IK reach (`SwingReach`, `WeaponRigController`, `ChainIKConstraint`) was removed Nov 2026 after testing showed custom animations are faster to iterate and look better.
 - **Phase 9: Enemies & Actors.** `ActorStatSO` is in place. Next: enemy prefabs with `StatusController` and `TargetHealth`, and real mitigation. Enemy AI is a separate task.
 - **Phase 10: Main Menu.** Separate scene, New Game / Continue / Load, and a full character round-trip check.
 
@@ -1282,7 +1281,7 @@ PLAYER (PlayerController implements IPlayerContext)
   Locomotion          Movement, Jumping, GravityController, GroundChecker,
                       CameraController, PlayerAnimationController
   Combat              CombatStateController, AnimationEventDispatcher, WeaponHitbox,
-                      WeaponVisualManager, WeaponRigController
+                      WeaponVisualManager, ComboSystem
   Status              StatusController (shared), PlayerStatusAdapter (plain C#)
   Modifiers           Modifier_MovementSpeedBoost, Modifier_GravityDirectionZone,
                       Modifier_GravityMultiplierTrigger (use IStatsService)

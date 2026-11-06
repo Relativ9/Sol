@@ -154,6 +154,39 @@ The collision hook covers bodies that are hit. A body that starts moving without
 ---
 
 
+---
+
+## 7. Animation Rigging IK reach abandoned for clip-driven motion
+
+### Symptom
+- A procedurally-solved swing arm looked stiff, restricted, and unnatural.
+- Tuning the IK weights, blend speeds, and rotation envelopes did not produce satisfying motion.
+- The system was complex: two separate IK constraints (idle hand, swing hand), two Rigs (one for idle, one for swing), a rotation envelope that faded over the swing, and a Chain IK solver trying to steer the whole arm toward an aim point.
+
+### Root cause
+Animation Rigging solvers are built for idle poses (hand placement on a gun, a sword hilt). They are not designed to drive dynamic motion over time with artistic control. The animator's pose is not a target—the motion is.
+
+### Decision
+Remove all procedural reach code (`SwingReach`, `WeaponRigController`, `ChainIKConstraint`, `SwingRig`) and drive attacks entirely from Blender animation clips. This gives:
+- Full artistic control over arm path and timing.
+- The hand and blade move together as authored.
+- No fighting between multiple solvers or rigs.
+- Faster iteration on feel.
+
+### Code changes (November 2026)
+- **Deleted:** `SwingReach.cs`, `WeaponRigController.cs`, `ISwingReach.cs`
+- **Removed from:** `CombatStateController` (`.Begin()` / `.End()` calls), `WeaponVisualManager` (`.SetWeapon()` calls), `PlayerController` (service registration)
+- **Scene cleanup needed:** Delete `OneHandedRigs` hierarchy (all IK constraints), delete `SwingReach` and `WeaponRigController` components from Player, remove all `Rig` components.
+
+### What remains
+- `ComboSystem` chains attack inputs. Three swings are separate animation clips, played sequentially if inputs chain within the hold window.
+- `CombatStateController` manages state and animation layer weights (no IK, just animator state).
+- `WeaponVisualManager` shows/hides the weapon and moves it between hand and back mounts.
+- `WeaponHitbox` detects blade hits (position and orientation from the animated blade).
+
+### Recognise it again
+If procedural motion feels wooden or limited, animated motion will feel better. Use the animator's tools (curves, tweaking keyframes) rather than trying to tune IK parameters. The tradeoff: no procedural adjustments mid-swing (like real-time aim following); the full swing is authored.
+
 ## Checklist for the next problem
 
 - [ ] Check `git status` for changes in `.cs`, `.unity` and `.prefab` files.
