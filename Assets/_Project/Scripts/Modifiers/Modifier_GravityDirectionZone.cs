@@ -27,7 +27,7 @@ namespace Sol
         {
             _statsService = ServiceLocator.Get<IStatsService>();
             // Generate unique zone ID for debugging
-            _zoneId = $"GravityZone_{gameObject.name}_{gameObject.GetInstanceID()}";
+            _zoneId = $"GravityZone_{gameObject.name}_{gameObject.GetEntityId()}";
             
             // Initialize zone effects
             if (_zoneEffect != null)

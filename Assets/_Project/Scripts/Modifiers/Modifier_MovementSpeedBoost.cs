@@ -32,7 +32,7 @@ namespace Sol
             // Generate a source ID if needed
             if (string.IsNullOrEmpty(_sourceId) || _generateUniqueId)
             {
-                _sourceId = $"SpeedBoostPad_{gameObject.GetInstanceID()}";
+                _sourceId = $"SpeedBoostPad_{gameObject.GetEntityId()}";
             }
 
             Debug.Log($"SpeedBoostPad initialized with sourceId: {_sourceId}");

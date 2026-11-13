@@ -33,7 +33,7 @@ namespace Sol
             // Generate a source ID if none is set manually
             if (string.IsNullOrEmpty(_sourceId) || _generateUniqueId)
             {
-                _sourceId = $"GravityModifier_{gameObject.GetInstanceID()}";
+                _sourceId = $"GravityModifier_{gameObject.GetEntityId()}";
             }
             
             Debug.Log($"Gravity Modifier initialized with sourceId: {_sourceId}");

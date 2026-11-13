@@ -12,9 +12,9 @@ namespace Sol
         void SetBool(string paramName, bool value);
         void SetFloat(string paramName, float value);
         void SetInteger(string paramName, int value);
-        /// <summary>Sets the animator's playback speed. 1 is normal, lower is slower. Used for the combo hold.</summary>
-        void SetAnimatorSpeed(float speed);
-        /// <summary>Crossfades a layer straight into a named state. Used to chain combo swings without an Animator transition.</summary>
-        void PlayState(string stateName, int layerIndex, float crossFadeSeconds);
+        /// <summary>Sets the weight of an animator layer (0 = off, 1 = full strength).</summary>
+        void SetLayerWeight(int layerIndex, float weight);
+        /// <summary>Gets the current weight of an animator layer.</summary>
+        float GetLayerWeight(int layerIndex);
     }
 }

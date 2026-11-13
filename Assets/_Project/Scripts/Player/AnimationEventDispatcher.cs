@@ -16,10 +16,15 @@ namespace Sol
         }
         
         // Unity calls animation events as messages, by function name, on the object that owns the Animator. These are the names
-        // the attack clip uses, so each forwards to the receivers registered for that name.
+        // the clips use, so each forwards to the receivers registered for that name. Every event used by any clip needs its own
+        // wrapper here, otherwise it will not appear in the Animation window's Function dropdown.
         public void OnAttackStart() => DispatchAnimationEvent("OnAttackStart");
         public void OnAttackEnd() => DispatchAnimationEvent("OnAttackEnd");
         public void AttackRecovery() => DispatchAnimationEvent("AttackRecovery");
+        public void OnBeginSheathe() => DispatchAnimationEvent("OnBeginSheathe");
+        public void OnSheatheWeapon() => DispatchAnimationEvent("OnSheatheWeapon");
+        public void OnBeginUnsheathe() => DispatchAnimationEvent("OnBeginUnsheathe");
+        public void OnDrawWeapon() => DispatchAnimationEvent("OnDrawWeapon");
 
         // Called by Animation Events
         public void DispatchAnimationEvent(string eventName)

@@ -180,12 +180,90 @@ Remove all procedural reach code (`SwingReach`, `WeaponRigController`, `ChainIKC
 
 ### What remains
 - `ComboSystem` chains attack inputs. Three swings are separate animation clips, played sequentially if inputs chain within the hold window.
-- `CombatStateController` manages state and animation layer weights (no IK, just animator state).
+- `CombatStateController` manages combat state and sets Animator parameters only. It does not force states or layer weights.
 - `WeaponVisualManager` shows/hides the weapon and moves it between hand and back mounts.
 - `WeaponHitbox` detects blade hits (position and orientation from the animated blade).
 
 ### Recognise it again
 If procedural motion feels wooden or limited, animated motion will feel better. Use the animator's tools (curves, tweaking keyframes) rather than trying to tune IK parameters. The tradeoff: no procedural adjustments mid-swing (like real-time aim following); the full swing is authored.
+
+## 8. Attack 1 cut short by an exit transition with no exit time
+
+### Symptom
+- Attack 1 stopped partway through its clip and snapped to idle or the next state.
+- It happened only when the combo gate (`CanStringToCombo`) was false.
+
+### Cause
+The Attack 1 exit transition had `HasExitTime: 0` with the condition `IfNot CanStringToCombo`. The transition fired on the first frame the gate was false, so the clip never reached its end.
+
+### Fix
+In `Player.controller`, Attack 1's exit has `HasExitTime: 1` and `ExitTime: 1`, so the clip plays to completion before the exit is checked.
+
+### Recognise it again
+- The clip is shorter in play than in the Animation window, and the cut happens at the same point every time.
+- Check the exit transition's `HasExitTime` and `ExitTime` before changing any code.
+
+---
+
+## 9. Forced state calls skipped the Animator's transitions
+
+### Symptom
+- Attack 2 appeared with no transition from Attack 1.
+- Animation timing did not match the Animator's transitions.
+
+### Cause
+`PlayerAnimationController` had `PlayState` and `SetAnimatorSpeed`, which C# used to force a state or change speed. These bypassed the Animator's transitions and conditions.
+
+### Fix
+Removed `PlayState` and `SetAnimatorSpeed` from `IAnimationController` and `PlayerAnimationController`. C# now only sets parameters (`Attack` trigger, `CanStringToCombo` bool), and the Animator decides which state plays.
+
+### Recognise it again
+- A state starts with no matching transition in the Animator. Search for `Play(` or `CrossFade` calls in C#.
+
+---
+
+## 10. Animation event with a blank function name
+
+### Symptom
+- Unity logged "no function name" when the clip played.
+
+### Cause
+A clip event in `1Handed_Idle.fbx.meta` had an empty `functionName`.
+
+### Fix
+Removed the blank event from the `.meta` file.
+
+### Recognise it again
+- The error names a clip, not a script. Search the clip's `.meta` for `functionName:` and check for an empty value.
+
+---
+
+## 11. Hold window races with the combo gate
+
+### Symptom
+- A chained press was lost, or the gate stayed open after a swing with the hold disabled.
+
+### Cause
+- `OnAttackEnd` cleared `CanStringToCombo` on the same frame as Attack 1's exit. A press that should chain could be lost.
+- With the hold disabled, a press during the swing set the gate to true, and nothing closed it afterwards.
+
+### Fix
+- `OnAttackEnd` no longer clears the gate. `OnAttackStart` clears it.
+- With the hold disabled, a press during the swing is ignored, so the gate is never opened.
+- The hold check uses `IsPressWindowOpen`, so a press during the start delay does not chain.
+
+### Recognise it again
+- A combo works one time and then stops, or a swing chains when it should not. Trace each write to `CanStringToCombo` and check the order of animation events and the Animator transition.
+
+---
+
+## 12. Tooling traps in the terminal and the editor
+
+- **zsh expands `!`** in double-quoted or unquoted strings, which breaks commands that contain `!u!` or similar. Use `set +H` or write the script with single quotes.
+- **Editor `new_text` limit:** the editor rejects text over about 6000 characters. Split large files into several edits or write them in parts.
+- **Stub compile checks:** a glob such as `PlayerInterfaces/*.cs` pulls in unrelated interfaces that need types you have not stubbed. Include only the files the code under test uses.
+
+---
 
 ## Checklist for the next problem
 

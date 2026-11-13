@@ -263,26 +263,36 @@ namespace Sol
             }
         }
         
-        public void SetAnimatorSpeed(float speed)
-        {
-            if (_animator != null)
-            {
-                _animator.speed = speed;
-            }
-        }
-
-        public void PlayState(string stateName, int layerIndex, float crossFadeSeconds)
-        {
-            if (_animator == null) return;
-            _animator.CrossFade(stateName, Mathf.Max(0f, crossFadeSeconds), layerIndex, 0f);
-        }
-
         public void SetInteger(string paramName, int value)
         {
             if (_animator != null)
             {
                 _animator.SetInteger(paramName, value);
             }
+        }
+        
+        /// <summary>
+        /// Sets the weight of an animator layer (0 = off, 1 = full strength).
+        /// Used to control which layers contribute to the final animation.
+        /// </summary>
+        public void SetLayerWeight(int layerIndex, float weight)
+        {
+            if (_animator != null && layerIndex >= 0 && layerIndex < _animator.layerCount)
+            {
+                _animator.SetLayerWeight(layerIndex, Mathf.Clamp01(weight));
+            }
+        }
+        
+        /// <summary>
+        /// Gets the current weight of an animator layer.
+        /// </summary>
+        public float GetLayerWeight(int layerIndex)
+        {
+            if (_animator != null && layerIndex >= 0 && layerIndex < _animator.layerCount)
+            {
+                return _animator.GetLayerWeight(layerIndex);
+            }
+            return 0f;
         }
         
         // Called when the component is disabled

@@ -28,7 +28,7 @@ namespace Sol
             _target = target;
             _camera = Camera.main;
 
-            _bar = new VisualElement { name = $"world-hp-{target.GetInstanceID()}" };
+            _bar = new VisualElement { name = $"world-hp-{target.GetEntityId()}" };
             _bar.pickingMode = PickingMode.Ignore;
             _bar.style.position = Position.Absolute;
             _bar.style.width = _barWidth;

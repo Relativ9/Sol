@@ -11,7 +11,7 @@ namespace Sol
         [SerializeField] private float _sheatheTime = 0.5f;
         [SerializeField] private bool _debugCombat = true;
         private bool _isFirstUnsheathe = true;
-        
+
         [Header("Attack Settings")]
         [SerializeField] private float _attackCooldown = 0.8f;
         [SerializeField] private string _attackTrigger = "Attack";
@@ -19,26 +19,23 @@ namespace Sol
         [Header("Combo")]
         [Tooltip("Animator bool. True from the start of a swing until its hold ends. The idle exits need it false.")]
         [SerializeField] private string _canStringToComboParam = "CanStringToCombo";
-        [Tooltip("Animator state names for the combo swings, in order. A press in the hold plays the next one by name.")]
-        [SerializeField] private string[] _comboStates = { "Melee Combo Attack 1", "Melee Combo Attack 2", "Melee Combo Attack 3" };
-        [Tooltip("Animator layer the combo states live on (the weapon layer).")]
-        [SerializeField] private int _comboLayerIndex = 1;
-        [Tooltip("Seconds of crossfade when a press chains into the next swing.")]
-        [SerializeField] private float _comboCrossFade = 0.05f;
-        [Tooltip("Seconds the swing eases down to the slow speed after it ends, waiting for the next press. A press in this time continues the combo.")]
-        [SerializeField] private float _comboHoldSeconds = 1f;
-        [Tooltip("Animator speed during the hold. 0.1 is 10% speed. The swing eases down to it rather than stopping.")]
-        [Range(0.01f, 1f)] [SerializeField] private float _comboSlowSpeed = 0.1f;
-        [Tooltip("Seconds the speed takes to ease between normal and the slow hold speed.")]
-        [SerializeField] private float _comboEaseSeconds = 0.25f;
+        [Tooltip("Turns the post-swing hold window on. Off: a press only counts during the swing itself, and CanStringToCombo is cleared when the swing ends.")]
+        [SerializeField] private bool _comboHoldEnabled = false;
+        [Tooltip("Seconds after a swing's recovery that a press still continues the combo. Past this, CanStringToCombo is set false and the swing exits to idle.")]
+        [Min(0f)] [SerializeField] private float _comboHoldSeconds = 1f;
+        [Tooltip("Dead time in seconds after the swing's recovery before the hold window opens. A press during this time does not continue the combo.")]
+        [Min(0f)] [SerializeField] private float _comboHoldStartDelay = 0f;
 
-        private bool _comboHolding;
-        private float _comboHoldEndsAt = -10f;
-        private float _animatorSpeed = 1f;
-        private float _animatorSpeedTarget = 1f;
-        private bool _comboQueued;
-        private int _comboStage = 0; // index into _comboStates of the swing that is running, or -1 when none
-        
+        [Header("Debug Time")]
+        [Tooltip("Slows the game clock so the swing can be watched. Affects everything that uses Time.deltaTime, and the hold and cooldown timers, which run in game time.")]
+        [SerializeField] private bool _useDebugTimeScale = false;
+        [Tooltip("Time.timeScale while the debug slow-motion is on. 1 is normal speed.")]
+        [Range(0.05f, 1f)] [SerializeField] private float _debugTimeScale = 0.25f;
+        private bool _ownsTimeScale = false;
+
+        // Owns the combo hold window. The Animator plays the swings and decides transitions from the parameters set here.
+        private CombatStateMachine _combatStateMachine;
+
         [Header("Animation Events")]
         [SerializeField] private string _attackStartEvent = "OnAttackStart";
         [SerializeField] private string _attackEndEvent = "OnAttackEnd";
@@ -48,23 +45,23 @@ namespace Sol
         [SerializeField] private string _sheatheWeaponEvent = "OnSheatheWeapon";
         [SerializeField] private string _beginUnsheatheEvent = "OnBeginUnsheathe";
         [SerializeField] private string _drawWeaponEvent = "OnDrawWeapon";
-        
+
         // Dependencies
         private IPlayerContext _context;
         private IAnimationController _animationController;
         private IStatusController _status;
         private IEquipmentService _equipment;
         private AnimationEventDispatcher _eventDispatcher;
-        
+
         // State
         private CombatState _currentState = CombatState.Sheathed;
         private Coroutine _stateTransitionCoroutine;
-        
+
         // Animation state tracking
         private bool _isAttackAnimationPlaying = false;
         private bool _isSheatheAnimationPlaying = false;
         private bool _isUnsheatheAnimationPlaying = false;
-        
+
         // Attack state
         private bool _isAttacking = false;
         private float _lastAttackTime = -10f;
@@ -76,21 +73,23 @@ namespace Sol
                  "After this window, a stale attack flag can no longer block input.")]
         [SerializeField] private float _swingDuration = 1f;
         private float _swingEndTime = -10f;
-        
+
         public void Initialize(IPlayerContext context)
         {
             _context = context;
-            
+
             _animationController = context.GetService<IAnimationController>();
             _status = context.GetService<IStatusController>();
             _equipment = ServiceLocator.TryGet<IEquipmentService>();
-            
+
             if (_animationController == null)
             {
                 Debug.LogError("Animation Controller not found! Combat animations won't work.");
             }
-            
-            
+
+            _combatStateMachine = new CombatStateMachine(_comboHoldSeconds, _comboHoldStartDelay);
+            _combatStateMachine.OnHoldExpired += () => SetCanStringToCombo(false);
+
             // Find the animator component
             Animator animator = GetComponentInChildren<Animator>();
             if (animator == null)
@@ -98,7 +97,7 @@ namespace Sol
                 Debug.LogError("No Animator found in children! Animation events won't work.");
                 return;
             }
-            
+
             // Find or create the animation event dispatcher
             _eventDispatcher = animator.gameObject.GetComponent<AnimationEventDispatcher>();
             if (_eventDispatcher == null)
@@ -106,7 +105,7 @@ namespace Sol
                 _eventDispatcher = animator.gameObject.AddComponent<AnimationEventDispatcher>();
                 _eventDispatcher.Initialize(context);
             }
-            
+
             // Register for animation events
             _eventDispatcher.RegisterReceiver(this, _attackStartEvent);
             _eventDispatcher.RegisterReceiver(this, _attackEndEvent);
@@ -115,24 +114,62 @@ namespace Sol
             _eventDispatcher.RegisterReceiver(this, _sheatheWeaponEvent);
             _eventDispatcher.RegisterReceiver(this, _beginUnsheatheEvent);
             _eventDispatcher.RegisterReceiver(this, _drawWeaponEvent);
-            
+
             // Initialize in sheathed state
             SetCombatState(CombatState.Sheathed);
-            
+
             if (_context != null)
             {
                 _context.SetStateValue("IsWeaponDrawn", false);
                 _context.SetStateValue("CombatState", (int)CombatState.Sheathed);
             }
-            
+
             _isFirstUnsheathe = true;
-        
+
             Debug.Log("Combat State Controller initialized in Sheathed state");
         }
-        
+
         private void Update()
         {
-            UpdateComboHold();
+            _combatStateMachine?.UpdateComboHoldTimer();
+        }
+
+        private void Start()
+        {
+            ApplyDebugTimeScale();
+        }
+
+        // Applies the debug slow-motion live when the Inspector value changes during Play Mode.
+        private void OnValidate()
+        {
+            if (!Application.isPlaying) return;
+            ApplyDebugTimeScale();
+        }
+
+        private void OnDisable()
+        {
+            RestoreTimeScale();
+        }
+
+        private void ApplyDebugTimeScale()
+        {
+            if (_useDebugTimeScale)
+            {
+                Time.timeScale = _debugTimeScale;
+                _ownsTimeScale = true;
+            }
+            else
+            {
+                RestoreTimeScale();
+            }
+        }
+
+        // Only restores the clock if this controller changed it, so it never undoes a pause set elsewhere.
+        private void RestoreTimeScale()
+        {
+            if (!_ownsTimeScale) return;
+            Time.timeScale = 1f;
+            _ownsTimeScale = false;
         }
 
         // IAnimationEventReceiver implementation
@@ -142,8 +179,7 @@ namespace Sol
             {
                 Debug.Log($"Combat controller received animation event: {eventName}");
             }
-            
-            // Handle attack events
+
             if (eventName == _attackStartEvent)
             {
                 _isAttackAnimationPlaying = true;
@@ -156,36 +192,22 @@ namespace Sol
                 _swingEndTime = -10f; // The clip has finished, so the hand is held again at once, not when the timer runs out.
                 _isAttacking = false;
                 _context.SetStateValue("IsAttacking", false);
-                
+
                 if (_debugCombat)
                 {
                     Debug.Log("Attack completed");
                 }
 
-                // A press during the swing continues the combo straight into the next clip, with no pause.
-                if (_comboQueued)
-                {
-                    _comboQueued = false;
-                    StartChainedSwing();
-                }
-                else
-                {
-                    // Nothing queued. The hold already started at AttackRecovery.
-                }
+                _combatStateMachine?.EndSwing();
             }
             else if (eventName == _attackRecoveryEvent)
             {
-                // The strike is done and the blade is returning. Decide here: a queued press continues the combo,
-                // otherwise hold now, before the clip exits to idle.
-                if (_comboQueued)
+                // The strike is done and the blade is returning. The hold window opens here, unless a press already arrived.
+                if (_comboHoldEnabled)
                 {
-                    // The queued swing starts at OnAttackEnd, so nothing to do yet. Keep the queue for that event.
-                    return;
+                    _combatStateMachine?.BeginComboHold();
                 }
-
-                BeginComboHold();
             }
-            // Handle sheathe/unsheathe events
             else if (eventName == _beginSheatheEvent)
             {
                 _isSheatheAnimationPlaying = true;
@@ -203,19 +225,19 @@ namespace Sol
                 _isUnsheatheAnimationPlaying = false;
             }
         }
-        
+
         public bool CanBeActivated()
         {
             // Combat controller can always be active
             return true;
         }
-        
+
         public void OnActivate()
         {
             // Nothing special needed when activated
             Debug.Log("Combat controller activated");
         }
-        
+
         public void OnDeactivate()
         {
             // Force sheathe weapon when deactivated
@@ -223,440 +245,382 @@ namespace Sol
             {
                 ForceSheatheWeapon();
             }
-            
+
             // Unregister from animation events
             if (_eventDispatcher != null)
             {
                 _eventDispatcher.UnregisterAllEvents(this);
             }
-            
+
             Debug.Log("Combat controller deactivated");
         }
-        
+
         public void ToggleWeaponState()
-{
-    // Check if any animation is playing that would prevent toggling
-    if (_isAttackAnimationPlaying || _isSheatheAnimationPlaying || _isUnsheatheAnimationPlaying)
-    {
-        if (_debugCombat)
         {
-            Debug.Log("Cannot toggle weapon during animation");
+            // Check if any animation is playing that would prevent toggling
+            if (_isAttackAnimationPlaying || _isSheatheAnimationPlaying || _isUnsheatheAnimationPlaying)
+            {
+                if (_debugCombat)
+                {
+                    Debug.Log("Cannot toggle weapon during animation");
+                }
+                return;
+            }
+
+            // Only allow toggling if we're in a stable state
+            if (_currentState == CombatState.Sheathed || _currentState == CombatState.Unsheathed)
+            {
+                if (_currentState == CombatState.Sheathed)
+                {
+                    UnsheatheWeapon();
+                }
+                else
+                {
+                    SheatheWeapon();
+                }
+            }
+            else
+            {
+                Debug.Log($"Cannot toggle weapon during state: {_currentState}");
+            }
         }
-        return;
-    }
-    
-    // Only allow toggling if we're in a stable state
-    if (_currentState == CombatState.Sheathed || _currentState == CombatState.Unsheathed)
-    {
-        if (_currentState == CombatState.Sheathed)
+
+        public bool IsWeaponDrawn()
         {
-            UnsheatheWeapon();
+            return _currentState != CombatState.Sheathed && _currentState != CombatState.Sheathing;
         }
-        else
+
+        public void HandleAttackInput()
         {
-            SheatheWeapon();
+            // A combat lock (e.g. stagger) blocks new attacks until it ends.
+            if (_status != null && _status.IsCombatLocked)
+            {
+                return;
+            }
+
+            // An attack whose end event never arrived (the Animator left the state early) must not block input forever.
+            // Once its swing window has passed, the attack is over, whatever the animation did.
+            if (_isAttackAnimationPlaying && Time.time >= _swingEndTime)
+            {
+                _isAttackAnimationPlaying = false;
+                _isAttacking = false;
+                _context.SetStateValue("IsAttacking", false);
+            }
+
+            // A press during a swing or the hold only opens the gate. The Animator decides whether the next swing plays.
+            // A press that lands outside the hold leaves the gate closed, so the swing exits to idle.
+            if (_isAttackAnimationPlaying && _currentState == CombatState.Unsheathed)
+            {
+                // With the hold off, a press during the swing must not open the gate. Nothing would close it afterwards.
+                if (!_comboHoldEnabled) return;
+
+                SetCanStringToCombo(true);
+                _combatStateMachine?.RegisterPress();
+                return;
+            }
+
+            // A press in the hold counts only once the start delay has passed.
+            if (_combatStateMachine != null && _combatStateMachine.IsPressWindowOpen)
+            {
+                SetCanStringToCombo(true);
+                _combatStateMachine.RegisterPress();
+                return;
+            }
+
+            // Check if any animation is playing that would prevent attacking
+            if (_isAttackAnimationPlaying || _isSheatheAnimationPlaying || _isUnsheatheAnimationPlaying)
+            {
+                if (_debugCombat)
+                {
+                    Debug.Log("Cannot attack during animation");
+                }
+                return;
+            }
+
+            // Only allow attacks when weapon is drawn and in the unsheathed state
+            if (_currentState != CombatState.Unsheathed)
+            {
+                if (_debugCombat)
+                {
+                    Debug.Log($"Cannot attack in state: {_currentState}");
+                }
+                return;
+            }
+
+            // Check cooldown
+            float timeSinceLastAttack = Time.time - _lastAttackTime;
+            if (timeSinceLastAttack < _attackCooldown)
+            {
+                if (_debugCombat)
+                {
+                    Debug.Log($"Attack on cooldown for {_attackCooldown - timeSinceLastAttack:F2} more seconds");
+                }
+                return;
+            }
+
+            // Start attack
+            StartAttack();
         }
-    }
-    else
-    {
-        Debug.Log($"Cannot toggle weapon during state: {_currentState}");
-    }
-}
 
-public bool IsWeaponDrawn()
-{
-    return _currentState != CombatState.Sheathed && _currentState != CombatState.Sheathing;
-}
-
-public void HandleAttackInput()
-{
-    // A combat lock (e.g. stagger) blocks new attacks until it ends.
-    if (_status != null && _status.IsCombatLocked)
-    {
-        return;
-    }
-
-    // An attack whose end event never arrived (the Animator left the state early) must not block input forever.
-    // Once its swing window has passed, the attack is over, whatever the animation did.
-    if (_isAttackAnimationPlaying && Time.time >= _swingEndTime)
-    {
-        _isAttackAnimationPlaying = false;
-        _isAttacking = false;
-        _context.SetStateValue("IsAttacking", false);
-    }
-
-    // A press during the hold continues the combo straight away: the animator returns to normal speed and the next swing starts.
-    if (_comboHolding)
-    {
-        // A press opens the combo, then the next swing plays by name.
-        SetCanStringToCombo(true);
-        EndComboHold(resumeNormalSpeed: true);
-        StartChainedSwing();
-        return;
-    }
-
-    // A press during a swing queues the next swing in the combo. The queued swing starts when this one ends.
-    if (_isAttackAnimationPlaying && _currentState == CombatState.Unsheathed)
-    {
-        SetCanStringToCombo(true);
-        _comboQueued = true;
-        return;
-    }
-
-    // Check if any animation is playing that would prevent attacking
-    if (_isAttackAnimationPlaying || _isSheatheAnimationPlaying || _isUnsheatheAnimationPlaying)
-    {
-        if (_debugCombat)
+        // Sets the Animator bool that gates the combo. True lets a press chain into the next swing; false lets the idle exit run.
+        private void SetCanStringToCombo(bool value)
         {
-            Debug.Log("Cannot attack during animation");
+            _animationController?.SetBool(_canStringToComboParam, value);
         }
-        return;
-    }
-    
-    // Only allow attacks when weapon is drawn and in the unsheathed state
-    if (_currentState != CombatState.Unsheathed)
-    {
-        if (_debugCombat)
+
+        // Ends the combo: the hold is over and no press continued it. Clears the bool so the idle exit can run.
+        private void EndCombo()
         {
-            Debug.Log($"Cannot attack in state: {_currentState}");
+            _combatStateMachine?.EndCombo();
+            SetCanStringToCombo(false);
         }
-        return;
-    }
-    
-    // Check cooldown
-    float timeSinceLastAttack = Time.time - _lastAttackTime;
-    if (timeSinceLastAttack < _attackCooldown)
-    {
-        if (_debugCombat)
+
+        private void StartAttack()
         {
-            Debug.Log($"Attack on cooldown for {_attackCooldown - timeSinceLastAttack:F2} more seconds");
+            // Set attack state
+            _isAttacking = true;
+            _lastAttackTime = Time.time;
+            _swingEndTime = Time.time + _swingDuration;
+
+            // Clear any trigger left over from an attack the Animator never took, so it cannot fire later out of sequence.
+            if (_animationController != null)
+            {
+                _animationController.ResetTrigger(_attackTrigger);
+                _animationController.SetTrigger(_attackTrigger);
+            }
+
+            _combatStateMachine?.StartNewCombo();
+
+            // Set context state for other components
+            _context.SetStateValue("IsAttacking", true);
+
+            if (_debugCombat)
+            {
+                Debug.Log("Starting attack");
+            }
         }
-        return;
+
+        public CombatState GetCurrentCombatState()
+        {
+            return _currentState;
+        }
+
+        // A one-handed loadout is a one-handed weapon in the main hand and nothing in the off hand. Anything else is not one-handed,
+        // so the one-handed grip never plays for it.
+        private bool IsOneHandedLoadout()
+        {
+            if (_equipment == null) return false;
+
+            if (_equipment.GetEquipped(EquipmentSlot.MainHand) is not WeaponDataSO weapon) return false;
+            if (weapon.weaponSize != WeaponSize.OneHanded) return false;
+
+            return _equipment.GetEquipped(EquipmentSlot.Offhand) == null;
+        }
+
+        private void UnsheatheWeapon()
+        {
+            if (_currentState != CombatState.Sheathed)
+            {
+                Debug.LogWarning($"Cannot unsheathe from state: {_currentState}");
+                return;
+            }
+
+            // Start transition to unsheathed state
+            SetCombatState(CombatState.Unsheathing);
+
+            // The one-handed grip layer only turns on for a real one-handed loadout. The animator is told the truth
+            // about the equipment, so the grip never plays with nothing in the hand.
+            bool oneHanded = IsOneHandedLoadout();
+            if (_animationController != null)
+            {
+                _animationController.SetTrigger("Unsheathe");
+                _animationController.SetBool("OneHanded", oneHanded);
+                _animationController.SetBool("TwoHanded", false);
+            }
+
+            if (_debugCombat)
+            {
+                Debug.Log($"Unsheathing. One-handed loadout: {oneHanded}");
+            }
+
+            // Start coroutine to complete unsheathing after animation time
+            if (_stateTransitionCoroutine != null)
+            {
+                StopCoroutine(_stateTransitionCoroutine);
+            }
+
+            _stateTransitionCoroutine = StartCoroutine(CompleteUnsheathe());
+
+            // Update context state
+            _context.SetStateValue("IsWeaponDrawn", true);
+        }
+
+        private IEnumerator CompleteUnsheathe()
+        {
+            yield return new WaitForSeconds(_unsheatheTime);
+
+            // Complete transition to unsheathed state
+            _isUnsheatheAnimationPlaying = false;
+            SetCombatState(CombatState.Unsheathed);
+
+            if (_debugCombat)
+            {
+                Debug.Log("Weapon fully unsheathed");
+            }
+
+            _stateTransitionCoroutine = null;
+        }
+
+        private void SheatheWeapon()
+        {
+            if (_currentState != CombatState.Unsheathed)
+            {
+                Debug.LogWarning($"Cannot sheathe from state: {_currentState}");
+                return;
+            }
+
+            // Start transition to sheathed state
+            SetCombatState(CombatState.Sheathing);
+
+            // Set animation parameters
+            if (_animationController != null)
+            {
+                _animationController.SetTrigger("Sheathe");
+            }
+
+            // Start coroutine to complete sheathing after animation time
+            if (_stateTransitionCoroutine != null)
+            {
+                StopCoroutine(_stateTransitionCoroutine);
+            }
+
+            _stateTransitionCoroutine = StartCoroutine(CompleteSheathe());
+
+            // Update context state
+            _context.SetStateValue("IsWeaponDrawn", false);
+
+            if (_debugCombat)
+            {
+                Debug.Log("Sheathing weapon");
+            }
+        }
+
+        private IEnumerator CompleteSheathe()
+        {
+            // Wait for sheathe animation to complete
+            yield return new WaitForSeconds(_sheatheTime);
+
+            // Complete transition to sheathed state
+            _isSheatheAnimationPlaying = false;
+            SetCombatState(CombatState.Sheathed);
+
+            // Reset weapon type booleans in animator
+            if (_animationController != null)
+            {
+                _animationController.SetBool("OneHanded", false);
+                _animationController.SetBool("TwoHanded", false);
+            }
+
+            if (_debugCombat)
+            {
+                Debug.Log("Weapon fully sheathed");
+            }
+
+            _stateTransitionCoroutine = null;
+        }
+
+        private void ForceSheatheWeapon()
+        {
+            EndCombo();
+
+            // Reset all animation states
+            _isAttackAnimationPlaying = false;
+            _isSheatheAnimationPlaying = false;
+            _isUnsheatheAnimationPlaying = false;
+            _isAttacking = false;
+
+            // Immediately set to sheathed state without animation
+            SetCombatState(CombatState.Sheathed);
+
+            // Reset all weapon type booleans
+            if (_animationController != null)
+            {
+                _animationController.SetBool("OneHanded", false);
+                _animationController.SetBool("TwoHanded", false);
+            }
+
+            // Update context state
+            _context.SetStateValue("IsWeaponDrawn", false);
+            _context.SetStateValue("IsAttacking", false);
+
+            if (_debugCombat)
+            {
+                Debug.Log("Weapon forcibly sheathed");
+            }
+
+            // Stop any ongoing transitions
+            if (_stateTransitionCoroutine != null)
+            {
+                StopCoroutine(_stateTransitionCoroutine);
+                _stateTransitionCoroutine = null;
+            }
+        }
+
+        private void SetCombatState(CombatState newState)
+        {
+            _currentState = newState;
+            _context.SetStateValue("CombatState", (int)newState);
+
+            if (_debugCombat)
+            {
+                Debug.Log($"Combat state changed to: {newState}");
+            }
+        }
+
+        // Cancels an attack in progress (e.g. when staggered). Safe to call when not attacking.
+        public void CancelAttack()
+        {
+            // A cancel ends any hold too, so the idle exit is never blocked by a stale bool.
+            EndCombo();
+
+            if (!_isAttacking && !_isAttackAnimationPlaying) return;
+
+            _isAttacking = false;
+            _isAttackAnimationPlaying = false;
+            _context.SetStateValue("IsAttacking", false);
+
+            if (_debugCombat)
+            {
+                Debug.Log("Attack cancelled");
+            }
+        }
+
+        // True for the swing window that starts when an attack begins. Driven by time, not animation events, because the clip has none.
+        public bool IsSwinging()
+        {
+            return Time.time < _swingEndTime;
+        }
+
+        // Helper method to check if player is currently in an attack
+        public bool IsAttacking()
+        {
+            return _isAttackAnimationPlaying || IsSwinging() || (_combatStateMachine?.IsComboHolding ?? false);
+        }
+
+        // Debug visualization
+        private void OnGUI()
+        {
+            if (!_debugCombat) return;
+
+            GUILayout.BeginArea(new Rect(10, 60, 300, 200));
+
+            GUILayout.Label($"Combat State: {_currentState}");
+            GUILayout.Label($"Attack Animation: {_isAttackAnimationPlaying}");
+            GUILayout.Label($"Sheathe Animation: {_isSheatheAnimationPlaying}");
+            GUILayout.Label($"Unsheathe Animation: {_isUnsheatheAnimationPlaying}");
+            GUILayout.Label($"Last Attack Time: {_lastAttackTime:F2}, Cooldown: {_attackCooldown:F2}");
+
+            GUILayout.EndArea();
+        }
     }
-    
-    // Start attack
-    StartAttack();
-}
-
-// Sets the Animator bool that gates the combo. True lets a press chain into the next swing; false lets the idle exit run.
-private void SetCanStringToCombo(bool value)
-{
-    _animationController?.SetBool(_canStringToComboParam, value);
-}
-
-// Plays the next combo swing by its state name, so the chain does not depend on Animator transitions or triggers.
-// The stage moves to the swing that is now playing. Chaining stops after the last swing in the list.
-private void StartChainedSwing()
-{
-    int next = _comboStage + 1;
-    if (next >= _comboStates.Length)
-    {
-        EndCombo();
-        return;
-    }
-
-    _comboStage = next;
-    _isAttacking = true;
-    _lastAttackTime = Time.time;
-    _swingEndTime = Time.time + _swingDuration;
-
-    _animationController?.PlayState(_comboStates[_comboStage], _comboLayerIndex, _comboCrossFade);
-    _context.SetStateValue("IsAttacking", true);
-
-    if (_debugCombat)
-    {
-        Debug.Log($"[Combo] chained to {_comboStates[_comboStage]}");
-    }
-}
-
-// Starts the hold after a swing ends with nothing queued. The animator eases to the slow speed, and a press in the window continues the combo.
-private void BeginComboHold()
-{
-    _comboHolding = true;
-    _comboHoldEndsAt = Time.time + _comboHoldSeconds;
-    _animatorSpeedTarget = _comboSlowSpeed;
-}
-
-// Ends the hold. Returns the animator to normal speed, and optionally keeps it slow when a continuing press has already started.
-private void EndComboHold(bool resumeNormalSpeed)
-{
-    if (!_comboHolding) return;
-    _comboHolding = false;
-    if (resumeNormalSpeed) _animatorSpeedTarget = 1f;
-}
-
-// Ends the combo: the hold is over and no press continued it. Clears the bool so the idle exit can run.
-private void EndCombo()
-{
-    EndComboHold(resumeNormalSpeed: true);
-    SetCanStringToCombo(false);
-}
-
-// Runs every frame. Eases the animator speed toward its target on unscaled time, and ends the combo when the hold runs out.
-private void UpdateComboHold()
-{
-    if (!Mathf.Approximately(_animatorSpeed, _animatorSpeedTarget))
-    {
-        float step = Time.unscaledDeltaTime / Mathf.Max(0.01f, _comboEaseSeconds) * (1f - _comboSlowSpeed);
-        _animatorSpeed = Mathf.MoveTowards(_animatorSpeed, _animatorSpeedTarget, step);
-        _animationController?.SetAnimatorSpeed(_animatorSpeed);
-    }
-
-    if (!_comboHolding) return;
-    if (Time.time < _comboHoldEndsAt) return;
-
-    // The hold ran out with no press: the combo is over.
-    EndCombo();
-}
-
-private void StartAttack()
-{
-    // Set attack state
-    _isAttacking = true;
-    _lastAttackTime = Time.time;
-    _swingEndTime = Time.time + _swingDuration;
-    
-    // Clear any trigger left over from an attack the Animator never took, so it cannot fire later out of sequence.
-    if (_animationController != null)
-    {
-        _animationController.ResetTrigger(_attackTrigger);
-        _animationController.SetTrigger(_attackTrigger);
-    }
-    _comboStage = 0;
-    
-    // Set context state for other components
-    _context.SetStateValue("IsAttacking", true);
-    
-    if (_debugCombat)
-    {
-        Debug.Log("Starting attack");
-    }
-}
-
-public CombatState GetCurrentCombatState()
-{
-    return _currentState;
-}
-
-// A one-handed loadout is a one-handed weapon in the main hand and nothing in the off hand. Anything else is not one-handed,
-// so the one-handed grip never plays for it.
-private bool IsOneHandedLoadout()
-{
-    if (_equipment == null) return false;
-
-    if (_equipment.GetEquipped(EquipmentSlot.MainHand) is not WeaponDataSO weapon) return false;
-    if (weapon.weaponSize != WeaponSize.OneHanded) return false;
-
-    return _equipment.GetEquipped(EquipmentSlot.Offhand) == null;
-}
-
-private void UnsheatheWeapon()
-{
-    if (_currentState != CombatState.Sheathed)
-    {
-        Debug.LogWarning($"Cannot unsheathe from state: {_currentState}");
-        return;
-    }
-    
-    // Start transition to unsheathed state
-    SetCombatState(CombatState.Unsheathing);
-    
-    // The one-handed grip layer only turns on for a real one-handed loadout. The animator is told the truth
-    // about the equipment, so the grip never plays with nothing in the hand.
-    bool oneHanded = IsOneHandedLoadout();
-    if (_animationController != null)
-    {
-        _animationController.SetTrigger("Unsheathe");
-        _animationController.SetBool("OneHanded", oneHanded);
-        _animationController.SetBool("TwoHanded", false);
-    }
-
-    if (_debugCombat)
-    {
-        Debug.Log($"Unsheathing. One-handed loadout: {oneHanded}");
-    }
-
-    // Start coroutine to complete unsheathing after animation time
-    if (_stateTransitionCoroutine != null)
-    {
-        StopCoroutine(_stateTransitionCoroutine);
-    }
-    
-    _stateTransitionCoroutine = StartCoroutine(CompleteUnsheathe());
-    
-    // Update context state
-    _context.SetStateValue("IsWeaponDrawn", true);
-    
-}
-
-private IEnumerator CompleteUnsheathe()
-{
-    yield return new WaitForSeconds(_unsheatheTime);
-
-    // Complete transition to unsheathed state
-    _isUnsheatheAnimationPlaying = false;
-    SetCombatState(CombatState.Unsheathed);
-
-    if (_debugCombat)
-    {
-        Debug.Log("Weapon fully unsheathed");
-    }
-
-    _stateTransitionCoroutine = null;
-}
-
-private void SheatheWeapon()
-{
-    if (_currentState != CombatState.Unsheathed)
-    {
-        Debug.LogWarning($"Cannot sheathe from state: {_currentState}");
-        return;
-    }
-    
-    // Start transition to sheathed state
-    SetCombatState(CombatState.Sheathing);
-    
-    // Set animation parameters
-    if (_animationController != null)
-    {
-        _animationController.SetTrigger("Sheathe");
-    }
-    
-    // Start coroutine to complete sheathing after animation time
-    if (_stateTransitionCoroutine != null)
-    {
-        StopCoroutine(_stateTransitionCoroutine);
-    }
-    
-    _stateTransitionCoroutine = StartCoroutine(CompleteSheathe());
-    
-    // Update context state
-    _context.SetStateValue("IsWeaponDrawn", false);
-    
-    if (_debugCombat)
-    {
-        Debug.Log("Sheathing weapon");
-    }
-}
-
-private IEnumerator CompleteSheathe()
-{
-    // Wait for sheathe animation to complete
-    yield return new WaitForSeconds(_sheatheTime);
-    
-    // Complete transition to sheathed state
-    _isSheatheAnimationPlaying = false;
-    SetCombatState(CombatState.Sheathed);
-    
-    // Reset weapon type booleans in animator
-    if (_animationController != null)
-    {
-        _animationController.SetBool("OneHanded", false);
-        _animationController.SetBool("TwoHanded", false);
-        // Reset other weapon types as needed
-    }
-    
-    if (_debugCombat)
-    {
-        Debug.Log("Weapon fully sheathed");
-    }
-    
-    _stateTransitionCoroutine = null;
-}
-
-private void ForceSheatheWeapon()
-{
-    EndCombo();
-
-    // Reset all animation states
-    _isAttackAnimationPlaying = false;
-    _isSheatheAnimationPlaying = false;
-    _isUnsheatheAnimationPlaying = false;
-    _isAttacking = false;
-    
-    // Immediately set to sheathed state without animation
-    SetCombatState(CombatState.Sheathed);
-    
-    // Reset all weapon type booleans
-    if (_animationController != null)
-    {
-        _animationController.SetBool("OneHanded", false);
-        _animationController.SetBool("TwoHanded", false);
-        // Reset other weapon types as needed
-    }
-    
-    // Update context state
-    _context.SetStateValue("IsWeaponDrawn", false);
-    _context.SetStateValue("IsAttacking", false);
-    
-    if (_debugCombat)
-    {
-        Debug.Log("Weapon forcibly sheathed");
-    }
-    
-    // Stop any ongoing transitions
-    if (_stateTransitionCoroutine != null)
-    {
-        StopCoroutine(_stateTransitionCoroutine);
-        _stateTransitionCoroutine = null;
-    }
-}
-
-private void SetCombatState(CombatState newState)
-{
-    _currentState = newState;
-    _context.SetStateValue("CombatState", (int)newState);
-    
-    if (_debugCombat)
-    {
-        Debug.Log($"Combat state changed to: {newState}");
-    }
-}
-
-// Cancels an attack in progress (e.g. when staggered). Safe to call when not attacking.
-public void CancelAttack()
-{
-    // A cancel ends any hold too, so the idle exit is never blocked by a stale bool.
-    EndCombo();
-
-    if (!_isAttacking && !_isAttackAnimationPlaying) return;
-
-    _isAttacking = false;
-    _isAttackAnimationPlaying = false;
-    _context.SetStateValue("IsAttacking", false);
-
-    if (_debugCombat)
-    {
-        Debug.Log("Attack cancelled");
-    }
-}
-
-// True for the swing window that starts when an attack begins. Driven by time, not animation events, because the clip has none.
-public bool IsSwinging()
-{
-    return Time.time < _swingEndTime;
-}
-
-// Helper method to check if player is currently in an attack
-public bool IsAttacking()
-{
-    return _isAttackAnimationPlaying || IsSwinging() || _comboHolding;
-}
-
-// Debug visualization
-private void OnGUI()
-{
-    if (!_debugCombat) return;
-    
-    GUILayout.BeginArea(new Rect(10, 60, 300, 200));
-    
-    GUILayout.Label($"Combat State: {_currentState}");
-    GUILayout.Label($"Attack Animation: {_isAttackAnimationPlaying}");
-    GUILayout.Label($"Sheathe Animation: {_isSheatheAnimationPlaying}");
-    GUILayout.Label($"Unsheathe Animation: {_isUnsheatheAnimationPlaying}");
-    GUILayout.Label($"Last Attack Time: {_lastAttackTime:F2}, Cooldown: {_attackCooldown:F2}");
-    
-    GUILayout.EndArea();
-}
-}
 }
