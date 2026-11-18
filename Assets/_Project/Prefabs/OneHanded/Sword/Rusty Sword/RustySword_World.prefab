@@ -85,7 +85,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: ca614c6c716d4b59f9c1dddfbb2739e7, type: 2}
     - target: {fileID: 919132149155446097, guid: 2d19a569bf1027f64acddcd61a7b959e, type: 3}
       propertyPath: m_Name
-      value: RustySword
+      value: RustySword_World
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -147,8 +147,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2430729, y: 1.1091771, z: 0.062107094}
-  m_Center: {x: 0.00021642819, y: 0.43322974, z: -0.000000013038516}
+  m_Size: {x: 0.2430729, y: 1.1231046, z: 0.062107094}
+  m_Center: {x: 0.00021642447, y: 0.4401934, z: -0.000000013038516}
 --- !u!54 &8022220145773171833
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -43,6 +43,7 @@ namespace Sol
         [Stat(StatRole.Derived)] ProjectileDamage,
         [Stat(StatRole.Derived)] ProjectileRange,
         [Stat(StatRole.Derived)] SpellPower,
+        [Stat(StatRole.Derived)] Perception,  // Enemy vision/hearing range bonus, derived from Insight
         [Stat(StatRole.Tuning)] ArmorValue,
         [Stat(StatRole.Derived)] CritChance,
         [Stat(StatRole.Derived)] CritMultiplier,

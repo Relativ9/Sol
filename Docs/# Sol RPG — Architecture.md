@@ -164,7 +164,7 @@ This is a status board for re-orientation after a break.
 Open items, carried into Phase 8:
 1. Set bonuses for full plate, flex and cloth (see the armour doc).
 2. Player weapon swings use custom Blender animations. Animation Rigging procedural reach and `SwingReach` were removed Nov 2026. Attacks are now 100% driven by animation clips, with no IK adjustments.
-3. Second and third swings are chained via `ComboSystem` (in place). All three attack clips play back-to-back if inputs chain within the hold window.
+3. **Done (Nov 2026):** the three-swing combo is complete. `CombatStateController` reads the combo from the Animator state, queues one press per swing, and opens a hold at `AttackRecovery` that slows the rest of the swing. See §5b.
 
 Design sections (§5 to §14) describe the rules as currently understood, and are placeholders until the design bible is written.
 
@@ -285,45 +285,78 @@ Every target that can receive statuses implements `IStatusTarget`: `StatusName`,
 
 The rules for the one-handed combo. The sequence is in `FLOWS.md` 3.4, and the decision tree in `DECISION_TREES.md` 4.
 
+Status: **core complete (November 2026)**. Hold, queue and counter, with the combo state read from the Animator. Code: `CombatStateController.cs`. How it got here is in `Problems and Pitfalls.md` §15.
+
 ### Principle
-A press decides the chain. The Animator never decides it. Transitions only handle the idle exits, so a clip finishing cannot race a press.
+- **The Animator plays the swings and owns every transition.** C# never forces a state, a crossfade or `Animator.speed`. It only sets parameters.
+- **The Animator state is the source of truth for which swing is playing.** Each frame the controller reads the combo layer. Animation events are never the only signal, because a clip that is cut or blended out never fires its later events.
+- **A press is always counted, but only taken during the hold.** Pressing early queues the next swing. The chain fires once the strike is done.
 
-### Clips and states
-- Three combo states on the `WeaponLayer`: `Melee Combo Attack 1`, `2` and `3`, in `_comboStates` on `CombatStateController`.
-- Their end events are set in each clip's importer: `OnAttackStart` near the start of the strike, `AttackRecovery` where the blade returns (about 0.68 s), `OnAttackEnd` near the end.
-- The swing duration (`_swingDuration`, 1.0 s) must match the clip. It is the window after which a stale attack flag can no longer block input.
+### Animator setup (`Player.controller`, Combat layer, index 1)
+States `Melee Combo Attack 1`, `2` and `3`. All three carry the tag **`MeleeCombo`**, and their Speed Multiplier is the **`ComboSpeed`** parameter.
 
-### The bool: `CanStringToCombo`
-- **False at the start of every clip** (`OnAttackStart`). A clip always begins with the combo closed.
-- **True on a press**, and only on a press. A press during a swing or during its hold opens the combo.
-- **False when the combo ends**: the hold times out, or a cancel or forced sheathe.
-- The idle exits from every combo state require `CanStringToCombo` to be **false**, with exit time at the clip end.
+Parameters: `Attack` (trigger), `CanStringToCombo` (bool), `ComboIndex` (int), `ComboSpeed` (float, default 1), `OneHanded` (bool).
+
+| Transition | Conditions | Exit time | Duration | Interruption |
+|---|---|---|---|---|
+| Any State → Attack 1 | `OneHanded`, `Attack`, `CanStringToCombo` false, `ComboIndex` = 0 | off | 0.25 s | None |
+| Attack 1 → Attack 2 | `OneHanded`, `ComboIndex` = 2, `CanStringToCombo` true | off | **0.1** | None |
+| Attack 2 → Attack 3 | `OneHanded`, `ComboIndex` = 3, `CanStringToCombo` true | off | **0.1** | None |
+| Attack 1, 2, 3 → idle exit | `CanStringToCombo` false | 0.8 (Attacks 1, 2), 0.4 (Attack 3) | 0.3 | unchanged |
+
+- **Chain exit time is off on purpose.** `CanStringToCombo` only goes true from `AttackRecovery` on, so the strike is never cut short, even when attack is spammed.
+- **Chain blend is 0.1.** The chain fires mid-recovery, so a long blend mixes the previous swing's recovery into the next one. At 0.3 (as a fraction of the clip), Attack 2's arc dropped below the camera. See pitfalls §15.
+- **Idle exits are unchanged.** A queued press holds them closed, because they need `CanStringToCombo` false.
+
+### Clip events
+- **`AttackRecovery`** is the only event the combo uses. It opens the hold. Place it where the strike is done and the blade starts to return.
+- **`OnAttackStart` / `OnAttackEnd`** are still used by the trail (`WeaponVisualManager`) and the hitbox side (`AttackEventHandler`). The combo ignores them.
+
+### State held by the controller
+| Field | Meaning |
+|---|---|
+| `_comboActive` | True from the idle press until the combo ends. Covers the frames before swing 1 starts |
+| `_currentSwing` | The swing the Animator is playing (1 to n), read from the state. 0 when none |
+| `_comboIndex` | Mirrors `ComboIndex`. Equals `_currentSwing`, or `_currentSwing + 1` once a press is queued |
+| `_attackQueued` | One press waiting for the next swing. Only one per swing |
+| `_holdOpen` | From `AttackRecovery` for `_comboHoldSeconds`. The chain can only take the queued press while it is open |
 
 ### The sequence
-1. **Attack from idle.** `StartAttack` sets the trigger, plays swing 1 (`_comboStates[0]`), and the combo is at swing 1.
-2. **A press during the swing** sets the bool true and queues the chain. At `OnAttackEnd` the queued chain plays the next swing by name.
-3. **At `AttackRecovery`** with nothing queued, the hold starts. The animator eases to 10% speed over 0.25 s and holds for 1 s.
-4. **A press during the hold** sets the bool true, ends the hold, and plays the next swing by name.
-5. **A hold that times out** ends the combo: the bool goes false, the speed returns to normal, and the idle exit runs.
-6. **The last swing** does not chain. A press after it starts a new combo from swing 1.
+1. **Idle press** (`StartAttack`). `_comboActive` is set and the `Attack` trigger fires. `ComboIndex` stays **0**, because the entry transition requires 0.
+2. **Swing starts** (`TrackComboFromAnimator`, every frame). The combo layer is in, or blending into, a new `MeleeCombo` state, so `_currentSwing` goes up by one and `ComboIndex` is set to it. The queue clears, the hold closes and the speed returns to 1.
+3. **Press during swing N.** If nothing is queued and N is below `_comboLength`, the press is queued and `ComboIndex` goes to N+1 at once. Further presses in the same swing are ignored, so spamming cannot skip a swing. A press during the last swing does nothing.
+4. **`AttackRecovery`** (`OpenHold`). The hold opens for `_comboHoldSeconds`. The rest of the swing, up to `_holdEndNormalizedTime`, plays at the `ComboSpeed` that fills that time, capped at 1 so it only slows. If a press is queued, `CanStringToCombo` goes true and the chain fires.
+5. **Press during the hold.** It is queued and `CanStringToCombo` goes true at once, so the chain fires.
+6. **Hold ends with no press** (`CloseHold`). `ComboSpeed` goes back to 1, `CanStringToCombo` goes false, and the idle exit runs at its exit time.
+7. **Combo ends** (`EndCombo`). The combo layer is no longer in or blending into a `MeleeCombo` state. Everything clears and `ComboIndex` goes to 0. Cancel and forced sheathe do the same.
+8. **Idle press not taken.** If swing 1 has not started within 0.5 s (`MaxSwingStartWait`), the trigger is reset and the combo ends, so a press the Animator never takes cannot keep the combo active.
 
-### Why chaining is by name, not by transition
-The first version chained by Animator transition with `ComboIndex` and triggers. Each swing's exit to idle and its chain transition were both ready at the same moment, so the wrong one could win, and a press could be lost or taken twice. Playing the next state directly (`PlayState`, a short crossfade on the weapon layer) removes the race. The Animator only has to hold the three states and their idle exits.
+### Why it is built this way
+- **The counter used to follow the events.** `OnAttackEnd` reset it and `OnAttackStart` raised it. Either could be cut or blended out, which left `ComboIndex` stuck at 3 and locked out new combos.
+- **The press must not set `ComboIndex` to 1.** The entry transition requires 0, so setting 1 on the press stopped the Animator taking the trigger.
+- **The hold had to come back.** Chaining on exit time alone waited for the clip end. Chaining with no gate cut the strike short. Opening the gate at `AttackRecovery` keeps the strike whole and the chain immediate.
+- **The slow-down uses a state Speed Multiplier, not `Animator.speed`.** `Animator.speed` slows every layer, locomotion included.
 
 ### Tuning values (inspector, `CombatStateController`)
 | Value | Default | Effect |
 |---|---|---|
-| `_comboHoldSeconds` | 1.0 | How long the hold waits for a press |
-| `_comboSlowSpeed` | 0.1 | Animator speed during the hold (0.1 = 10%) |
-| `_comboEaseSeconds` | 0.25 | How long the speed takes to ease down and back up |
-| `_comboCrossFade` | 0.05 | Blend time when a press chains into the next swing |
-| `_swingDuration` | 1.0 | One swing, start to finish. Match the clip |
-| `_comboLayerIndex` | 1 | Animator layer the combo states live on |
+| `_comboLength` | 3 | Number of swings. Presses during the last one are ignored |
+| `_comboHoldSeconds` | 0.5 | Real seconds the hold lasts. Also sets how slowly the rest of the swing plays |
+| `_holdEndNormalizedTime` | 0.8 | Where in the clip the hold ends. Match it to the idle exit's exit time |
+| `_comboSpeedParam` | `ComboSpeed` | Float parameter used as the attack states' Speed Multiplier |
+| `_comboTag` | `MeleeCombo` | Tag on every combo state |
+| `_comboLayerIndex` | 1 | Animator layer of the combo states |
+| `_attackCooldown` | 0.8 (scene: 0.1) | Minimum time between idle presses |
+
+Swing length is no longer a setting. It comes from the playing clip, so each clip can have its own length. `_swingDuration` was removed.
+
+**Slow-down maths.** Speed = clip length × (`_holdEndNormalizedTime` − recovery time) ÷ `_comboHoldSeconds`, capped at 1. For a 1.96 s clip with recovery at 0.5 and the hold ending at 0.8, the stretch is about 0.59 s at normal speed. A hold of 1.2 s gives roughly 0.5× speed. A hold of 0.59 s or less plays at normal speed, and the hold ends before the idle exit.
 
 ### Known limits
-- The clips still look stiff in first person. The combo timing is solid, but the motion itself needs work (see the rig reach plan in §17).
-- The hold's slow-down is driven by `Animator.speed`, so animation events fire at the slower speed too. This is intended.
-- The weapon rig keeps the hand on while an attack or a hold is active (`IsAttacking()` includes the hold), so the arm does not drop during the slow-down.
+- `ComboSpeed` must be set as the Speed Multiplier on all three attack states. If the parameter is missing, the console warns and the hold works without slowing the swing.
+- The 0.1 chain blend is tuned for the current clips. A clip whose first frame is far from the previous swing's pose at recovery will pop. Fix that in the clip, not with a longer blend.
+- Transition Offset on the chains is 0. Any offset skips `OnAttackStart` on Attacks 2 and 3 (the event is at time 0), and the trail and hitbox depend on it.
+- The 0.5 s wait for swing 1 to start (`MaxSwingStartWait`) is a constant. A much slower entry transition would need it raised.
 
 ---
 
@@ -1223,7 +1256,7 @@ The character pipeline is working end to end, and Phase 7 (damage and status) is
 - Set bonuses for full plate, flex and cloth (dodge, spell power, mobility). They need the set system and the talent layer.
 
 ### After Phase 8
-- **Swing system (complete).** Attacks use custom Blender animations played through `ComboSystem`. Three swings chain on input timing (hold window). Animation Rigging IK reach (`SwingReach`, `WeaponRigController`, `ChainIKConstraint`) was removed Nov 2026 after testing showed custom animations are faster to iterate and look better.
+- **Swing system (complete).** Attacks use custom Blender animations. Three swings chain through `CombatStateController` (§5b): hold at `AttackRecovery`, one queued press per swing, and the counter read from the Animator state. Animation Rigging IK reach (`SwingReach`, `WeaponRigController`, `ChainIKConstraint`) was removed Nov 2026 after testing showed custom animations are faster to iterate and look better.
 - **Phase 9: Enemies & Actors.** `ActorStatSO` is in place. Next: enemy prefabs with `StatusController` and `TargetHealth`, and real mitigation. Enemy AI is a separate task.
 - **Phase 10: Main Menu.** Separate scene, New Game / Continue / Load, and a full character round-trip check.
 
@@ -1280,8 +1313,8 @@ PLAYER (PlayerController implements IPlayerContext)
                       composition root for the player (see §5)
   Locomotion          Movement, Jumping, GravityController, GroundChecker,
                       CameraController, PlayerAnimationController
-  Combat              CombatStateController, AnimationEventDispatcher, WeaponHitbox,
-                      WeaponVisualManager, ComboSystem
+  Combat              CombatStateController (combo, hold, weapon state), AnimationEventDispatcher,
+                      WeaponHitbox, WeaponVisualManager
   Status              StatusController (shared), PlayerStatusAdapter (plain C#)
   Modifiers           Modifier_MovementSpeedBoost, Modifier_GravityDirectionZone,
                       Modifier_GravityMultiplierTrigger (use IStatsService)

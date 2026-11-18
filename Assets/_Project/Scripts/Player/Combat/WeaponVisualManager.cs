@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace Sol
 {
@@ -11,7 +12,7 @@ namespace Sol
     /// </summary>
     public class WeaponVisualManager : MonoBehaviour, IPlayerComponent, IAnimationEventReceiver
     {
-        private const string TrailName = "SwingTrail";
+        private const string TrailName = "WeaponBlur";
 
         [Header("Attack Events")]
         [Tooltip("Starts the trail. Fired at the beginning of the swing.")]
@@ -20,11 +21,14 @@ namespace Sol
         [SerializeField] private string _trailEndEvent = "AttackRecovery";
 
         private AnimationEventDispatcher _eventDispatcher;
-        private TrailRenderer _trail;
+        private VisualEffect _trail;
         private WeaponHitbox _hitbox;
         private IStatsService _stats;
         private IStatusController _status;
-
+        
+        private const string TrailRateProperty = "Rate";
+        [SerializeField] private float _trailRate = 30f;
+        
         [Header("Mounts")]
         [Tooltip("Where the weapon rests while sheathed. Parent this under a spine or hip bone.")]
         [SerializeField] private Transform _backMount;
@@ -87,8 +91,9 @@ namespace Sol
             {
                 if (_trail != null)
                 {
-                    _trail.Clear();
-                    _trail.emitting = true;
+                    _trail.Reinit();
+                    _trail.SetFloat(TrailRateProperty, _trailRate);
+                  
                 }
                 _hitbox?.BeginSwing();
             }
@@ -98,8 +103,8 @@ namespace Sol
                 // Clearing removes them now, so the trail disappears when the blade reaches its resting point.
                 if (_trail != null)
                 {
-                    _trail.emitting = false;
-                    _trail.Clear();
+                    _trail.SetFloat(TrailRateProperty, 0f);
+                    _trail.Reinit();
                 }
                 _hitbox?.EndSwing();
             }
@@ -167,15 +172,16 @@ namespace Sol
         }
 
         // Finds the swing trail on the weapon. A weapon without one is allowed, and simply shows no trail.
-        private static TrailRenderer FindTrail(Transform root)
+        private static VisualEffect FindTrail(Transform root)
         {
             Transform trail = root.Find(TrailName);
             if (trail == null) trail = FindDeep(root, TrailName);
             if (trail == null) return null;
 
-            TrailRenderer renderer = trail.GetComponent<TrailRenderer>();
-            if (renderer != null) renderer.emitting = false;
-            return renderer;
+            VisualEffect effect = trail.GetComponent<VisualEffect>();
+            if (effect != null) effect.SetFloat(TrailRateProperty, 0f);
+
+            return effect;
         }
 
         private static Transform FindDeep(Transform parent, string childName)

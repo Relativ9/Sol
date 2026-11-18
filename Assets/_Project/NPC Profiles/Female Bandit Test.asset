@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d123e4252c83d7479feace7fd071ad6, type: 3}
+  m_Name: Female Bandit Test
+  m_EditorClassIdentifier: Sol_Scripts::Sol.ActorStatSO
+  brawn: 12
+  finesse: 11
+  insight: 9
+  focus: 10
+  vigor: 14
+  willpower: 8
+  baseArmorValue: 2
+  baseDeflectionChance: 0
+  baseFireResistance: 0
+  baseIceResistance: 0
+  baseVoidResistance: 0
+  baseSonicResistance: 0
+  baseSoulResistance: 0
+  baseStaggerResistance: 0
+  baseBleedResistance: 0
+  baseRigidWeight: 0
+  baseFlexWeight: 0
+  basePlateCount: 0
+  baseFlexCount: 0
+  baseClothCount: 0
+  immunities: 0
+  mainHandItem: {fileID: 11400000, guid: 2e845513eec465ad987f752f99a42587, type: 2}
+  offhandItem: {fileID: 0}
+  headItem: {fileID: 0}
+  torsoItem: {fileID: 11400000, guid: 3c8f457fb0a8c2faebb02c45a9114c33, type: 2}
+  legsItem: {fileID: 0}
+  feetItem: {fileID: 0}
+  neckItem: {fileID: 0}
+  lootTable:
+  - {fileID: 11400000, guid: b18cc801b94d161eab323a1f460476d3, type: 2}
+  disposition: -1
+  aggressiveness: 0.7
+  brawnToMeleeDamage: 0.5
+  finesseToProjectileDamage: 0.5
+  insightToSpellPower: 1
+  insightToPerception: 0.05
+  insightToCritMultiplier: 0.02
+  focusToCritChance: 0.5
+  finesseToPenetration: 1.5
+  vigorToMaxHealth: 5
+  willpowerToMaxEnergy: 3
+  minCritMultiplier: 1.2

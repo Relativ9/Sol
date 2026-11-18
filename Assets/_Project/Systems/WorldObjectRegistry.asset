@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 463950960d748e1e9aa7036dbc7a932a, type: 3}
   m_Name: WorldObjectRegistry
   m_EditorClassIdentifier: Sol_Scripts::Sol.WorldObjectRegistry
-  _nextIndex: 20
+  _nextIndex: 21
   _entries:
   - guid: 215a73347c494136a64709c728a012ae
     objectIndex: 1
@@ -89,4 +89,8 @@ MonoBehaviour:
   - guid: f5502f6890c341e7b5eaa90c622e2139
     objectIndex: 19
     itemId: shiny-dagger
+    retired: 0
+  - guid: dc16985302ac4eceb7ee0d2d379debd4
+    objectIndex: 20
+    itemId: rusty-armor
     retired: 0

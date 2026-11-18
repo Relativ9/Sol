@@ -18,7 +18,7 @@ MonoBehaviour:
   focus: 10
   vigor: 10
   willpower: 10
-  baseMoveSpeed: 6
+  baseMoveSpeed: 4
   baseDeceleration: 8
   baseCrouchSpeed: 3
   baseJumpDirectionBoost: 1

@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Sol
 {
-    public class PlayerController : MonoBehaviour, IPlayerContext
+    public class PlayerController : MonoBehaviour, IPlayerContext, IMovement
     {
 
         private Rigidbody _playerRb;
@@ -378,6 +378,9 @@ namespace Sol
         {
             return _playerRb.linearVelocity;
         }
+
+        // IMovement implementation: used by perception systems (enemies, etc.)
+        public Vector3 Velocity => _playerRb.linearVelocity;
 
         public Vector2 GetLookInput()
         {

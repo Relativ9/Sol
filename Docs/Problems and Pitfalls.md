@@ -105,6 +105,8 @@ ProbeSkin = 0.4
 
 ## 4c. Animator chains that race the idle exit
 
+> **Superseded (Nov 2026).** The fix below (chain in code with `PlayState`) was later removed. The combo now chains with Animator transitions again, gated by `ComboIndex` and `CanStringToCombo`, and reads the swing from the Animator state. See §15. The lessons about flags and counters still apply.
+
 - **A combo that exits to idle after one press, or that never chains.** Each swing's exit to idle and its chain transition were ready at the same moment, so the wrong one could win. A press could also be lost or taken twice.
   - *Fix:* chain in code. A press plays the next state by name (`PlayState`, a crossfade on the weapon layer). The Animator only holds the three states and their idle exits, gated by `CanStringToCombo`.
   - *Recognise it again:* two transitions from the same state, both with exit time, and a condition that differs only by a threshold. Prefer one owner for each decision.
@@ -179,8 +181,8 @@ Remove all procedural reach code (`SwingReach`, `WeaponRigController`, `ChainIKC
 - **Scene cleanup needed:** Delete `OneHandedRigs` hierarchy (all IK constraints), delete `SwingReach` and `WeaponRigController` components from Player, remove all `Rig` components.
 
 ### What remains
-- `ComboSystem` chains attack inputs. Three swings are separate animation clips, played sequentially if inputs chain within the hold window.
-- `CombatStateController` manages combat state and sets Animator parameters only. It does not force states or layer weights.
+- `CombatStateController` chains the three swings (separate animation clips) through Animator transitions, gated by `ComboIndex` and `CanStringToCombo` (see §15 and Architecture §5b).
+- `CombatStateController` manages combat state and sets Animator parameters only. It does not force states. It sets the weapon layer weight (§14).
 - `WeaponVisualManager` shows/hides the weapon and moves it between hand and back mounts.
 - `WeaponHitbox` detects blade hits (position and orientation from the animated blade).
 
@@ -240,6 +242,8 @@ Removed the blank event from the `.meta` file.
 
 ## 11. Hold window races with the combo gate
 
+> **Superseded (Nov 2026).** `CombatStateMachine`, `IsPressWindowOpen` and the start delay were removed. See §15 for the current design.
+
 ### Symptom
 - A chained press was lost, or the gate stayed open after a swing with the hold disabled.
 
@@ -262,6 +266,93 @@ Removed the blank event from the `.meta` file.
 - **zsh expands `!`** in double-quoted or unquoted strings, which breaks commands that contain `!u!` or similar. Use `set +H` or write the script with single quotes.
 - **Editor `new_text` limit:** the editor rejects text over about 6000 characters. Split large files into several edits or write them in parts.
 - **Stub compile checks:** a glob such as `PlayerInterfaces/*.cs` pulls in unrelated interfaces that need types you have not stubbed. Include only the files the code under test uses.
+
+---
+
+## 13. Attack hips and shoulders did not match Blender
+
+### Symptom
+- In Unity the hips and shoulders moved far less than in Blender. The attack looked stiff, and the body did not follow the swing.
+- The import window showed a long list of "has scale animation that will be discarded" and "inbetween humanoid transforms and has rotation animation that will be discarded" warnings, along with "Activate translation DOF on avatar".
+
+### Cause
+The Animation Type was Humanoid, but the Root Transform Position (Y) was not baked to the feet. The hips' vertical movement was therefore not carried into the clip, so the body had no bob or weight shift. The import warnings were a red herring. They list discarded scale and inbetween-bone rotation on Rigify `DEF-` and `ORG-` bones, and those are not the cause of the lost hip and shoulder motion.
+
+### Fix
+In the FBX import settings, Rig tab, for the attack clip (`1HandedAttack_1_r.fbx`), and the same for the idle clips:
+- **Root Transform Position (Y)**: Baked into Pose, Based Upon: **Feet**.
+- **Root Transform Position (XZ)**: Baked into Pose, Based Upon: **Center of Mass**.
+
+Translation DoF on the avatar was also checked. The Root Transform Position (Y) setting was the change that fixed it.
+
+### Recognise it again
+- The clip plays in Unity with less body movement than the same clip in Blender, while the limbs match.
+- Before blaming the rig, check the clip's **Root Transform** settings in the Animation tab of the FBX import. Do not start with the warning list.
+- Each new clip imported from Blender needs the same Root Transform settings, or the same problem returns.
+
+---
+
+## 14. Weapon layer weight stayed at 1 with no weapon in hand
+
+### Symptom
+- The weapon-layer pose (the grip and attack layers) showed with the hands empty, and the idle hand did not return to a neutral pose.
+
+### Cause
+The Combat layer in `Player.controller` has `m_DefaultWeight: 1`. Nothing in code set its weight, so it stayed at 1 whether or not a weapon was drawn. The `OneHanded` and `TwoHanded` bools were set, but the layer weight was not tied to them.
+
+### Fix
+`CombatStateController` now sets the weapon layer weight with `SetWeaponLayer(bool)`, using a serialized `_weaponLayerIndex` (default 1):
+- Set to `1` on unsheathe only when the loadout is one-handed (the same value as the `OneHanded` bool).
+- Set to `0` in Initialize, when sheathing completes, and in `ForceSheatheWeapon`.
+
+`PlayerAnimationController.SetLayerWeight` already existed and is the only path that writes the weight.
+
+### Recognise it again
+- A layer shows its pose when the weapon is not in hand. Check the layer's default weight in `Player.controller`, then grep for `SetLayerWeight`. If nothing calls it, the layer is always on.
+- Every place that sets `OneHanded` or `TwoHanded` must also set the layer weight, or the two drift apart.
+
+---
+
+## 15. Melee combo rebuild: events, counters and blends
+
+Rules and setup are in `# Sol RPG — Architecture.md` §5b. This entry records what went wrong on the way.
+
+### a. Animation events cannot be the only signal
+- **Symptom:** after some combos `ComboIndex` stayed at 3, and no new combo could start until the weapon was sheathed and drawn again.
+- **Cause:** the counter was reset in `OnAttackEnd`. Attack 3's idle exit (exit time 0.4, 0.3 s blend) leaves the state at about 0.7 of the clip, so the event at 1.0 never fired. `OnAttackStart` can be skipped the same way by a blend or an offset.
+- **Fix:** the controller reads the Combat layer every frame (`TrackComboFromAnimator`). A new `MeleeCombo` state is the next swing, and leaving the `MeleeCombo` states ends the combo. The current state, or the next state during a blend, is what counts.
+- **Recognise it again:** a value that should reset sometimes doesn't, and the event that resets it sits near the end of a clip with an exit before it.
+
+### b. The counter must match the entry condition
+- **Symptom:** `ComboIndex` went 0 → 1 for about half a second, then back to 0, and the combo only worked when attack was spammed.
+- **Cause:** the idle press set `ComboIndex` to 1, but Any State → Attack 1 requires `ComboIndex` = 0, so the Animator would not take the trigger. A timeout then reset the counter to 0, and only then did swing 1 start.
+- **Fix:** the idle press leaves `ComboIndex` at 0. It becomes 1 when the Animator is actually in Attack 1.
+- **Recognise it again:** before writing a parameter from code, check every transition that reads it on the same frame.
+
+### c. One queued press per swing
+- **Symptom:** spamming took `ComboIndex` straight to 3, so the `ComboIndex` = 2 chain never fired.
+- **Cause:** each press added 1.
+- **Fix:** only one press is queued per swing, and `ComboIndex` is set to the playing swing + 1, not incremented.
+
+### d. The chain needs a gate, and exit time is not that gate
+- **Symptom:** with the chain on exit time, a press at 50% waited until the clip had ended, about 1.4 s. The timing logs proved it: press at normalised time 0.59, chain at 0.00 of the next state. With no gate at all, a spammed press cut the strike short.
+- **Fix:** `CanStringToCombo` only goes true from `AttackRecovery` onwards (the hold), and the chain has exit time off. A press before that is queued and taken the moment the hold opens.
+- **Recognise it again:** add timestamped logs on the press and on the state change before changing Animator settings. Most of the wrong guesses in this rebuild were Animator theories that the logs ruled out.
+
+### e. Slow one state, not the Animator
+- **Symptom:** no visible slow-down in the hold. The log showed `speed 1.96`.
+- **Cause:** the speed was set so the rest of the clip fit the hold, so a short hold sped the swing up. It was also set on `Animator.speed`, which affects every layer.
+- **Fix:** speed is capped at 1, and applied through the `ComboSpeed` float as the attack states' Speed Multiplier.
+- **Note:** the slow-down is only visible when `_comboHoldSeconds` is longer than the rest of the swing at normal speed (about 0.59 s for the current clips).
+
+### f. A long chain blend dragged Attack 2's arc down
+- **Symptom:** Attack 2's swing played much lower than in the clip, mostly below the first-person camera. The clip itself was fine.
+- **Cause:** the chain fires mid-recovery, while Attack 1 is still lowering the sword. The blend was 0.3 with Fixed Duration off, so it ran for 0.3 of Attack 1's clip (about 0.59 s), which covered most of Attack 2's arc. The pose was a mix of the two clips.
+- **Fix:** chain transition duration 0.1. A duration of 0 confirmed the cause, and 0.1 keeps a little smoothing.
+- **Recognise it again:** a clip looks right on its own but wrong in the combo. Set the incoming transition's duration to 0 to test. Also check Fixed Duration: when it is off, the duration is a fraction of the source clip, not seconds.
+
+### g. Transition Offset skips events
+Left at 0. Attacks 2 and 3 have `OnAttackStart` at time 0, so any offset skips it, and the trail and hitbox depend on it. If an offset is needed later, move those events past it first.
 
 ---
 

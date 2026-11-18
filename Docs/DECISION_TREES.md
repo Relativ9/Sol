@@ -79,14 +79,16 @@ Source: `PlayerController.OnAttack` → `CombatStateController.HandleAttackInput
 
 ```mermaid
 flowchart TD
-  A["Attack pressed (started)"] --> B{"Attack, sheathe, or\ndraw animation playing?"}
+  A["Attack pressed (started)"] --> A2{"Combo active?"}
+  A2 -- yes --> X0["Combo press: see 4b"]
+  A2 -- no --> B{"Sheathe or draw\nanimation playing?"}
   B -- yes --> X1["Ignored: cannot attack during animation"]
   B -- no --> C{"State is Unsheathed?"}
   C -- no --> X2["Ignored: wrong combat state"]
-  C -- yes --> D{"Cooldown 0.8 s passed?"}
+  C -- yes --> D{"Cooldown passed?\n(_attackCooldown, scene 0.1 s)"}
   D -- no --> X3["Ignored: on cooldown"]
-  D -- yes --> E["StartAttack:\nIsAttacking true\nattack trigger, swing 1"]
-  E --> F["OnAttackStart: CanStringToCombo false\n(WeaponHitbox enabled)"]
+  D -- yes --> E["StartAttack:\ncombo active, Attack trigger\nComboIndex 0 until swing 1 starts"]
+  E --> F["OnAttackStart\n(WeaponHitbox enabled)"]
   F --> G{"Blade trigger touches\na receiver this swing?"}
   G -- no --> H["No contact"]
   G -- yes --> I{"Attacker combat-locked\n(e.g. staggered)?"}
@@ -95,21 +97,27 @@ flowchart TD
   K --> L["OnAttackEnd\n(WeaponHitbox disabled)"]
   H --> L
   J --> L
-  L --> M["IsAttacking false"]
+  L --> M["Hitbox off. IsAttacking clears when the\nCombat layer leaves the MeleeCombo states"]
 ```
 
 ### 4b. Chaining a combo
 
-See `# Sol RPG — Architecture.md` §5b for the rules. In short: a press during a swing or a hold sets `CanStringToCombo` true and plays the next swing by name. A hold that times out ends the combo.
+See `# Sol RPG — Architecture.md` §5b for the rules. In short: a press is always queued (one per swing) and sets `ComboIndex` to the next swing. The chain only takes it while the hold is open, from `AttackRecovery`. The combo ends when the Animator leaves the `MeleeCombo` states.
 
 ```mermaid
 flowchart TD
-  A["Press during a swing"] --> B["CanStringToCombo true, queue next"]
-  B --> C["OnAttackEnd: play next swing by name"]
-  H["AttackRecovery, nothing queued"] --> I["Hold: speed eases to 10%"]
-  I --> J{"Press within hold?"}
-  J -- yes --> K["CanStringToCombo true\nEnd hold, play next swing by name"]
-  J -- no --> L["EndCombo: CanStringToCombo false, speed back to 1"]
+  A["Press during swing N"] --> B{"Already queued, or N is the last swing?"}
+  B -- yes --> X["Ignored"]
+  B -- no --> C["Queue: ComboIndex = N+1"]
+  C --> D{"Hold open?"}
+  D -- yes --> E["CanStringToCombo true\nAnimator chain plays swing N+1"]
+  D -- no --> F["Wait for AttackRecovery"]
+  H["AttackRecovery"] --> I["Hold opens: ComboSpeed slows the rest of the swing"]
+  I --> J{"Press queued, or pressed during the hold?"}
+  J -- yes --> E
+  J -- no --> K["Hold ends: ComboSpeed 1, CanStringToCombo false\nIdle exit at its exit time"]
+  E --> S["New MeleeCombo state seen: swing N+1 begins"]
+  K --> L["Combat layer leaves MeleeCombo states\nEndCombo: ComboIndex 0"]
 ```
 
 Notes:

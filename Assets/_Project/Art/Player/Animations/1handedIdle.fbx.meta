@@ -19,8 +19,8 @@ ModelImporter:
     motionNodeName: 
     animationImportErrors: 
     animationImportWarnings: "\nClip 'Scene' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'DEF-spine.004' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-spine.004' has scale animation that will be discarded.\n\t'DEF-neck' has scale animation that will be discarded.\n\t'DEF-upper_arm.R' has scale animation that will be discarded.\n\t'DEF-forearm.R' has scale animation that will be discarded.\n\t'DEF-hand.R' has scale animation that will be discarded.\n\t'DEF-thigh.L' has scale animation that will be discarded.\n\t'DEF-shin.L' has scale animation that will be discarded.\n\t'DEF-foot.L' has scale animation that will be discarded.\n\t'DEF-shin.R' has scale animation that will be discarded.\n"
-    animationRetargetingWarnings: 
-    animationDoRetargetingWarnings: 0
+    animationRetargetingWarnings: "\nRetargeting quality report for clip 'Scene':\n\tLeftFoot average position error 3.0 mm and maximum position error 3.1 mm at time 2: 1 (50.5%) Frame 49\n\tRightLowerLeg average position error 2.9 mm and maximum position error 2.9 mm at time 2: 1 (50.5%) Frame 49\n\tRightFoot average position error 9.5 mm and maximum position error 9.5 mm at time 2: 1 (50.5%) Frame 49\n\tRightUpperArm average position error 1.4 mm and maximum position error 1.8 mm at time 4: 0 (100.0%) Frame 96\n\tRightLowerArm average position error 7.6 mm and maximum position error 7.9 mm at time 2: 9 (58.9%) Frame 57\n\tRightHand average position error 20.0 mm and maximum position error 20.4 mm at time 2: 2 (51.6%) Frame 50\n\tHead average position error 6.3 mm and maximum position error 6.8 mm at time 4: 0 (100.0%) Frame 96\n"
+    animationDoRetargetingWarnings: 1
     importAnimatedCustomProperties: 0
     importConstraints: 0
     animationCompression: 0
@@ -46,12 +46,12 @@ ModelImporter:
       loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
+      keepOriginalPositionY: 0
       keepOriginalPositionXZ: 0
-      heightFromFeet: 0
+      heightFromFeet: 1
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000u
       curves: []
@@ -59,7 +59,7 @@ ModelImporter:
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0.96
+      additiveReferencePoseFrame: 1
     isReadable: 0
   meshes:
     lODScreenPercentages: []

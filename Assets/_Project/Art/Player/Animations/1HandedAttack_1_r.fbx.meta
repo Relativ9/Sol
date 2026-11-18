@@ -18,8 +18,8 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Scene' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'DEF-neck' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-neck' has scale animation that will be discarded.\n\t'DEF-upper_arm.R' has scale animation that will be discarded.\n\t'DEF-forearm.R' has scale animation that will be discarded.\n\t'DEF-hand.R' has scale animation that will be discarded.\n\t'ORG-palm.02.R' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'ORG-palm.02.R' has scale animation that will be discarded.\n\t'ORG-palm.03.R' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'ORG-palm.03.R' has scale animation that will be discarded.\n\t'ORG-palm.04.R' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-thigh.L' has scale animation that will be discarded.\n\t'DEF-shin.L' has scale animation that will be discarded.\n\t'DEF-foot.L' has scale animation that will be discarded.\n\t'DEF-toe.L' has scale animation that will be discarded.\n\t'DEF-thigh.R' has scale animation that will be discarded.\n\t'DEF-shin.R' has scale animation that will be discarded.\n\t'DEF-foot.R' has scale animation that will be discarded.\n\t'DEF-toe.R' has scale animation that will be discarded.\n"
-    animationRetargetingWarnings: "\nRetargeting quality report for clip 'Scene':\n\tLeftLowerLeg average position error 5.9 mm and maximum position error 9.3 mm at time 0: 9 (17.0%) Frame 9\n\tLeftFoot average position error 19.9 mm and maximum position error 31.6 mm at time 0: 9 (17.0%) Frame 9\n\tRightLowerLeg average position error 4.4 mm and maximum position error 6.8 mm at time 0:15 (29.8%) Frame 15\n\tRightFoot average position error 14.7 mm and maximum position error 23.0 mm at time 0:15 (29.8%) Frame 15\n\tRightUpperArm average position error 0.5 mm and maximum position error 1.8 mm at time 0: 1 (0.0%) Frame 1\n\tRightLowerArm average position error 7.1 mm and maximum position error 12.7 mm at time 0: 9 (17.0%) Frame 9\n\tRightHand average position error 16.9 mm and maximum position error 22.9 mm at time 0: 6 (10.6%) Frame 6\n"
+    animationImportWarnings: "\nClip 'Scene' has import animation warnings that might lower retargeting quality:\n\t'DEF-spine.001' has scale animation that will be discarded.\n\t'DEF-spine.002' has scale animation that will be discarded.\n\t'DEF-spine.003' has scale animation that will be discarded.\n\t'DEF-neck' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-forearm.R' has scale animation that will be discarded.\n\t'DEF-hand.R' has scale animation that will be discarded.\n\t'ORG-palm.02.R' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'ORG-palm.03.R' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'ORG-palm.04.R' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-thigh.L' has scale animation that will be discarded.\n\t'DEF-shin.L' has scale animation that will be discarded.\n\t'DEF-foot.L' has scale animation that will be discarded.\n\t'DEF-thigh.R' has scale animation that will be discarded.\n\t'DEF-shin.R' has scale animation that will be discarded.\n\t'DEF-foot.R' has scale animation that will be discarded.\n"
+    animationRetargetingWarnings: "\nRetargeting quality report for clip 'Scene':\n\tLeftLowerLeg average position error 3.1 mm and maximum position error 4.0 mm at time 0: 7 (12.8%) Frame 7\n\tLeftFoot average position error 5.4 mm and maximum position error 6.7 mm at time 0: 7 (12.8%) Frame 7\n\tRightLowerLeg average position error 2.5 mm and maximum position error 4.5 mm at time 0: 9 (17.0%) Frame 9\n\tRightFoot average position error 4.2 mm and maximum position error 7.2 mm at time 0: 9 (17.0%) Frame 9\n\tLeftLowerArm average position error 0.5 mm and maximum position error 1.3 mm at time 0:21 (42.6%) Frame 21\n\tLeftHand average position error 0.8 mm and maximum position error 2.2 mm at time 0:21 (42.6%) Frame 21\n\tRightLowerArm average position error 4.4 mm and maximum position error 5.8 mm at time 0:21 (42.6%) Frame 21\n\tRightHand average position error 8.4 mm and maximum position error 14.0 mm at time 0:14 (27.7%) Frame 14\n\tHead average position error 0.5 mm and maximum position error 1.0 mm at time 0:16 (31.9%) Frame 16\n"
     animationDoRetargetingWarnings: 1
     importAnimatedCustomProperties: 0
     importConstraints: 0
@@ -45,13 +45,13 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
+      keepOriginalPositionY: 0
       keepOriginalPositionXZ: 0
-      heightFromFeet: 0
+      heightFromFeet: 1
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000u
       curves:
@@ -81,21 +81,21 @@ ModelImporter:
           postInfinity: 2
           rotationOrder: 4
       events:
-      - time: 0.072463766
+      - time: 0.086571805
         functionName: OnAttackStart
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: bda7950f28d580d489cff9ef54b03cd9, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.7504424
+      - time: 0.33457825
         functionName: AttackRecovery
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: bda7950f28d580d489cff9ef54b03cd9, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.9194049
+      - time: 0.8322148
         functionName: OnAttackEnd
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: bda7950f28d580d489cff9ef54b03cd9, type: 3}
@@ -960,7 +960,7 @@ ModelImporter:
     feetSpacing: 0
     globalScale: 1
     rootMotionBoneName: 
-    hasTranslationDoF: 0
+    hasTranslationDoF: 1
     hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: c022a376c4564f0189a46aa958f17ad3, type: 3}
@@ -975,3 +975,4 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+  script: {fileID: 21018, guid: 0000000000000000e000000000000000, type: 0}

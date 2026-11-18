@@ -23,6 +23,9 @@ namespace Sol
 
         public IReadOnlyList<StatusInstance> Active => _active;
 
+        /// <summary>Fired when a status effect is applied. Used by AI systems to react to statuses (e.g., stagger).</summary>
+        public event System.Action<IStatusEffect> StatusApplied;
+
         public bool IsMovementLocked
         {
             get
@@ -131,6 +134,9 @@ namespace Sol
                 _target?.SetAnimatorTrigger(effect.AnimatorTrigger);
 
             ServiceLocator.TryGet<ICombatLog>()?.Add($"{sourceId}: {effect.DisplayName} on {_target?.StatusName ?? name}", CombatLogKind.Warning);
+
+            // Fire event for AI systems to react
+            StatusApplied?.Invoke(effect);
         }
 
         public bool TryConsumeImpulse(out Vector3 impulse)

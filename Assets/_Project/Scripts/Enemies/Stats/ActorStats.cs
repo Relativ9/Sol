@@ -13,6 +13,8 @@ namespace Sol
         private readonly List<StatModifier> _modifiers = new List<StatModifier>();
         private readonly IStatCalculator _calculator = new StandardStatCalculator();
 
+        public ActorStatSO ActorStatSO => _base;
+
         public ActorStats(ActorStatSO baseStats)
         {
             _base = baseStats;

@@ -260,14 +260,14 @@ sequenceDiagram
 
 Combo rules are in `# Sol RPG — Architecture.md` §5b. This section is the sequence only.
 
-Combo sequence `[verified]`:
-1. `OnAttack` starts a swing from idle with the `Attack` trigger, and the combo is at swing 1.
-2. `OnAttackStart` (clip start) sets `CanStringToCombo` false.
-3. A press during the swing sets `CanStringToCombo` true and queues the next swing.
-4. `AttackRecovery` (about 0.68 s) starts the hold if nothing is queued. The animator eases to 10% speed.
-5. `OnAttackEnd` plays the queued swing by name (`PlayState`), or does nothing if there is none.
-6. A press during the hold sets `CanStringToCombo` true, ends the hold, and plays the next swing by name.
-7. A hold that times out, or a cancel or forced sheathe, sets `CanStringToCombo` false and ends the combo.
+Combo sequence `[verified in play, Nov 2026]`:
+1. `OnAttack` from idle calls `StartAttack`. The combo becomes active and the `Attack` trigger fires. `ComboIndex` stays 0, because the entry transition into Attack 1 requires it.
+2. Every frame, `TrackComboFromAnimator` reads the Combat layer (or the state it is blending into). A new `MeleeCombo` state is the next swing, and `ComboIndex` is set to its number.
+3. A press during swing N queues swing N+1, and `ComboIndex` becomes N+1 at once. Only one press is queued per swing. A press during the last swing is ignored.
+4. `AttackRecovery` opens the hold for `_comboHoldSeconds`. `ComboSpeed` slows the rest of the swing to fill it. If a press is queued, `CanStringToCombo` goes true and the Animator's chain transition (exit time off, 0.1 blend) plays the next swing.
+5. A press during the hold sets `CanStringToCombo` true at once, so the chain plays.
+6. A hold that ends with no press resets `ComboSpeed` to 1 and `CanStringToCombo` to false, and the idle exit runs at its exit time.
+7. When the Combat layer leaves the `MeleeCombo` states, the combo ends and `ComboIndex` goes to 0. Cancel and forced sheathe do the same. `OnAttackStart` and `OnAttackEnd` are not used by the combo, only by the trail and the hitbox.
 
 
 Chain: `PlayerController.OnToggleWeapon` / `OnAttack` → `CombatStateController` → animation events → state values.
